@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 
 namespace MineSweeper;
-
+/// <summary>
+/// The Main  App File
+/// </summary>
 public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
