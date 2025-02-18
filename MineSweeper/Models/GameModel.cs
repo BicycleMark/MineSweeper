@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -21,7 +22,7 @@ public partial class GameModel : ObservableObject
 
     [ObservableProperty] private GameEnums.GameStatus _gameStatus;
 
-    [ObservableProperty] private ObservableCollection<SweeperItem> _items;
+    [ObservableProperty] private ObservableCollection<SweeperItem>? _items;
 
     public SweeperItem this[int row, int column]
     {
@@ -29,10 +30,34 @@ public partial class GameModel : ObservableObject
         private set => Items[row * Columns + column] = value;
     }
 
+    public GameModel()
+    {
+        
+    }
     public GameModel(int rows = 10, int columns = 10, int mines = 10)
     {
         _rows = rows;
         _columns = columns;
+        _gameTime = 0;
+        _gameStatus = GameEnums.GameStatus.NotStarted;
+        _items = new ObservableCollection<SweeperItem>();
+        _mines = mines;
+
+        for (var i = 0; i < rows; i++)
+        {
+            for (var j = 0; j < columns; j++)
+            {
+                _items.Add(new SweeperItem());
+            }
+        }
+    }
+
+    public GameModel(GameEnums.GameDifficulty gameDifficulty)
+    {
+        var (rows, columns, mines) = GameConstants.GameLevels[gameDifficulty];
+        _rows = rows;
+        _columns = columns;
+        _mines = mines;
         _gameTime = 0;
         _gameStatus = GameEnums.GameStatus.NotStarted;
         _items = new ObservableCollection<SweeperItem>();
@@ -44,34 +69,55 @@ public partial class GameModel : ObservableObject
                 _items.Add(new SweeperItem());
             }
         }
+        
+    }
+    public GameModel(string jsonFile)
+    {
+        var gameModel = JsonSerializer.Deserialize<GameModel>(jsonFile);
+        if (gameModel != null)
+        {
+            _rows = gameModel.Rows;
+            _columns = gameModel.Columns;
+            _mines = gameModel.Mines;
+            _gameTime = gameModel.GameTime;
+            _gameStatus = gameModel.GameStatus;
+            _items = gameModel.Items;
+        }
+    }
+    
+    [RelayCommand]
+    private void SaveGame(string fileName)
+    {
+        var jsonFile = JsonSerializer.Serialize(this);
+        File.WriteAllText(fileName, jsonFile);
     }
 
 
     /// <summary>
     /// Evaluates if the Game is Won
     /// </summary>
-    /// <returns></returns>
+    /// <returns>GameStatus</returns>
     private GameEnums.GameStatus EvaluateIfWon()
     {
         if (GameStatus == GameEnums.GameStatus.InProgress)
         {
             // Linq that returns Count of all mines on the board that are not Flagged
-            var minesNotFlagged = Items.Count(i => i.IsMine && !i.IsFlagged);
+            var minesNotFlagged = Items!.Count(i => i.IsMine && !i.IsFlagged);
             if (minesNotFlagged == 0)
             {
                 GameStatus = GameEnums.GameStatus.Won;
             }
             else
             {
-                GameStatus = GameEnums.GameStatus.InProgress;
+               // GameStatus = GameEnums.GameStatus.InProgress;
             }
         }
 
         return GameStatus;
     }
 
-[RelayCommand]
-    private void FlagItem(Point pt)
+    [RelayCommand]
+    private void _flagItem(Point pt)
     {
         var (row, column) = ExtractRowColTuple(pt);
 
@@ -95,7 +141,7 @@ public partial class GameModel : ObservableObject
 
     private int CountFlaggedItems()
     {
-        return Items.Count(i => i.IsFlagged);
+        return Items != null ? Items.Count(i => i.IsFlagged) : 0;
     }
 
     private static (int r, int c) ExtractRowColTuple(Point pt)
@@ -121,7 +167,7 @@ public partial class GameModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Play(Point pt)
+    private void _play(Point pt)
     {
         void InitializeGame(int rows, int columns, int mines)
         {
@@ -183,20 +229,16 @@ public partial class GameModel : ObservableObject
 
             if (GameStatus == GameEnums.GameStatus.InProgress && item.MineCount == 0)
             {
-                Play(new Point(row - 1, column - 1));
-                Play(new Point(row - 1, column));
-                Play(new Point(row - 1, column + 1));
-                Play(new Point(row, column - 1));
-                Play(new Point(row, column + 1));
-                Play(new Point(row + 1, column - 1));
-                Play(new Point(row + 1, column));
-                Play(new Point(row + 1, column + 1));
+                _play(new Point(row - 1, column - 1));
+                _play(new Point(row - 1, column));
+                _play(new Point(row - 1, column + 1));
+                _play(new Point(row, column - 1));
+                _play(new Point(row, column + 1));
+                _play(new Point(row + 1, column - 1));
+                _play(new Point(row + 1, column));
+                _play(new Point(row + 1, column + 1));
             }
-
             return;
         }
     }
 }
-
-
-

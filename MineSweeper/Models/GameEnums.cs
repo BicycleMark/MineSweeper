@@ -6,6 +6,7 @@ public class GameEnums
     {
         NotStarted,
         InProgress,
+        InPress,
         Won,
         Lost
     }
@@ -26,4 +27,12 @@ public class GameEnums
         ValidItemPlayed
         
     }
+    
+    public enum GameDifficulty
+    {
+        Easy,
+        Medium,
+        Hard
+    }
+    
 }
