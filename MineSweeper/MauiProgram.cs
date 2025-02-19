@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-
-namespace MineSweeper;
+namespace MineSweeper
+   ;
 
 public static class MauiProgram
 {
