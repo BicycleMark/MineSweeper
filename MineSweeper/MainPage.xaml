@@ -25,8 +25,32 @@
                                     MaxColumns="10" 
                                     VerticalOptions="FillAndExpand" 
                                     HorizontalOptions="FillAndExpand"
-                                    Background="Gray">
+                                    Background="Gray" Padding="2">
            
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
+            <Border StrokeThickness="2" Background="Purple">
+                <Button/>
+            </Border>
             <!--
             <Button Text="1" FontSize="Micro"/>
             <Button Text="2" FontSize="Micro"/>
