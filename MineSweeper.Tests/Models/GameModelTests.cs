@@ -111,4 +111,36 @@ public class GameModelTests
         TEST_GAME_STATUS:
         Assert.Equal(expectedStatus, game.GameStatus);
     }
+    
+    [Theory]
+    [InlineData(GameEnums.GameDifficulty.Easy)]
+    [InlineData(GameEnums.GameDifficulty.Medium)]
+    [InlineData(GameEnums.GameDifficulty.Hard)]
+    public void FlagAllMinesAndEnsureGameWasWonTest(GameEnums.GameDifficulty gd)
+    {
+        var game = new GameModel(gd);
+        // get Random index point and call Play(randomI, randomJ)
+        var random = new Random();    
+        var r = random.Next(0, game.Rows);         
+        var c = random.Next(0, game.Columns);      
+        game.PlayCommand.Execute(new Point(r,c));                      
+        
+        for (int i = 0; i < game.Rows; i++)
+        {
+            for (int j = 0; j < game.Columns; j++)
+            {
+                if (game[i,j].IsMine)
+                {
+                    if (game.GameStatus == GameEnums.GameStatus.InProgress)
+                    {
+                        game.FlagCommand.Execute(new Point(i, j));
+                        if (game.GameStatus == GameEnums.GameStatus.Won)
+                            goto ASSERT_WON;
+                    }
+                }
+            }
+        }
+        ASSERT_WON:
+        Assert.Equal(GameEnums.GameStatus.Won, game.GameStatus);
+    }
 }

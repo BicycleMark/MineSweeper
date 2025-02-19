@@ -29,6 +29,9 @@ public partial class GameModel : ObservableObject
         private set => Items[row * Columns + column] = value;
     }
 
+    /// <summary>
+    /// Default Constructor - this was added to allow for serialization
+    /// </summary>
     public GameModel()
     {
     }
@@ -116,9 +119,13 @@ public partial class GameModel : ObservableObject
     }
 
     [RelayCommand]
-    private void _flagItem(Point pt)
+    private void Flag(Point pt)
     {
         var (row, column) = ExtractRowColTuple(pt);
+        if (GameStatus == GameEnums.GameStatus.NotStarted)
+        {
+            GameStatus = GameEnums.GameStatus.InProgress;
+        }
 
         if (row < 0 || row >= Rows || column < 0 || column >= Columns)
         {
@@ -242,7 +249,6 @@ public partial class GameModel : ObservableObject
             Play(new Point(row + 1, column));
             Play(new Point(row + 1, column + 1));
         }
-
         return;
     }
 }
