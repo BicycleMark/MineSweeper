@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace MineSweeper.Models;
 
-
 public partial class GameModel : ObservableObject
 {
     [ObservableProperty] private int _rows = 10;
@@ -32,8 +31,8 @@ public partial class GameModel : ObservableObject
 
     public GameModel()
     {
-        
     }
+
     public GameModel(int rows = 10, int columns = 10, int mines = 10)
     {
         _rows = rows;
@@ -69,8 +68,8 @@ public partial class GameModel : ObservableObject
                 _items.Add(new SweeperItem());
             }
         }
-        
     }
+
     public GameModel(string jsonFile)
     {
         var gameModel = JsonSerializer.Deserialize<GameModel>(jsonFile);
@@ -84,7 +83,7 @@ public partial class GameModel : ObservableObject
             _items = gameModel.Items;
         }
     }
-    
+
     [RelayCommand]
     private void SaveGame(string fileName)
     {
@@ -109,7 +108,7 @@ public partial class GameModel : ObservableObject
             }
             else
             {
-               // GameStatus = GameEnums.GameStatus.InProgress;
+                // GameStatus = GameEnums.GameStatus.InProgress;
             }
         }
 
@@ -167,7 +166,7 @@ public partial class GameModel : ObservableObject
     }
 
     [RelayCommand]
-    private void _play(Point pt)
+    private void Play(Point pt)
     {
         void InitializeGame(int rows, int columns, int mines)
         {
@@ -197,48 +196,53 @@ public partial class GameModel : ObservableObject
                     }
                 }
             }
+        }
 
-            var (row, column) = ExtractRowColTuple(pt);
+        var (row, column) = ExtractRowColTuple(pt);
 
-            if (row < 0 || row >= Rows || column < 0 || column >= Columns)
-            {
-                return;
-            }
-
-            var item = this[row, column];
-
-            if (item.IsFlagged)
-                return;
-
-            if (item.IsRevealed)
-                return;
-
-            if (GameStatus != GameEnums.GameStatus.InProgress)
-            {
-                InitializeGame(row, column, Mines);
-            }
-
-            if (item.IsMine)
-            {
-                GameStatus = GameEnums.GameStatus.Lost;
-                item.IsRevealed = true;
-                return;
-            }
-            
-            item.IsRevealed = true;
-
-            if (GameStatus == GameEnums.GameStatus.InProgress && item.MineCount == 0)
-            {
-                _play(new Point(row - 1, column - 1));
-                _play(new Point(row - 1, column));
-                _play(new Point(row - 1, column + 1));
-                _play(new Point(row, column - 1));
-                _play(new Point(row, column + 1));
-                _play(new Point(row + 1, column - 1));
-                _play(new Point(row + 1, column));
-                _play(new Point(row + 1, column + 1));
-            }
+        if (row < 0 || row >= Rows || column < 0 || column >= Columns)
+        {
             return;
         }
+
+        var item = this[row, column];
+
+        if (item.IsFlagged)
+            return;
+
+        if (item.IsRevealed)
+            return;
+
+        if (GameStatus != GameEnums.GameStatus.InProgress)
+        {
+            InitializeGame(Rows, Columns, Mines);
+        }
+
+        if (item.IsMine)
+        {
+            GameStatus = GameEnums.GameStatus.Lost;
+            item.IsRevealed = true;
+            return;
+        }
+
+        item.IsRevealed = true;
+        if (this.GameStatus == GameEnums.GameStatus.NotStarted)
+        {
+            GameStatus = GameEnums.GameStatus.InProgress;
+        }
+
+        if (GameStatus == GameEnums.GameStatus.InProgress && item.MineCount == 0)
+        {
+            Play(new Point(row - 1, column - 1));
+            Play(new Point(row - 1, column));
+            Play(new Point(row - 1, column + 1));
+            Play(new Point(row, column - 1));
+            Play(new Point(row, column + 1));
+            Play(new Point(row + 1, column - 1));
+            Play(new Point(row + 1, column));
+            Play(new Point(row + 1, column + 1));
+        }
+
+        return;
     }
 }

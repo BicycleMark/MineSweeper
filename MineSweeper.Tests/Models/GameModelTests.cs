@@ -9,7 +9,7 @@ public class GameModelTests
     [InlineData(GameEnums.GameDifficulty.Easy)]
     [InlineData(GameEnums.GameDifficulty.Medium)]
     [InlineData(GameEnums.GameDifficulty.Hard)]
-    public void TestGameDificultyConstructor(GameEnums.GameDifficulty gd)
+    public void GameDificultyConstructorTest(GameEnums.GameDifficulty gd)
     {
         var game = new GameModel(gd);
         // TODO: Determine if we should have a GameDifficulty
@@ -22,7 +22,9 @@ public class GameModelTests
         Assert.NotNull(game.Items);
         if (game.Items != null) 
             Assert.Equal(game.Items.Count, game.Rows * game.Columns);
-        
+        // Ensure there are no mines yet in any SweeperItems
+        if (game.Items != null) 
+            Assert.DoesNotContain(game.Items, i => i.IsMine);
     }
     
     // Test the Custom Game Constructor with several different values
@@ -31,7 +33,7 @@ public class GameModelTests
     [InlineData(15, 15, 40)] // Medium
     [InlineData(20, 20, 80)] // Hard
     [InlineData(5, 5, 5)] // Custom
-    public void TestCustomGameConstructor(int rows, int columns, int mines)
+    public void CustomGameConstructorTest(int rows, int columns, int mines)
     {
         var game = new GameModel(rows, columns, mines);
         // Assert.Equal(GameEnums.GameDifficulty.Custom, game.Difficulty);
@@ -42,13 +44,17 @@ public class GameModelTests
         Assert.NotNull(game.Items);
         if (game.Items != null) 
             Assert.Equal(game.Items.Count, game.Rows * game.Columns);
+        // Ensure there are no mines yet in any SweeperItems
+        if (game.Items != null) 
+            Assert.DoesNotContain(game.Items, i => i.IsMine);
+        
     }
     
     [Theory]
     [InlineData(10, 10, 10, "SavedGame.json")]
     [InlineData(15, 15, 40, "SavedGame.json")]
     [InlineData(20, 20, 80, "SavedGame.json")]
-    public void TestSaveGameCustomConstructor(int rows, int columns, int mines, string fileName)
+    public void SaveGameCustomConstructorTest(int rows, int columns, int mines, string fileName)
     {
         var game = new GameModel(rows, columns, mines);
         game.SaveGameCommand.Execute(fileName);
@@ -67,7 +73,7 @@ public class GameModelTests
     [InlineData(GameEnums.GameDifficulty.Easy, "SavedGame.json")]
     [InlineData(GameEnums.GameDifficulty.Medium, "SavedGame.json")]
     [InlineData(GameEnums.GameDifficulty.Hard, "SavedGame.json")]
-    public void TestSaveGameDifficultyLevelConstructor
+    public void SaveGameDifficultyLevelConstructorTest
         (GameEnums.GameDifficulty gd, string fileName)
     {
         var game = new GameModel(gd);
@@ -81,5 +87,28 @@ public class GameModelTests
         Assert.NotNull(savedGame.Items);
         if (savedGame.Items != null) 
             Assert.Equal(savedGame.Items.Count, savedGame.Rows * savedGame.Columns);
+    }
+    
+    [Theory]
+    [InlineData(20, 20, 0, GameEnums.GameStatus.InProgress)]
+    [InlineData(20, 20, 1, GameEnums.GameStatus.Lost)]
+    [InlineData(20, 20, 5, GameEnums.GameStatus.Lost)]
+    public void PlayAllPiecesGameCustomConstructorTest(int rows, int columns, int mines, 
+        GameEnums.GameStatus expectedStatus)
+    {
+        var game = new GameModel(rows, columns, mines);
+        // Play all pieces
+        for (var i = 0; i < game.Rows; i++)
+        {
+            for (var j = 0; j < game.Columns; j++)
+            {
+                game.PlayCommand.Execute(new Point(i,j));
+                if (game.GameStatus != GameEnums.GameStatus.InProgress)
+                    goto TEST_GAME_STATUS;
+            }
+        }
+        
+        TEST_GAME_STATUS:
+        Assert.Equal(expectedStatus, game.GameStatus);
     }
 }
