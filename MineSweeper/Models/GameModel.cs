@@ -1,10 +1,5 @@
-using System.Collections.ObjectModel;
-using System.Text.Json;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 namespace MineSweeper.Models;
-
 public partial class GameModel : ObservableObject
 {
     [ObservableProperty] private int _rows = 10;
@@ -127,7 +122,7 @@ public partial class GameModel : ObservableObject
             GameStatus = GameEnums.GameStatus.InProgress;
         }
 
-        if (row < 0 || row >= Rows || column < 0 || column >= Columns)
+        if (!InBounds(row, column))
         {
             return;
         }
@@ -162,7 +157,7 @@ public partial class GameModel : ObservableObject
         {
             for (var j = column - 1; j <= column + 1; j++)
             {
-                if (i >= 0 && i < Rows && j >= 0 && j < Columns)
+                if (InBounds(i,j))
                 {
                     neighbors.Add(this[i, j]);
                 }
@@ -171,7 +166,7 @@ public partial class GameModel : ObservableObject
 
         return neighbors;
     }
-
+    
     [RelayCommand]
     private void Play(Point pt)
     {
@@ -207,7 +202,7 @@ public partial class GameModel : ObservableObject
 
         var (row, column) = ExtractRowColTuple(pt);
 
-        if (row < 0 || row >= Rows || column < 0 || column >= Columns)
+        if (!InBounds(row, column))
         {
             return;
         }
@@ -250,5 +245,10 @@ public partial class GameModel : ObservableObject
             Play(new Point(row + 1, column + 1));
         }
         return;
+    }
+
+    private bool InBounds(int row, int column)
+    {
+        return !(row < 0 || row >= Rows || column < 0 || column >= Columns);
     }
 }
