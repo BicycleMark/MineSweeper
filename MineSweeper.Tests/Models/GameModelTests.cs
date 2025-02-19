@@ -152,5 +152,7 @@ public class GameModelTests
         }
         ASSERT_WON:
         Assert.Equal(GameEnums.GameStatus.Won, game.GameStatus);
+        // Assert Count of flagged items = game.Mins
+        Assert.Equal(game.Mines, game.Items.Count(i => i.IsFlagged));
     }
 }
