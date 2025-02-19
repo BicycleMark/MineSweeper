@@ -67,6 +67,16 @@ public class GameModelTests
         Assert.NotNull(savedGame.Items);
         if (savedGame.Items != null) 
             Assert.Equal(savedGame.Items.Count, savedGame.Rows * savedGame.Columns);
+        
+        var constructedSavedGame = new GameModel (jsonFile);
+        Assert.NotNull(constructedSavedGame);
+        Assert.Equal(rows, constructedSavedGame.Rows);
+        Assert.Equal(columns, constructedSavedGame.Columns);
+        Assert.Equal(mines, constructedSavedGame.Mines);
+        Assert.NotNull(constructedSavedGame.Items);
+        if (constructedSavedGame.Items != null) 
+            Assert.Equal(constructedSavedGame.Items.Count, savedGame.Rows * savedGame.Columns);
+
     }
     
     [Theory]
