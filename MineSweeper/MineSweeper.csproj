@@ -69,6 +69,7 @@
 
     <ItemGroup>
         <Folder Include="ViewModels\"/>
+        <Folder Include="Views\Controls\" />
     </ItemGroup>
 
 </Project>
