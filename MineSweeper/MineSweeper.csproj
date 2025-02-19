@@ -13,7 +13,7 @@
         either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
         <!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
-        <OutputType Condition="'$(TargetFramework)' != 'net9.0'">Exe</OutputType> 
+        <OutputType Condition="'$(TargetFramework)' != 'net9.0'">Exe</OutputType>
         <OutputType Condition="'$(TargetFramework)' == 'net9.0'">Library</OutputType>
         <RootNamespace>MineSweeper</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -61,13 +61,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ViewModels\" />
+        <Folder Include="ViewModels\"/>
     </ItemGroup>
 
 </Project>

@@ -16,4 +16,6 @@ public partial class SweeperItem : ObservableObject
     private int _mineCount = 0;
     [ObservableProperty]
     private int _neighborMineCount = 0;
+    [ObservableProperty]
+    private Point _point;
 }

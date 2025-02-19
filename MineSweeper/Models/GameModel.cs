@@ -195,6 +195,7 @@ public partial class GameModel : ObservableObject
                     {
                         var neighbors = GetNeighbors(i, j);
                         it.MineCount = neighbors.Count(n => n.IsMine);
+                        it.Point = new Point(i, j);
                     }
                 }
             }
