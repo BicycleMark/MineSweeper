@@ -1,5 +1,4 @@
 namespace MineSweeper.Models;
-
 public static class GameConstants
 {
     public static readonly Dictionary
