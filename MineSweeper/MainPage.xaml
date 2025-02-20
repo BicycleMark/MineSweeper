@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MineSweeper.MainPage"
              xmlns:vm="clr-namespace:MineSweeper.Models"
+             xmlns:ctl="clr-namespace:MineSweeper.Views.Controls;assembly=MineSweeper"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:DataType="vm:GameModel"
              BindingContext="{vm:GameModel}">
@@ -15,65 +16,13 @@
         -->
     </ContentPage.Resources>
     
-    <Grid Background="lightgray" Margin="10,10">
+    <Grid x:Name="mainGrid" Background="lightgray" Margin="10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="75" />
         </Grid.RowDefinitions>
-        <toolkit:UniformItemsLayout Grid.Row="0" 
-                                    MaxRows="10" 
-                                    MaxColumns="10" 
-                                    VerticalOptions="FillAndExpand" 
-                                    HorizontalOptions="FillAndExpand"
-                                    Background="Gray" Padding="2">
-           
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <Border StrokeThickness="2" Background="Purple">
-                <Button/>
-            </Border>
-            <!--
-            <Button Text="1" FontSize="Micro"/>
-            <Button Text="2" FontSize="Micro"/>
-            <Button Text="3" FontSize="Micro"/>
-            <Button Text="4" FontSize="Micro"/>
-            <Button Text="5" FontSize="Micro"/>
-            <Button Text="6" FontSize="Micro"/>
-            <Button Text="7" FontSize="Micro"/>
-            <Button Text="8" FontSize="Micro"/>
-            <Button Text="9" FontSize="Micro"/>
-            <Button Text="10" FontSize="Micro"/>
-            <Button Text="11" FontSize="Micro"/>
-            <Button Text="12" FontSize="Micro"/>
-            <Button Text="13" FontSize="Micro"/>
-            <Button Text="14" FontSize="Micro"/>
-            <Button Text="15" FontSize="Micro"/>
-            <Button Text="16" FontSize="Micro"/>
-            <Button Text="17" FontSize="Micro"/>
-            <Button Text="18" FontSize="Micro"/>
-            <Button Text="19" FontSize="Micro"/>
-            <Button Text="20" FontSize="Micro"/>
-            -->
-        </toolkit:UniformItemsLayout>
+        <ctl:GameGrid x:Name="gameGrid" Grid.Row="0" BorderColor="Blue" BorderThickness="8" />
+        <Button Grid.Row="1" Text="New Game" Clicked="NewGame_Clicked" />
     </Grid>
 
 
