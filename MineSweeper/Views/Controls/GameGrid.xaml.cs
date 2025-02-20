@@ -75,7 +75,7 @@ public partial class GameGrid : ContentView
     }
     
 
-    public BindableProperty ColumnsProperty = BindableProperty.Create(
+    public  static BindableProperty ColumnsProperty = BindableProperty.Create(
         nameof(Columns),
         typeof(int),
         typeof(GameGrid),
