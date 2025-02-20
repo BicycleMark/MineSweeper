@@ -2,22 +2,51 @@
 namespace MineSweeper.Models;
 public partial class GameModel : ObservableObject
 {
+    /// <summary>
+    /// The Number of Rows in the Game
+    /// </summary>
     [ObservableProperty] private int _rows = 10;
-
+    
+    /// <summary>
+    /// The Number of Columns in the Game
+    /// </summary>
     [ObservableProperty] private int _columns = 10;
 
+    /// <summary>
+    /// The Number of Mines in the Game
+    /// </summary>
     [ObservableProperty] private int _mines = 10;
 
+    /// <summary>
+    /// The Number of Flagged Mines Items in the Game
+    /// </summary>
     [ObservableProperty] private int _flaggedItems = 0;
 
+    /// <summary>
+    /// The Remaining Mines left to be flagged correctly
+    /// </summary>
     [ObservableProperty] private int _remainingMines = 10;
 
+    /// <summary>
+    /// The Time since first piece was played
+    /// </summary>
     [ObservableProperty] private int _gameTime;
 
+    /// <summary>
+    /// The Game Status as defined by <sew cref="GameEnums.GameStatus"/>
+    /// </summary>
     [ObservableProperty] private GameEnums.GameStatus _gameStatus;
 
+    /// <summary>
+    /// The Collection of Sweeper Items - Game Pieces
+    /// </summary>
     [ObservableProperty] private ObservableCollection<SweeperItem>? _items;
 
+    /// <summary>
+    /// The Indexer allows for accessing the SweeperItem at a specific row and column
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="column"></param>
     public SweeperItem this[int row, int column]
     {
         get => Items[row * Columns + column];
@@ -31,6 +60,12 @@ public partial class GameModel : ObservableObject
     {
     }
 
+    /// <summary>
+    /// Custom Game Constructor
+    /// </summary>
+    /// <param name="rows">Number of rows in the game</param>
+    /// <param name="columns">Number of columns in the game</param>
+    /// <param name="mines">Number of Mines to be generated in random spots</param>
     public GameModel(int rows = 10, int columns = 10, int mines = 10)
     {
         _rows = rows;
@@ -49,6 +84,13 @@ public partial class GameModel : ObservableObject
         }
     }
 
+    
+    /// <summary>
+    /// Creates a sweeper game from a pre-defined Game Difficulty
+    /// The Rows, Columns and Mines are defined in the GameConstants
+    /// <see cref="GameConstants.GameLevels"/>
+    /// </summary>
+    /// <param name="gameDifficulty"></param>
     public GameModel(GameEnums.GameDifficulty gameDifficulty)
     {
         var (rows, columns, mines) = GameConstants.GameLevels[gameDifficulty];
@@ -68,8 +110,13 @@ public partial class GameModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Constructor that takes a JSON file and deserializes it into a GameModel
+    /// </summary>
+    /// <param name="jsonFile"></param>
     public GameModel(string jsonFile)
     {
+        
         var gameModel = JsonSerializer.Deserialize<GameModel>(jsonFile);
         if (gameModel != null)
         {
@@ -82,6 +129,10 @@ public partial class GameModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Saving the Game to a JSON file
+    /// </summary>
+    /// <param name="fileName">The file does not need to exist</param>
     [RelayCommand]
     private void SaveGame(string fileName)
     {
@@ -113,6 +164,11 @@ public partial class GameModel : ObservableObject
         return GameStatus;
     }
 
+    /// <summary>
+    /// Flags a game Piece at a specific row and column
+    /// Flagging indicates the player believes the piece is a mine
+    /// </summary>
+    /// <param name="pt"></param>
     [RelayCommand]
     private void Flag(Point pt)
     {
@@ -140,33 +196,11 @@ public partial class GameModel : ObservableObject
         EvaluateIfWon();
     }
 
-    private int CountFlaggedItems()
-    {
-        return Items != null ? Items.Count(i => i.IsFlagged) : 0;
-    }
-
-    private static (int r, int c) ExtractRowColTuple(Point pt)
-    {
-        return ((int r, int c)) (pt.X, pt.Y);
-    }
-
-    private List<SweeperItem> GetNeighbors(int row, int column)
-    {
-        var neighbors = new List<SweeperItem>();
-        for (var i = row - 1; i <= row + 1; i++)
-        {
-            for (var j = column - 1; j <= column + 1; j++)
-            {
-                if (InBounds(i,j))
-                {
-                    neighbors.Add(this[i, j]);
-                }
-            }
-        }
-
-        return neighbors;
-    }
-    
+    /// <summary>
+    /// Plays a game piece at a specific row and column
+    /// </summary>
+    /// <param name="pt">The Point to play</param>
+   
     [RelayCommand]
     private void Play(Point pt)
     {
@@ -248,6 +282,32 @@ public partial class GameModel : ObservableObject
         return;
     }
 
+    private int CountFlaggedItems()
+    {
+        return Items != null ? Items.Count(i => i.IsFlagged) : 0;
+    }
+
+    private static (int r, int c) ExtractRowColTuple(Point pt)
+    {
+        return ((int r, int c)) (pt.X, pt.Y);
+    }
+
+    private List<SweeperItem> GetNeighbors(int row, int column)
+    {
+        var neighbors = new List<SweeperItem>();
+        for (var i = row - 1; i <= row + 1; i++)
+        {
+            for (var j = column - 1; j <= column + 1; j++)
+            {
+                if (InBounds(i,j))
+                {
+                    neighbors.Add(this[i, j]);
+                }
+            }
+        }
+
+        return neighbors;
+    }
     private bool InBounds(int row, int column)
     {
         return !(row < 0 || row >= Rows || column < 0 || column >= Columns);
