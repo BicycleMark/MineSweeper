@@ -112,6 +112,7 @@ public class GameModelTests
         {
             for (var j = 0; j < game.Columns; j++)
             {
+                
                 game.PlayCommand.Execute(new Point(i,j));
                 if (game.GameStatus != GameEnums.GameStatus.InProgress)
                     goto TEST_GAME_STATUS;
@@ -126,27 +127,55 @@ public class GameModelTests
     [InlineData(GameEnums.GameDifficulty.Easy)]
     [InlineData(GameEnums.GameDifficulty.Medium)]
     [InlineData(GameEnums.GameDifficulty.Hard)]
+    public void CreateGameAndPlayOneItemTest(GameEnums.GameDifficulty gd)
+    {
+        var game = new GameModel(gd);
+        // get Random index point and call Play(randomI, randomJ)
+        var random = new Random();
+        var observableCollection = game!.Items;
+        if (observableCollection != null)
+        {
+            Assert.Equal(observableCollection.Count, game.Rows * game.Columns);
+            var r = random.Next(0, game.Rows);
+            var c = random.Next(0, game.Columns);
+            Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
+            Assert.Equal(0, game.Items.Count(i => i.IsMine));
+            game.PlayCommand.Execute(new Point(r, c));
+            Assert.Equal(GameConstants.GameLevels[gd].mines, game.Items.Count(i => i.IsMine));
+        }
+
+        Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
+    }
+    
+    [Theory]
+    [InlineData(GameEnums.GameDifficulty.Easy)]
+    [InlineData(GameEnums.GameDifficulty.Medium)]
+    [InlineData(GameEnums.GameDifficulty.Hard)]
     public void FlagAllMinesAndEnsureGameWasWonTest(GameEnums.GameDifficulty gd)
     {
         var game = new GameModel(gd);
         // get Random index point and call Play(randomI, randomJ)
         var random = new Random();    
         var r = random.Next(0, game.Rows);         
-        var c = random.Next(0, game.Columns);      
-        game.PlayCommand.Execute(new Point(r,c));                      
+        var c = random.Next(0, game.Columns); 
+        Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
+        Assert.Equal(0,game.Items.Count(i => i.IsMine));
+        game.PlayCommand.Execute(new Point(r,c));
+        Assert.Equal(GameConstants.GameLevels[gd].mines ,game.Items.Count(i => i.IsMine));
+        Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
         
         for (int i = 0; i < game.Rows; i++)
         {
             for (int j = 0; j < game.Columns; j++)
             {
-                if (game[i,j].IsMine)
+                if (game[i,j].IsMine && !game[i,j].IsRevealed)
                 {
-                    if (game.GameStatus == GameEnums.GameStatus.InProgress)
                     {
                         game.FlagCommand.Execute(new Point(i, j));
                         if (game.GameStatus == GameEnums.GameStatus.Won)
                             goto ASSERT_WON;
                     }
+                    Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
                 }
             }
         }

@@ -1,7 +1,22 @@
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Maui.Graphics;
+
 namespace MineSweeper.Models;
 public partial class GameModel : ObservableObject
 {
+    public static class GameConstants
+    {
+        public static readonly Dictionary
+            <GameEnums.GameDifficulty, (int rows, int columns, int mines)> GameLevels = new()
+            {
+                {GameEnums.GameDifficulty.Easy, (10, 10, 10)},
+                {GameEnums.GameDifficulty.Medium, (15, 15, 40)},
+                {GameEnums.GameDifficulty.Hard, (20, 20, 80)}
+            };
+    }
     /// <summary>
     /// The Number of Rows in the Game
     /// </summary>
@@ -193,18 +208,20 @@ public partial class GameModel : ObservableObject
         FlaggedItems = CountFlaggedItems();
         RemainingMines = Mines - FlaggedItems;
 
-        EvaluateIfWon();
+        GameStatus = EvaluateIfWon();
     }
 
     /// <summary>
     /// Plays a game piece at a specific row and column
     /// </summary>
     /// <param name="pt">The Point to play</param>
-   
+    
+    // What is wrong with this code?
+    
     [RelayCommand]
     private void Play(Point pt)
     {
-        void InitializeGame(int rows, int columns, int mines)
+        void InitializeGame(int rows, int columns, int mines, int firstRow, int firstColumn)
         {
             var random = new Random();
             var minesPlaced = 0;
@@ -212,12 +229,12 @@ public partial class GameModel : ObservableObject
             {
                 var r = random.Next(0, rows);
                 var c = random.Next(0, columns);
-                var it = this[r, c];
-                if (!it.IsMine)
+                if ((r == firstRow && c == firstColumn) || this[r, c].IsMine)
                 {
-                    it.IsMine = true;
-                    minesPlaced++;
+                    continue;
                 }
+                this[r, c].IsMine = true;
+                minesPlaced++;
             }
 
             for (var i = 0; i < rows; i++)
@@ -237,51 +254,45 @@ public partial class GameModel : ObservableObject
 
         var (row, column) = ExtractRowColTuple(pt);
 
-        if (!InBounds(row, column))
+        if (!InBounds(row, column) || this[row, column].IsFlagged || this[row, column].IsRevealed)
         {
             return;
+        }
+
+        if (GameStatus != GameEnums.GameStatus.InProgress)
+        {
+            InitializeGame(Rows, Columns, Mines, row, column);
+            GameStatus = GameEnums.GameStatus.InProgress;
         }
 
         var item = this[row, column];
 
-        if (item.IsFlagged)
-            return;
-
-        if (item.IsRevealed)
-            return;
-
-        if (GameStatus != GameEnums.GameStatus.InProgress)
-        {
-            InitializeGame(Rows, Columns, Mines);
-        }
-
-        if (item.IsMine)
+        if (item.IsMine && !item.IsFlagged && !item.IsRevealed)
         {
             GameStatus = GameEnums.GameStatus.Lost;
             item.IsRevealed = true;
             return;
         }
 
+
+        if (item.IsRevealed)
+            return;
+        
         item.IsRevealed = true;
-        if (this.GameStatus == GameEnums.GameStatus.NotStarted)
-        {
-            GameStatus = GameEnums.GameStatus.InProgress;
-        }
 
-        if (GameStatus == GameEnums.GameStatus.InProgress && item.MineCount == 0)
+        if (item.MineCount == 0)
         {
-            Play(new Point(row - 1, column - 1));
-            Play(new Point(row - 1, column));
-            Play(new Point(row - 1, column + 1));
-            Play(new Point(row, column - 1));
-            Play(new Point(row, column + 1));
-            Play(new Point(row + 1, column - 1));
-            Play(new Point(row + 1, column));
-            Play(new Point(row + 1, column + 1));
+            var neighbors = GetNeighbors(row, column);
+            foreach (var neighbor in neighbors)
+            {
+                if (!neighbor.IsRevealed && !neighbor.IsFlagged && GameStatus == GameEnums.GameStatus.InProgress)
+                {
+                    Play(neighbor.Point);
+                }
+            }
         }
-        return;
     }
-
+    
     private int CountFlaggedItems()
     {
         return Items != null ? Items.Count(i => i.IsFlagged) : 0;
