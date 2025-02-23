@@ -5,12 +5,17 @@ namespace MineSweeper;
 
 public partial class MainPage : ContentPage
 {
-    
-
     public MainPage()
     {
-        InitializeComponent();
-        
+        try
+        {
+            InitializeComponent();
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            Console.WriteLine($"Error during InitializeComponent: {ex.Message}");
+        }
     }
 
 
@@ -24,10 +29,10 @@ public partial class MainPage : ContentPage
         var gg = new GameGrid();
         gg.ItemSource = new List<SweeperItem>
         {
-            new SweeperItem {IsMine = true},
-            new SweeperItem {IsMine = false},
-            new SweeperItem {IsMine = false},
-            new SweeperItem {IsMine = false}
+            new() {IsMine = true},
+            new() {IsMine = false},
+            new() {IsMine = false},
+            new() {IsMine = false}
         };
         gg.ItemTemplate = new DataTemplate(() =>
         {

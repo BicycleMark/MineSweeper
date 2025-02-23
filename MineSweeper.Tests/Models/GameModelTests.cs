@@ -20,13 +20,13 @@ public class GameModelTests
         Assert.Equal(GameConstants.GameLevels[gd].columns, game.Columns);
         Assert.Equal(GameConstants.GameLevels[gd].mines, game.Mines);
         Assert.NotNull(game.Items);
-        if (game.Items != null) 
+        if (game.Items != null)
             Assert.Equal(game.Items.Count, game.Rows * game.Columns);
         // Ensure there are no mines yet in any SweeperItems
-        if (game.Items != null) 
+        if (game.Items != null)
             Assert.DoesNotContain(game.Items, i => i.IsMine);
     }
-    
+
     // Test the Custom Game Constructor with several different values
     [Theory]
     [InlineData(10, 10, 10)] // Easy
@@ -42,14 +42,13 @@ public class GameModelTests
         Assert.Equal(columns, game.Columns);
         Assert.Equal(mines, game.Mines);
         Assert.NotNull(game.Items);
-        if (game.Items != null) 
+        if (game.Items != null)
             Assert.Equal(game.Items.Count, game.Rows * game.Columns);
         // Ensure there are no mines yet in any SweeperItems
-        if (game.Items != null) 
+        if (game.Items != null)
             Assert.DoesNotContain(game.Items, i => i.IsMine);
-        
     }
-    
+
     [Theory]
     [InlineData(10, 10, 10, "SavedGame.json")]
     [InlineData(15, 15, 40, "SavedGame.json")]
@@ -65,20 +64,19 @@ public class GameModelTests
         Assert.Equal(columns, savedGame.Columns);
         Assert.Equal(mines, savedGame.Mines);
         Assert.NotNull(savedGame.Items);
-        if (savedGame.Items != null) 
+        if (savedGame.Items != null)
             Assert.Equal(savedGame.Items.Count, savedGame.Rows * savedGame.Columns);
-        
-        var constructedSavedGame = new GameModel (jsonFile);
+
+        var constructedSavedGame = new GameModel(jsonFile);
         Assert.NotNull(constructedSavedGame);
         Assert.Equal(rows, constructedSavedGame.Rows);
         Assert.Equal(columns, constructedSavedGame.Columns);
         Assert.Equal(mines, constructedSavedGame.Mines);
         Assert.NotNull(constructedSavedGame.Items);
-        if (constructedSavedGame.Items != null) 
+        if (constructedSavedGame.Items != null)
             Assert.Equal(constructedSavedGame.Items.Count, savedGame.Rows * savedGame.Columns);
-
     }
-    
+
     [Theory]
     [InlineData(GameEnums.GameDifficulty.Easy, "SavedGame.json")]
     [InlineData(GameEnums.GameDifficulty.Medium, "SavedGame.json")]
@@ -95,34 +93,31 @@ public class GameModelTests
         Assert.Equal(GameConstants.GameLevels[gd].columns, savedGame.Columns);
         Assert.Equal(GameConstants.GameLevels[gd].mines, savedGame.Mines);
         Assert.NotNull(savedGame.Items);
-        if (savedGame.Items != null) 
+        if (savedGame.Items != null)
             Assert.Equal(savedGame.Items.Count, savedGame.Rows * savedGame.Columns);
     }
-    
+
     [Theory]
     [InlineData(20, 20, 0, GameEnums.GameStatus.InProgress)]
     [InlineData(20, 20, 1, GameEnums.GameStatus.Lost)]
     [InlineData(20, 20, 5, GameEnums.GameStatus.Lost)]
-    public void PlayAllPiecesGameCustomConstructorTest(int rows, int columns, int mines, 
+    public void PlayAllPiecesGameCustomConstructorTest(int rows, int columns, int mines,
         GameEnums.GameStatus expectedStatus)
     {
         var game = new GameModel(rows, columns, mines);
         // Play all pieces
         for (var i = 0; i < game.Rows; i++)
+        for (var j = 0; j < game.Columns; j++)
         {
-            for (var j = 0; j < game.Columns; j++)
-            {
-                
-                game.PlayCommand.Execute(new Point(i,j));
-                if (game.GameStatus != GameEnums.GameStatus.InProgress)
-                    goto TEST_GAME_STATUS;
-            }
+            game.PlayCommand.Execute(new Point(i, j));
+            if (game.GameStatus != GameEnums.GameStatus.InProgress)
+                goto TEST_GAME_STATUS;
         }
-        
+
         TEST_GAME_STATUS:
         Assert.Equal(expectedStatus, game.GameStatus);
     }
-    
+
     [Theory]
     [InlineData(GameEnums.GameDifficulty.Easy)]
     [InlineData(GameEnums.GameDifficulty.Medium)]
@@ -146,7 +141,7 @@ public class GameModelTests
 
         Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
     }
-    
+
     [Theory]
     [InlineData(GameEnums.GameDifficulty.Easy)]
     [InlineData(GameEnums.GameDifficulty.Medium)]
@@ -155,30 +150,27 @@ public class GameModelTests
     {
         var game = new GameModel(gd);
         // get Random index point and call Play(randomI, randomJ)
-        var random = new Random();    
-        var r = random.Next(0, game.Rows);         
-        var c = random.Next(0, game.Columns); 
+        var random = new Random();
+        var r = random.Next(0, game.Rows);
+        var c = random.Next(0, game.Columns);
         Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
-        Assert.Equal(0,game.Items.Count(i => i.IsMine));
-        game.PlayCommand.Execute(new Point(r,c));
-        Assert.Equal(GameConstants.GameLevels[gd].mines ,game.Items.Count(i => i.IsMine));
+        Assert.Equal(0, game.Items.Count(i => i.IsMine));
+        game.PlayCommand.Execute(new Point(r, c));
+        Assert.Equal(GameConstants.GameLevels[gd].mines, game.Items.Count(i => i.IsMine));
         Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
-        
-        for (int i = 0; i < game.Rows; i++)
-        {
-            for (int j = 0; j < game.Columns; j++)
+
+        for (var i = 0; i < game.Rows; i++)
+        for (var j = 0; j < game.Columns; j++)
+            if (game[i, j].IsMine && !game[i, j].IsRevealed)
             {
-                if (game[i,j].IsMine && !game[i,j].IsRevealed)
                 {
-                    {
-                        game.FlagCommand.Execute(new Point(i, j));
-                        if (game.GameStatus == GameEnums.GameStatus.Won)
-                            goto ASSERT_WON;
-                    }
-                    Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
+                    game.FlagCommand.Execute(new Point(i, j));
+                    if (game.GameStatus == GameEnums.GameStatus.Won)
+                        goto ASSERT_WON;
                 }
+                Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
             }
-        }
+
         ASSERT_WON:
         Assert.Equal(GameEnums.GameStatus.Won, game.GameStatus);
         // Assert Count of flagged items = game.Mins

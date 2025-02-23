@@ -1,5 +1,4 @@
-﻿
-using UIKit;
+﻿using UIKit;
 
 namespace MineSweeper;
 

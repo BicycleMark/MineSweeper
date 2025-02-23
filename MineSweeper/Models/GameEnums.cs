@@ -10,7 +10,7 @@ public class GameEnums
         Won,
         Lost
     }
-    
+
     public enum SweeperItemStatus
     {
         Hidden,
@@ -25,14 +25,12 @@ public class GameEnums
         MinePlayed,
         InvalidItemPlayed,
         ValidItemPlayed
-        
     }
-    
+
     public enum GameDifficulty
     {
         Easy,
         Medium,
         Hard
     }
-    
 }

@@ -71,4 +71,12 @@
         <Folder Include="ViewModels\"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <MauiXaml Remove="Views\Controls\UniformGrid.xaml"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Views\Controls\UniformGrid.xaml.cs"/>
+    </ItemGroup>
+
 </Project>
