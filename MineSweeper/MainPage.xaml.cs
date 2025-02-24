@@ -26,8 +26,8 @@ public partial class MainPage : ContentPage
 
     private void NewGame_Clicked(object? sender, EventArgs e)
     {
-        var gg = new GameGrid();
-        gg.ItemSource = new List<SweeperItem>
+        var gg = new UniformGrid();
+        gg.ItemsSource = new List<SweeperItem>
         {
             new() {IsMine = true},
             new() {IsMine = false},
