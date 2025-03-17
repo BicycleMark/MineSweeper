@@ -1,6 +1,10 @@
+using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Windows.Input;
+
 namespace MineSweeper.Models;
 
-public partial class GameModel : ObservableObject
+public partial class GameModel : ObservableObject, IGameModel
 {
     private readonly ILogger? _logger;
     
@@ -197,6 +201,14 @@ public partial class GameModel : ObservableObject
 
         return GameStatus;
     }
+
+    // ICommand properties for IGameModel interface
+    ICommand IGameModel.PlayCommand => GetPlayCommand();
+    ICommand IGameModel.FlagCommand => GetFlagCommand();
+    
+    // Helper methods to get the commands
+    private ICommand GetPlayCommand() => PlayCommand;
+    private ICommand GetFlagCommand() => FlagCommand;
 
     /// <summary>
     /// Flags a game Piece at a specific row and column

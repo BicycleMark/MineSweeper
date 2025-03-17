@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:MineSweeper.Converters"
+             x:Class="MineSweeper.Views.Controls.SweeperItemTemplate">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:BoolAndBoolConverter x:Key="BoolAndBoolConverter" />
+            
+            <!-- Colors for different mine counts -->
+            <Color x:Key="MineCount1Color">Blue</Color>
+            <Color x:Key="MineCount2Color">Green</Color>
+            <Color x:Key="MineCount3Color">Red</Color>
+            <Color x:Key="MineCount4Color">DarkBlue</Color>
+            <Color x:Key="MineCount5Color">DarkRed</Color>
+            <Color x:Key="MineCount6Color">Teal</Color>
+            <Color x:Key="MineCount7Color">Black</Color>
+            <Color x:Key="MineCount8Color">Gray</Color>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    
+    <Border Stroke="Gray" 
+            StrokeThickness="1" 
+            BackgroundColor="{Binding IsRevealed, Converter={StaticResource BoolToColorConverter}, ConverterParameter='White,LightGray'}">
+        <Grid>
+            <!-- Hidden state (not revealed) -->
+            <Grid IsVisible="{Binding IsRevealed, Converter={StaticResource BoolToColorConverter}, ConverterParameter='False,True'}">
+                <!-- Flag icon (if flagged) -->
+                <Label Text="🚩" 
+                       IsVisible="{Binding IsFlagged}"
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" 
+                       FontSize="18" />
+            </Grid>
+            
+            <!-- Revealed state -->
+            <Grid IsVisible="{Binding IsRevealed}">
+                <!-- Mine icon (if it's a mine) -->
+                <Label Text="💣" 
+                       IsVisible="{Binding IsMine}"
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" 
+                       FontSize="18" />
+                
+                <!-- Mine count (if not a mine and has adjacent mines) -->
+                <Label Text="{Binding MineCount}" 
+                       IsVisible="{Binding IsMine, Converter={StaticResource BoolToColorConverter}, ConverterParameter='False,True'}"
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center" 
+                       FontSize="16"
+                       FontAttributes="Bold">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="1">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount1Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="2">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount2Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="3">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount3Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="4">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount4Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="5">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount5Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="6">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount6Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="7">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount7Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="8">
+                            <Setter Property="TextColor" Value="{StaticResource MineCount8Color}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding MineCount}" Value="0">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+        </Grid>
+    </Border>
+</ContentView>
