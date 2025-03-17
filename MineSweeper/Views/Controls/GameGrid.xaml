@@ -4,7 +4,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
              xmlns:models="clr-namespace:MineSweeper.Models"
-             x:Class="MineSweeper.Views.Controls.GameGrid">
+             xmlns:viewmodels="clr-namespace:MineSweeper.ViewModels"
+             x:Class="MineSweeper.Views.Controls.GameGrid"
+             x:DataType="viewmodels:IGameViewModel">
     
     <ContentView.Resources>
         <ResourceDictionary>
