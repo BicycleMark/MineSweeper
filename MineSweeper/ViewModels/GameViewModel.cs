@@ -6,23 +6,32 @@ using System.Diagnostics;
 
 namespace MineSweeper.ViewModels;
 
+/// <summary>
+/// ViewModel for the Minesweeper game, implementing the MVVM pattern
+/// </summary>
 public partial class GameViewModel : ObservableObject, IGameViewModel
 {
     private readonly IDispatcher _dispatcher;
     private IDispatcherTimer? _timer;
     private readonly IGameModelFactory _modelFactory;
-    private GameModel _gameModel;
+    private IGameModel _gameModel;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the GameViewModel class
+    /// </summary>
+    /// <param name="dispatcher">The dispatcher for UI thread operations</param>
+    /// <param name="logger">The logger for debugging</param>
+    /// <param name="modelFactory">The factory for creating game models</param>
     public GameViewModel(
         IDispatcher dispatcher, 
-        ILogger? logger = null,
-        IGameModelFactory? modelFactory = null)
+        ILogger logger,
+        IGameModelFactory modelFactory)
     {
         _dispatcher = dispatcher;
-        _logger = logger ?? new ConsoleLogger();
-        _modelFactory = modelFactory ?? new GameModelFactory();
-        _gameModel = (GameModel)_modelFactory.CreateModel(GameEnums.GameDifficulty.Easy, _logger);
+        _logger = logger;
+        _modelFactory = modelFactory;
+        _gameModel = _modelFactory.CreateModel(GameEnums.GameDifficulty.Easy);
         
         // Initialize commands
         NewGameCommand = new RelayCommand<object>(NewGame);
@@ -37,41 +46,78 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
 
     #region Properties
 
+    /// <summary>
+    /// Gets or sets the collection of sweeper items (cells) in the game grid
+    /// </summary>
     [ObservableProperty]
     private ObservableCollection<SweeperItem>? _items;
 
+    /// <summary>
+    /// Gets or sets the number of rows in the game grid
+    /// </summary>
     [ObservableProperty]
     private int _rows;
 
+    /// <summary>
+    /// Gets or sets the number of columns in the game grid
+    /// </summary>
     [ObservableProperty]
     private int _columns;
 
+    /// <summary>
+    /// Gets or sets the total number of mines in the game
+    /// </summary>
     [ObservableProperty]
     private int _mines;
 
+    /// <summary>
+    /// Gets or sets the number of mines remaining to be flagged
+    /// </summary>
     [ObservableProperty]
     private int _remainingMines;
 
+    /// <summary>
+    /// Gets or sets the elapsed game time in seconds
+    /// </summary>
     [ObservableProperty]
     private int _gameTime;
 
+    /// <summary>
+    /// Gets or sets the current game status
+    /// </summary>
     [ObservableProperty]
     private GameEnums.GameStatus _gameStatus;
 
+    /// <summary>
+    /// Gets or sets the current game difficulty level
+    /// </summary>
     [ObservableProperty]
     private GameEnums.GameDifficulty _gameDifficulty = GameEnums.GameDifficulty.Easy;
     
-    // IGameViewModel interface implementation
+    /// <summary>
+    /// Gets the underlying game model (for testing purposes)
+    /// </summary>
     public IGameModel Model => _gameModel;
+    
+    /// <summary>
+    /// Gets the game timer (for testing purposes)
+    /// </summary>
     public IDispatcherTimer? Timer => _timer;
     
     #if DEBUG
+    /// <summary>
+    /// Sets the game status directly (for testing purposes)
+    /// </summary>
+    /// <param name="status">The game status to set</param>
     public void SetGameStatus(GameEnums.GameStatus status)
     {
         _gameModel.GameStatus = status;
         GameStatus = status;
     }
     
+    /// <summary>
+    /// Invokes the CheckGameStatus method directly (for testing purposes)
+    /// </summary>
     public void InvokeCheckGameStatus()
     {
         CheckGameStatus();
@@ -82,42 +128,41 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
 
     #region Commands
 
+    /// <summary>
+    /// Command to start a new game with the specified difficulty
+    /// </summary>
     public ICommand NewGameCommand { get; }
+    
+    /// <summary>
+    /// Command to play (reveal) a cell at the specified position
+    /// </summary>
     public ICommand PlayCommand { get; }
+    
+    /// <summary>
+    /// Command to flag a cell at the specified position
+    /// </summary>
     public ICommand FlagCommand { get; }
 
     #endregion
 
     #region Methods
 
+    /// <summary>
+    /// Creates a new game with the specified difficulty
+    /// </summary>
+    /// <param name="difficultyParam">Difficulty parameter (can be GameDifficulty enum or string)</param>
     private void NewGame(object difficultyParam)
     {
-        GameEnums.GameDifficulty difficulty;
-        
         // Parse the difficulty parameter
-        if (difficultyParam is GameEnums.GameDifficulty enumValue)
-        {
-            difficulty = enumValue;
-        }
-        else if (difficultyParam is string stringValue && int.TryParse(stringValue, out var intValue))
-        {
-            // Convert integer to enum
-            difficulty = (GameEnums.GameDifficulty)intValue;
-        }
-        else
-        {
-            // Default to Easy if parameter is invalid
-            difficulty = GameEnums.GameDifficulty.Easy;
-        }
+        var difficulty = ParseDifficultyParameter(difficultyParam);
+        
+        _logger.Log($"Starting new game with difficulty: {difficulty}");
         
         // Stop timer if running
-        if (_timer != null)
-        {
-            _timer.Stop();
-        }
+        _timer?.Stop();
         
         // Create new game model with selected difficulty using the factory
-        _gameModel = (GameModel)_modelFactory.CreateModel(difficulty, _logger);
+        _gameModel = _modelFactory.CreateModel(difficulty);
         GameDifficulty = difficulty;
         
         // Update properties from model
@@ -126,19 +171,32 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
         // Reset timer
         GameTime = 0;
     }
+    
+    /// <summary>
+    /// Parses the difficulty parameter from various input types
+    /// </summary>
+    /// <param name="difficultyParam">The difficulty parameter to parse</param>
+    /// <returns>The parsed game difficulty</returns>
+    private GameEnums.GameDifficulty ParseDifficultyParameter(object difficultyParam)
+    {
+        return difficultyParam switch
+        {
+            GameEnums.GameDifficulty enumValue => enumValue,
+            string stringValue when int.TryParse(stringValue, out var intValue) 
+                && Enum.IsDefined(typeof(GameEnums.GameDifficulty), intValue) 
+                => (GameEnums.GameDifficulty)intValue,
+            _ => GameEnums.GameDifficulty.Easy // Default to Easy if parameter is invalid
+        };
+    }
 
+    /// <summary>
+    /// Plays (reveals) a cell at the specified position
+    /// </summary>
+    /// <param name="point">The position to play</param>
     private void Play(Point point)
     {
-        if (_gameModel.GameStatus == GameEnums.GameStatus.NotStarted)
-        {
-            // Start timer on first move
-            if (_timer != null)
-            {
-                _timer.Start();
-            }
-            _gameModel.GameStatus = GameEnums.GameStatus.InProgress;
-            GameStatus = GameEnums.GameStatus.InProgress;
-        }
+        // Handle first move if needed
+        HandleFirstMoveIfNeeded();
         
         // Execute play command on model
         _gameModel.PlayCommand.Execute(point);
@@ -150,141 +208,136 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
         CheckGameStatus();
     }
 
+    /// <summary>
+    /// Flags a cell at the specified position
+    /// </summary>
+    /// <param name="point">The position to flag</param>
     private void Flag(Point point)
     {
         bool isFirstMove = _gameModel.GameStatus == GameEnums.GameStatus.NotStarted;
-        _logger.Log($"Flag method called. IsFirstMove: {isFirstMove}, Timer: {_timer != null}, Point: {point}");
+        _logger.Log($"Flag method called at {point}");
         
-        if (isFirstMove)
-        {
-            _logger.Log("First move detected, starting timer");
-            // Start timer on first move
-            if (_timer != null)
-            {
-                _timer.Start();
-                _logger.Log($"Timer started. IsRunning: {_timer.IsRunning}");
-            }
-            else
-            {
-                _logger.LogError("Timer is null!");
-            }
-            
-            // Set game status to in progress
-            _gameModel.GameStatus = GameEnums.GameStatus.InProgress;
-            GameStatus = GameEnums.GameStatus.InProgress;
-            _logger.Log($"Game status set to: {GameStatus}");
-        }
+        // Handle first move if needed
+        HandleFirstMoveIfNeeded();
         
         // Execute flag command on model
-        _logger.Log("Executing flag command on model");
         _gameModel.FlagCommand.Execute(point);
         
         // Update properties from model
-        _logger.Log("Updating properties from model");
         UpdatePropertiesFromModel();
-        _logger.Log($"After update, GameStatus: {GameStatus}");
         
-        // For the first move, we need to ensure the game status stays in progress
+        // For the first move, ensure game status stays in progress
         // This is because the model might set it to Won since no mines are placed yet
         if (isFirstMove)
         {
-            _logger.Log("First move: Ensuring game status stays in progress");
-            if (GameStatus != GameEnums.GameStatus.InProgress)
-            {
-                _logger.LogWarning($"Game status changed to {GameStatus} after first flag. Resetting to InProgress.");
-                _gameModel.GameStatus = GameEnums.GameStatus.InProgress;
-                GameStatus = GameEnums.GameStatus.InProgress;
-            }
-            
-            // Ensure timer is still running
-            if (_timer != null && !_timer.IsRunning)
-            {
-                _logger.LogWarning("Timer stopped after model update! Restarting timer.");
-                _timer.Start();
-            }
+            EnsureGameInProgress();
         }
-        
-        // Only check game status if it's not the first move
-        if (!isFirstMove)
+        else
         {
-            _logger.Log("Not first move, checking game status");
+            // Only check game status if it's not the first move
             CheckGameStatus();
         }
-        
-        _logger.Log($"Flag method completed. Timer running: {_timer?.IsRunning}, GameStatus: {GameStatus}");
     }
 
+    /// <summary>
+    /// Handles the first move logic if the game hasn't started yet
+    /// </summary>
+    private void HandleFirstMoveIfNeeded()
+    {
+        if (_gameModel.GameStatus != GameEnums.GameStatus.NotStarted)
+            return;
+            
+        _logger.Log("First move detected, starting timer");
+        
+        // Start timer
+        _timer?.Start();
+        
+        // Set game status to in progress
+        _gameModel.GameStatus = GameEnums.GameStatus.InProgress;
+        GameStatus = GameEnums.GameStatus.InProgress;
+    }
+    
+    /// <summary>
+    /// Ensures the game stays in progress state (used after first flag move)
+    /// </summary>
+    private void EnsureGameInProgress()
+    {
+        if (GameStatus == GameEnums.GameStatus.InProgress && _timer?.IsRunning == true)
+            return;
+            
+        _logger.LogWarning("Ensuring game stays in progress state");
+        
+        // Reset game status if needed
+        if (GameStatus != GameEnums.GameStatus.InProgress)
+        {
+            _gameModel.GameStatus = GameEnums.GameStatus.InProgress;
+            GameStatus = GameEnums.GameStatus.InProgress;
+        }
+        
+        // Ensure timer is running
+        if (_timer?.IsRunning == false)
+        {
+            _timer.Start();
+        }
+    }
+
+    /// <summary>
+    /// Updates the ViewModel properties from the Model
+    /// </summary>
     private void UpdatePropertiesFromModel()
     {
-        _logger.Log("UpdatePropertiesFromModel called");
-        
+        // Update basic properties
         Items = _gameModel.Items;
         Rows = _gameModel.Rows;
         Columns = _gameModel.Columns;
-        
-        int oldMines = Mines;
         Mines = _gameModel.Mines;
-        if (oldMines != Mines)
-        {
-            _logger.Log($"Mines updated from {oldMines} to {Mines}");
-        }
         
-        int oldRemainingMines = RemainingMines;
+        // Calculate remaining mines
         RemainingMines = _gameModel.Mines - _gameModel.FlaggedItems;
-        _logger.Log($"RemainingMines calculation: {_gameModel.Mines} - {_gameModel.FlaggedItems} = {RemainingMines}");
-        if (oldRemainingMines != RemainingMines)
-        {
-            _logger.Log($"RemainingMines updated from {oldRemainingMines} to {RemainingMines}");
-        }
         
-        GameEnums.GameStatus oldStatus = GameStatus;
+        // Update game status
         GameStatus = _gameModel.GameStatus;
-        if (oldStatus != GameStatus)
-        {
-            _logger.Log($"GameStatus updated from {oldStatus} to {GameStatus}");
-        }
         
-        _logger.Log("UpdatePropertiesFromModel completed");
+        _logger.Log($"Properties updated: Status={GameStatus}, RemainingMines={RemainingMines}");
     }
 
+    /// <summary>
+    /// Checks the game status and takes appropriate actions
+    /// </summary>
     private void CheckGameStatus()
     {
-        _logger.Log($"CheckGameStatus called. GameStatus: {_gameModel.GameStatus}, Timer running: {_timer?.IsRunning}");
-        
-        if (_gameModel.GameStatus == GameEnums.GameStatus.Won || 
-            _gameModel.GameStatus == GameEnums.GameStatus.Lost)
-        {
-            _logger.Log("Game is over, stopping timer");
-            // Stop timer when game is over
-            if (_timer != null)
-            {
-                _timer.Stop();
-                _logger.Log($"Timer stopped. IsRunning: {_timer.IsRunning}");
-            }
+        // Only take action if game is over
+        if (_gameModel.GameStatus != GameEnums.GameStatus.Won && 
+            _gameModel.GameStatus != GameEnums.GameStatus.Lost)
+            return;
             
-            // Reveal all mines if game is lost
-            if (_gameModel.GameStatus == GameEnums.GameStatus.Lost)
-            {
-                RevealAllMines();
-            }
+        _logger.Log($"Game over with status: {_gameModel.GameStatus}");
+        
+        // Stop timer
+        _timer?.Stop();
+        
+        // Reveal all mines if game is lost
+        if (_gameModel.GameStatus == GameEnums.GameStatus.Lost)
+        {
+            RevealAllMines();
         }
     }
 
+    /// <summary>
+    /// Reveals all mines on the board when the game is lost
+    /// </summary>
     private void RevealAllMines()
     {
-        if (Items == null) return;
+        _logger.Log("Requesting model to reveal all mines");
         
-        // Force update of all mine items to be revealed
-        foreach (var item in Items)
-        {
-            if (item.IsMine)
-            {
-                item.IsRevealed = true;
-                item.IsFlagged = false; // Ensure mines are not flagged
-            }
-        }
+        // Use the model's implementation to reveal all mines
+        // This follows MVVM pattern by delegating model operations to the model
+        _gameModel.RevealAllMines();
     }
 
+    /// <summary>
+    /// Initializes the game timer
+    /// </summary>
     private void InitializeTimer()
     {
         _timer = _dispatcher.CreateTimer();

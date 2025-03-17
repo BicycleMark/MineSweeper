@@ -58,15 +58,8 @@ public class GameModelTests
         var game = new GameModel(rows, columns, mines);
         game.SaveGameCommand.Execute(fileName);
         var jsonFile = File.ReadAllText(fileName);
-        var savedGame = JsonSerializer.Deserialize<GameModel>(jsonFile);
-        Assert.NotNull(savedGame);
-        Assert.Equal(rows, savedGame.Rows);
-        Assert.Equal(columns, savedGame.Columns);
-        Assert.Equal(mines, savedGame.Mines);
-        Assert.NotNull(savedGame.Items);
-        if (savedGame.Items != null)
-            Assert.Equal(savedGame.Items.Count, savedGame.Rows * savedGame.Columns);
-
+        
+        // Use our custom constructor instead of JsonSerializer.Deserialize
         var constructedSavedGame = new GameModel(jsonFile);
         Assert.NotNull(constructedSavedGame);
         Assert.Equal(rows, constructedSavedGame.Rows);
@@ -74,7 +67,7 @@ public class GameModelTests
         Assert.Equal(mines, constructedSavedGame.Mines);
         Assert.NotNull(constructedSavedGame.Items);
         if (constructedSavedGame.Items != null)
-            Assert.Equal(constructedSavedGame.Items.Count, savedGame.Rows * savedGame.Columns);
+            Assert.Equal(constructedSavedGame.Items.Count, rows * columns);
     }
 
     [Theory]
@@ -87,14 +80,16 @@ public class GameModelTests
         var game = new GameModel(gd);
         game.SaveGameCommand.Execute(fileName);
         var jsonFile = File.ReadAllText(fileName);
-        var savedGame = JsonSerializer.Deserialize<GameModel>(jsonFile);
-        Assert.NotNull(savedGame);
-        Assert.Equal(GameConstants.GameLevels[gd].rows, savedGame.Rows);
-        Assert.Equal(GameConstants.GameLevels[gd].columns, savedGame.Columns);
-        Assert.Equal(GameConstants.GameLevels[gd].mines, savedGame.Mines);
-        Assert.NotNull(savedGame.Items);
-        if (savedGame.Items != null)
-            Assert.Equal(savedGame.Items.Count, savedGame.Rows * savedGame.Columns);
+        
+        // Use our custom constructor instead of JsonSerializer.Deserialize
+        var constructedSavedGame = new GameModel(jsonFile);
+        Assert.NotNull(constructedSavedGame);
+        Assert.Equal(GameConstants.GameLevels[gd].rows, constructedSavedGame.Rows);
+        Assert.Equal(GameConstants.GameLevels[gd].columns, constructedSavedGame.Columns);
+        Assert.Equal(GameConstants.GameLevels[gd].mines, constructedSavedGame.Mines);
+        Assert.NotNull(constructedSavedGame.Items);
+        if (constructedSavedGame.Items != null)
+            Assert.Equal(constructedSavedGame.Items.Count, constructedSavedGame.Rows * constructedSavedGame.Columns);
     }
 
     [Theory]

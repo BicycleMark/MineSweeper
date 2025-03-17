@@ -9,7 +9,6 @@ public interface IGameModelFactory
     /// Creates a new game model with the specified difficulty
     /// </summary>
     /// <param name="difficulty">The difficulty level</param>
-    /// <param name="logger">Optional logger for debugging</param>
     /// <returns>A new game model</returns>
-    IGameModel CreateModel(GameEnums.GameDifficulty difficulty, ILogger? logger = null);
+    IGameModel CreateModel(GameEnums.GameDifficulty difficulty);
 }

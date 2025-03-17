@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
+             xmlns:viewmodels="clr-namespace:MineSweeper.ViewModels"
+             x:Class="MineSweeper.MainPageDebug"
+             Title="Debug Page">
+
+    <Grid Padding="16" BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Phase 1: Basic Controls -->
+        <Label Grid.Row="0" 
+               Text="Debug Page - Phase 1" 
+               FontSize="24" 
+               HorizontalOptions="Center"
+               Margin="0,0,0,20" />
+
+        <Border Grid.Row="1"
+                Stroke="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                StrokeThickness="2"
+                StrokeShape="RoundRectangle 8"
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
+                Padding="10"
+                Margin="0,0,0,20">
+            <Label Text="This is a basic Border with a Label to verify layout" 
+                   HorizontalOptions="Center" />
+        </Border>
+
+        <!-- Phase 2: Simple Grid with Colored Boxes -->
+        <Label Grid.Row="2" 
+               Text="Phase 2: Grid Layout Test" 
+               FontSize="18" 
+               HorizontalOptions="Center"
+               Margin="0,0,0,10" />
+
+        <Border Grid.Row="3"
+                Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
+                StrokeThickness="2"
+                StrokeShape="RoundRectangle 12"
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
+                Padding="10"
+                HeightRequest="400"
+                WidthRequest="400"
+                HorizontalOptions="Center"
+                VerticalOptions="Start">
+            
+            <!-- We'll replace this with UniformGrid in Phase 2 -->
+            <Grid x:Name="regularGrid"
+                  RowDefinitions="*,*,*,*,*"
+                  ColumnDefinitions="*,*,*,*,*"
+                  RowSpacing="2"
+                  ColumnSpacing="2">
+                
+                <!-- Add some colored boxes to verify layout -->
+                <BoxView Grid.Row="0" Grid.Column="0" Color="Red" />
+                <BoxView Grid.Row="0" Grid.Column="1" Color="Blue" />
+                <BoxView Grid.Row="0" Grid.Column="2" Color="Green" />
+                <BoxView Grid.Row="0" Grid.Column="3" Color="Yellow" />
+                <BoxView Grid.Row="0" Grid.Column="4" Color="Purple" />
+                
+                <BoxView Grid.Row="1" Grid.Column="0" Color="Blue" />
+                <BoxView Grid.Row="1" Grid.Column="1" Color="Green" />
+                <BoxView Grid.Row="1" Grid.Column="2" Color="Yellow" />
+                <BoxView Grid.Row="1" Grid.Column="3" Color="Purple" />
+                <BoxView Grid.Row="1" Grid.Column="4" Color="Red" />
+                
+                <BoxView Grid.Row="2" Grid.Column="0" Color="Green" />
+                <BoxView Grid.Row="2" Grid.Column="1" Color="Yellow" />
+                <BoxView Grid.Row="2" Grid.Column="2" Color="Purple" />
+                <BoxView Grid.Row="2" Grid.Column="3" Color="Red" />
+                <BoxView Grid.Row="2" Grid.Column="4" Color="Blue" />
+                
+                <BoxView Grid.Row="3" Grid.Column="0" Color="Yellow" />
+                <BoxView Grid.Row="3" Grid.Column="1" Color="Purple" />
+                <BoxView Grid.Row="3" Grid.Column="2" Color="Red" />
+                <BoxView Grid.Row="3" Grid.Column="3" Color="Blue" />
+                <BoxView Grid.Row="3" Grid.Column="4" Color="Green" />
+                
+                <BoxView Grid.Row="4" Grid.Column="0" Color="Purple" />
+                <BoxView Grid.Row="4" Grid.Column="1" Color="Red" />
+                <BoxView Grid.Row="4" Grid.Column="2" Color="Blue" />
+                <BoxView Grid.Row="4" Grid.Column="3" Color="Green" />
+                <BoxView Grid.Row="4" Grid.Column="4" Color="Yellow" />
+            </Grid>
+            
+            <!-- Phase 2: We'll uncomment this in the next step -->
+            <!--
+            <controls:UniformGrid x:Name="uniformGrid"
+                                 Rows="5"
+                                 Columns="5"
+                                 IsVisible="False" />
+            -->
+        </Border>
+        
+        <!-- Navigation Button -->
+        <Button Grid.Row="4"
+                Text="Go to Main Page"
+                Margin="0,20,0,0"
+                HorizontalOptions="Center"
+                Clicked="OnGoToMainPageClicked" />
+    </Grid>
+</ContentPage>

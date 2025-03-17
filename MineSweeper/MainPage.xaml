@@ -9,21 +9,49 @@
     
     <ContentPage.Resources>
         <ResourceDictionary>
-            <Style TargetType="Button">
-                <Setter Property="FontSize" Value="Small" />
+            <!-- Game Button Style -->
+            <Style x:Key="GameButtonStyle" TargetType="Button">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="Margin" Value="5" />
-                <Setter Property="Padding" Value="10,5" />
+                <Setter Property="Padding" Value="10,8" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=White, Dark=White}" />
+                <Setter Property="Shadow">
+                    <Shadow Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
+                            Offset="0,2"
+                            Radius="4"
+                            Opacity="0.2" />
+                </Setter>
             </Style>
             
-            <Style TargetType="Label">
+            <!-- Game Label Style -->
+            <Style x:Key="GameLabelStyle" TargetType="Label">
                 <Setter Property="VerticalOptions" Value="Center" />
                 <Setter Property="HorizontalOptions" Value="Center" />
                 <Setter Property="FontSize" Value="16" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource MidnightBlue}, Dark=White}" />
+            </Style>
+            
+            <!-- Game Info Panel Style -->
+            <Style x:Key="GameInfoPanelStyle" TargetType="Border">
+                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}" />
+                <Setter Property="Padding" Value="10,8" />
+                <Setter Property="Shadow">
+                    <Shadow Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
+                            Offset="0,2"
+                            Radius="4"
+                            Opacity="0.2" />
+                </Setter>
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid BackgroundColor="LightGray" Padding="10">
+    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -31,8 +59,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
+        <!-- Game Title -->
+        <Label Grid.Row="0" Text="MineSweeper" 
+               FontSize="28" FontAttributes="Bold" 
+               HorizontalOptions="Center"
+               TextColor="{AppThemeBinding Light={StaticResource MidnightBlue}, Dark=White}"
+               Margin="0,0,0,16" />
+        
         <!-- Game Info Panel -->
-        <Grid Grid.Row="0" Margin="0,0,0,10">
+        <Grid Grid.Row="1" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -40,29 +75,41 @@
             </Grid.ColumnDefinitions>
             
             <!-- Mines Counter -->
-            <Border Grid.Column="0" Stroke="DarkGray" StrokeThickness="1" BackgroundColor="White" Padding="10,5">
-                <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                    <Label Text="💣" FontSize="18" VerticalOptions="Center" />
-                    <Label Text="{Binding RemainingMines}" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
-                </StackLayout>
+            <Border Grid.Column="0" Style="{StaticResource GameInfoPanelStyle}" Margin="0,0,8,0">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                    <Label Text="💣" FontSize="20" VerticalOptions="Center" />
+                    <Label Text="{Binding RemainingMines}" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Secondary}}" />
+                </HorizontalStackLayout>
             </Border>
             
             <!-- Game Status -->
-            <Border Grid.Column="1" Stroke="DarkGray" StrokeThickness="1" BackgroundColor="White" Padding="10,5">
-                <Label Text="{Binding GameStatus}" FontSize="16" HorizontalOptions="Center" />
+            <Border Grid.Column="1" Style="{StaticResource GameInfoPanelStyle}" Margin="4,0,4,0">
+                <Label Text="{Binding GameStatus}" 
+                       FontSize="16" 
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       Style="{StaticResource GameLabelStyle}" />
             </Border>
             
             <!-- Timer -->
-            <Border Grid.Column="2" Stroke="DarkGray" StrokeThickness="1" BackgroundColor="White" Padding="10,5">
-                <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
-                    <Label Text="⏱️" FontSize="18" VerticalOptions="Center" />
-                    <Label Text="{Binding GameTime}" FontSize="18" FontAttributes="Bold" VerticalOptions="Center" />
-                </StackLayout>
+            <Border Grid.Column="2" Style="{StaticResource GameInfoPanelStyle}" Margin="8,0,0,0">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                    <Label Text="⏱️" FontSize="20" VerticalOptions="Center" />
+                    <Label Text="{Binding GameTime}" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
+                </HorizontalStackLayout>
             </Border>
         </Grid>
         
         <!-- Difficulty Selection -->
-        <Grid Grid.Row="1" Margin="0,0,0,10">
+        <Grid Grid.Row="2" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -71,27 +118,54 @@
             
             <Button Grid.Column="0" Text="Easy" 
                     Command="{Binding NewGameCommand}" 
-                    CommandParameter="0" />
+                    CommandParameter="0"
+                    Style="{StaticResource GameButtonStyle}"
+                    BackgroundColor="{StaticResource Tertiary}"
+                    Margin="0,0,8,0" />
             
             <Button Grid.Column="1" Text="Medium" 
                     Command="{Binding NewGameCommand}" 
-                    CommandParameter="1" />
+                    CommandParameter="1"
+                    Style="{StaticResource GameButtonStyle}"
+                    BackgroundColor="{StaticResource Primary}"
+                    Margin="4,0,4,0" />
             
             <Button Grid.Column="2" Text="Hard" 
                     Command="{Binding NewGameCommand}" 
-                    CommandParameter="2" />
+                    CommandParameter="2"
+                    Style="{StaticResource GameButtonStyle}"
+                    BackgroundColor="{StaticResource Secondary}"
+                    Margin="8,0,0,0" />
         </Grid>
         
         <!-- Game Grid -->
-        <controls:GameGrid Grid.Row="2" 
-                          PlayCommand="{Binding PlayCommand}" 
-                          FlagCommand="{Binding FlagCommand}"
-                          BindingContext="{Binding .}" />
+        <Border Grid.Row="3" 
+                StrokeShape="RoundRectangle 12"
+                Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
+                StrokeThickness="2"
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
+                Padding="8"
+                Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,4', Radius='8', Opacity='0.2'}">
+            <controls:GameGrid
+                PlayCommand="{Binding PlayCommand}" 
+                FlagCommand="{Binding FlagCommand}"
+                BindingContext="{Binding .}" />
+        </Border>
         
         <!-- Instructions -->
-        <StackLayout Grid.Row="3" Margin="0,10,0,0">
-            <Label Text="Tap to reveal a cell" HorizontalOptions="Center" />
-            <Label Text="Double-tap to flag a mine" HorizontalOptions="Center" />
-        </StackLayout>
+        <VerticalStackLayout Grid.Row="4" Margin="0,16,0,0" Spacing="4">
+            <Label Text="Tap to reveal a cell" 
+                   HorizontalOptions="Center" 
+                   Style="{StaticResource GameLabelStyle}" />
+            <Label Text="Double-tap to flag a mine" 
+                   HorizontalOptions="Center" 
+                   Style="{StaticResource GameLabelStyle}" />
+            
+            <!-- Debug Navigation Button -->
+            <Button Text="Go to Debug Page"
+                    Margin="0,10,0,0"
+                    HorizontalOptions="Center"
+                    Clicked="OnGoToDebugPageClicked" />
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

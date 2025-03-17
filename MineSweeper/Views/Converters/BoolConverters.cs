@@ -1,7 +1,7 @@
 using System.Globalization;
 using Microsoft.Maui.Graphics;
 
-namespace MineSweeper.Converters;
+namespace MineSweeper.Views.Converters;
 
 public class BoolToColorConverter : IValueConverter
 {
@@ -20,6 +20,19 @@ public class BoolToColorConverter : IValueConverter
     
     private Color GetColorByName(string colorName)
     {
+        // Check if the color name is a resource reference
+        if (colorName.StartsWith("{StaticResource "))
+        {
+            var resourceName = colorName.Substring("{StaticResource ".Length, colorName.Length - "{StaticResource ".Length - 1);
+            
+            // Try to get the color from the application resources
+            if (Application.Current?.Resources?.TryGetValue(resourceName, out var resource) == true && resource is Color color)
+            {
+                return color;
+            }
+        }
+        
+        // Fallback to predefined colors
         return colorName.ToLower() switch
         {
             "lightgray" => Colors.LightGray,

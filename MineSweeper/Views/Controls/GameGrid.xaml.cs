@@ -39,34 +39,83 @@ public partial class GameGrid : ContentView
         InitializeComponent();
         
         // Add tap gesture recognizer for normal play and double-tap for flagging
-        var tapGesture = new TapGestureRecognizer();
-        tapGesture.Tapped += OnCellTapped;
-        board.GestureRecognizers.Add(tapGesture);
+        this.Loaded += OnLoaded;
+    }
+    
+    private void OnLoaded(object sender, EventArgs e)
+    {
+        try
+        {
+            // Remove the event handler to avoid multiple registrations
+            this.Loaded -= OnLoaded;
+            
+            // Now that the control is loaded, add the tap gesture recognizer
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += OnCellTapped;
+            
+            // Check if board is not null before adding the gesture recognizer
+            if (board != null)
+            {
+                board.GestureRecognizers.Add(tapGesture);
+                System.Diagnostics.Debug.WriteLine("GameGrid: Added tap gesture recognizer to board");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("GameGrid: board is null in OnLoaded");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"GameGrid: Exception in OnLoaded: {ex}");
+        }
     }
 
     private void OnCellTapped(object sender, EventArgs e)
     {
-        if (board.Width <= 0 || board.Height <= 0 || board.Rows <= 0 || board.Columns <= 0)
+        // Check if board is null
+        if (board == null)
+        {
+            System.Diagnostics.Debug.WriteLine("GameGrid: board is null in OnCellTapped");
             return;
+        }
+        
+        if (board.Width <= 0 || board.Height <= 0 || board.Rows <= 0 || board.Columns <= 0)
+        {
+            System.Diagnostics.Debug.WriteLine($"GameGrid: Invalid dimensions - Width={board.Width}, Height={board.Height}, Rows={board.Rows}, Columns={board.Columns}");
+            return;
+        }
 
         // Get the tap location
         if (e is not TappedEventArgs tappedEventArgs)
+        {
+            System.Diagnostics.Debug.WriteLine("GameGrid: Event is not TappedEventArgs");
             return;
+        }
 
         // Calculate the cell position
         var location = tappedEventArgs.GetPosition(board);
         if (location == null)
+        {
+            System.Diagnostics.Debug.WriteLine("GameGrid: Tap location is null");
             return;
+        }
 
+        // Use the UniformGrid's item size for more accurate calculations
         var cellWidth = board.Width / board.Columns;
         var cellHeight = board.Height / board.Rows;
         
         var column = (int)(location.Value.X / cellWidth);
         var row = (int)(location.Value.Y / cellHeight);
         
+        // Log the tap location for debugging
+        System.Diagnostics.Debug.WriteLine($"Tap at ({location.Value.X}, {location.Value.Y}), Cell: row={row}, column={column}");
+        
         // Ensure we're within bounds
         if (row < 0 || row >= board.Rows || column < 0 || column >= board.Columns)
+        {
+            System.Diagnostics.Debug.WriteLine("Tap outside grid bounds");
             return;
+        }
         
         // Calculate a unique cell ID
         var cellId = row * board.Columns + column;
@@ -82,11 +131,13 @@ public partial class GameGrid : ContentView
         // Execute the appropriate command
         if (isDoubleTap)
         {
+            System.Diagnostics.Debug.WriteLine($"Double tap detected at row={row}, column={column}");
             if (FlagCommand?.CanExecute(null) == true)
                 FlagCommand.Execute(new Point(row, column));
         }
         else
         {
+            System.Diagnostics.Debug.WriteLine($"Single tap detected at row={row}, column={column}");
             if (PlayCommand?.CanExecute(null) == true)
                 PlayCommand.Execute(new Point(row, column));
         }

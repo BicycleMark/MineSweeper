@@ -14,12 +14,19 @@
         </ResourceDictionary>
     </ContentView.Resources>
     
-    <Border x:Name="mainBorder" StrokeThickness="2" Stroke="DarkGray">
+    <Border x:Name="mainBorder" 
+            StrokeThickness="0" 
+            Padding="4"
+            BackgroundColor="Transparent"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill">
         <controls:UniformGrid x:Name="board"
-                             Rows="{Binding Rows}"
-                             Columns="{Binding Columns}"
+                             Rows="{Binding Rows, FallbackValue=10}"
+                             Columns="{Binding Columns, FallbackValue=10}"
                              ItemsSource="{Binding Items}"
-                             ItemTemplate="{StaticResource SweeperItemTemplate}" />
+                             ItemTemplate="{StaticResource SweeperItemTemplate}"
+                             HorizontalOptions="Fill"
+                             VerticalOptions="Fill" />
     </Border>
 
 </ContentView>

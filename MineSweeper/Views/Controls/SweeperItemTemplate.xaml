@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:converters="clr-namespace:MineSweeper.Converters"
+             xmlns:converters="clr-namespace:MineSweeper.Views.Converters"
              x:Class="MineSweeper.Views.Controls.SweeperItemTemplate">
     <ContentView.Resources>
         <ResourceDictionary>
@@ -20,9 +20,13 @@
         </ResourceDictionary>
     </ContentView.Resources>
     
-    <Border Stroke="Gray" 
+    <Border Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}" 
             StrokeThickness="1" 
-            BackgroundColor="{Binding IsRevealed, Converter={StaticResource BoolToColorConverter}, ConverterParameter='White,LightGray'}">
+            StrokeShape="RoundRectangle 4"
+            BackgroundColor="{Binding IsRevealed, Converter={StaticResource BoolToColorConverter}, ConverterParameter='{StaticResource CellRevealed},{StaticResource CellUnrevealed}'}"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill"
+            Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,1', Radius='2', Opacity='0.1'}">
         <Grid>
             <!-- Hidden state (not revealed) -->
             <Grid IsVisible="{Binding IsRevealed, Converter={StaticResource BoolToColorConverter}, ConverterParameter='False,True'}">
@@ -31,7 +35,8 @@
                        IsVisible="{Binding IsFlagged}"
                        HorizontalOptions="Center" 
                        VerticalOptions="Center" 
-                       FontSize="18" />
+                       FontSize="18"
+                       TextColor="{StaticResource FlagColor}" />
             </Grid>
             
             <!-- Revealed state -->
@@ -41,7 +46,8 @@
                        IsVisible="{Binding IsMine}"
                        HorizontalOptions="Center" 
                        VerticalOptions="Center" 
-                       FontSize="18" />
+                       FontSize="18"
+                       TextColor="{StaticResource MineColor}" />
                 
                 <!-- Mine count (if not a mine and has adjacent mines) -->
                 <Label Text="{Binding MineCount}" 

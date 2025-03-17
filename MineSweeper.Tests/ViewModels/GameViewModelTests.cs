@@ -3,6 +3,9 @@ using Microsoft.Maui.Dispatching;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.Input;
+using Moq;
 
 namespace MineSweeper.Tests.ViewModels;
 
@@ -86,9 +89,28 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
         
         // Act
-        var viewModel = new GameViewModel(mockDispatcher);
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Assert
         Assert.NotNull(viewModel.NewGameCommand);
@@ -117,7 +139,27 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(expectedRows);
+        mockModel.Setup(m => m.Columns).Returns(expectedColumns);
+        mockModel.Setup(m => m.Mines).Returns(expectedMines);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(expectedMines);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(difficulty))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Act
         viewModel.NewGameCommand.Execute(difficulty);
@@ -141,7 +183,27 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Act
         viewModel.NewGameCommand.Execute(difficultyString);
@@ -155,7 +217,27 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(GameEnums.GameDifficulty.Easy))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Act
         viewModel.NewGameCommand.Execute("invalid");
@@ -172,7 +254,27 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Set initial game time
         var gameTimeProperty = typeof(GameViewModel).GetProperty("GameTime");
@@ -194,7 +296,27 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Get the timer
         var timer = viewModel.Timer as MockDispatcherTimer;
@@ -216,7 +338,42 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Create a collection of 100 SweeperItems (10x10 grid)
+        var items = new ObservableCollection<SweeperItem>();
+        for (int i = 0; i < 100; i++)
+        {
+            items.Add(new SweeperItem());
+        }
+        
+        // Setup mock model with a game status that can be changed
+        var gameStatus = GameEnums.GameStatus.NotStarted;
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(() => gameStatus);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { 
+            // Update game status to InProgress when Play is called
+            gameStatus = GameEnums.GameStatus.InProgress;
+        }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(items);
+        
+        // Allow setting the GameStatus property
+        mockModel.SetupSet(m => m.GameStatus = It.IsAny<GameEnums.GameStatus>())
+            .Callback<GameEnums.GameStatus>(status => gameStatus = status);
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Act
         viewModel.PlayCommand.Execute(new Point(0, 0));
@@ -237,7 +394,26 @@ public class GameViewModelTests
         // Arrange
         var mockDispatcher = new MockDispatcher();
         var mockLogger = new MockLogger();
-        var viewModel = new GameViewModel(mockDispatcher, mockLogger);
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Get the timer
         var timer = viewModel.Timer as MockDispatcherTimer;
@@ -277,7 +453,30 @@ public class GameViewModelTests
         // Arrange
         var mockDispatcher = new MockDispatcher();
         var mockLogger = new MockLogger();
-        var viewModel = new GameViewModel(mockDispatcher, mockLogger);
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        
+        // Setup flagged items to change when flag command is executed
+        var flaggedItems = 0;
+        mockModel.Setup(m => m.FlaggedItems).Returns(() => flaggedItems);
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => flaggedItems++));
+        
+        mockModel.Setup(m => m.RemainingMines).Returns(() => 10 - flaggedItems);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.InProgress);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Initialize game with a play move to set up the board
         viewModel.PlayCommand.Execute(new Point(0, 0));
@@ -325,8 +524,7 @@ public class GameViewModelTests
     // Helper method to get the FlaggedItems count from the model
     private int GetModelFlaggedItems(GameViewModel viewModel)
     {
-        var model = viewModel.Model as GameModel;
-        return model?.FlaggedItems ?? -1;
+        return viewModel.Model?.FlaggedItems ?? -1;
     }
 
     #endregion
@@ -338,7 +536,27 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var viewModel = new GameViewModel(mockDispatcher);
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Get the timer
         var timer = viewModel.Timer as MockDispatcherTimer;
@@ -356,7 +574,34 @@ public class GameViewModelTests
         // Arrange
         var mockDispatcher = new MockDispatcher();
         var mockLogger = new MockLogger();
-        var viewModel = new GameViewModel(mockDispatcher, mockLogger);
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock model with a game status that can be changed
+        var gameStatus = GameEnums.GameStatus.NotStarted;
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(() => gameStatus);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { 
+            // Update game status to InProgress when Play is called
+            gameStatus = GameEnums.GameStatus.InProgress;
+        }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        // Allow setting the GameStatus property
+        mockModel.SetupSet(m => m.GameStatus = It.IsAny<GameEnums.GameStatus>())
+            .Callback<GameEnums.GameStatus>(status => gameStatus = status);
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Initialize game
         viewModel.PlayCommand.Execute(new Point(0, 0));
@@ -396,17 +641,53 @@ public class GameViewModelTests
         // Arrange
         var mockDispatcher = new MockDispatcher();
         var mockLogger = new MockLogger();
-        var viewModel = new GameViewModel(mockDispatcher, mockLogger);
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Create a collection of SweeperItems with one mine
+        var items = new ObservableCollection<SweeperItem>();
+        for (int i = 0; i < 100; i++)
+        {
+            items.Add(new SweeperItem());
+        }
+        // Set the first item as a mine
+        items[0].IsMine = true;
+        
+        // Setup mock model with a game status that can be changed
+        var gameStatus = GameEnums.GameStatus.InProgress;
+        var mockModel = new Mock<IGameModel>();
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(() => gameStatus);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(items);
+        
+        // Setup the RevealAllMines method to reveal all mines
+        mockModel.Setup(m => m.RevealAllMines())
+            .Callback(() => {
+                foreach (var item in items.Where(i => i.IsMine))
+                {
+                    item.IsRevealed = true;
+                    item.IsFlagged = false;
+                }
+            });
+        
+        // Allow setting the GameStatus property
+        mockModel.SetupSet(m => m.GameStatus = It.IsAny<GameEnums.GameStatus>())
+            .Callback<GameEnums.GameStatus>(status => gameStatus = status);
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
         // Initialize game
         viewModel.PlayCommand.Execute(new Point(0, 0));
         
         Assert.NotNull(viewModel.Items);
-        
-        // Ensure at least one item is a mine
-        var mineItem = viewModel.Items.FirstOrDefault();
-        Assert.NotNull(mineItem);
-        mineItem.IsMine = true;
         
         // Act - set game status to lost
         viewModel.SetGameStatus(GameEnums.GameStatus.Lost);
@@ -415,7 +696,7 @@ public class GameViewModelTests
         viewModel.InvokeCheckGameStatus();
         
         // Assert
-        Assert.True(mineItem.IsRevealed, "Mine should be revealed when game is lost");
+        Assert.True(items[0].IsRevealed, "Mine should be revealed when game is lost");
     }
 
     #endregion

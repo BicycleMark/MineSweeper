@@ -22,4 +22,10 @@ public partial class MainPage : ContentPage
         // Start a new game with Easy difficulty
         _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
     }
+    
+    private async void OnGoToDebugPageClicked(object sender, EventArgs e)
+    {
+        // Navigate to the debug page
+        await Shell.Current.GoToAsync("///MainPageDebug");
+    }
 }
