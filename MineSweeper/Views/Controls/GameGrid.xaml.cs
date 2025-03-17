@@ -42,7 +42,7 @@ public partial class GameGrid : ContentView
         this.Loaded += OnLoaded;
     }
     
-    private void OnLoaded(object sender, EventArgs e)
+    private void OnLoaded(object? sender, EventArgs e)
     {
         try
         {
@@ -70,7 +70,7 @@ public partial class GameGrid : ContentView
         }
     }
 
-    private void OnCellTapped(object sender, EventArgs e)
+    private void OnCellTapped(object? sender, TappedEventArgs e)
     {
         // Check if board is null
         if (board == null)

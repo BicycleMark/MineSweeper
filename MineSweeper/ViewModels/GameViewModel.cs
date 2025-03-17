@@ -151,7 +151,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// Creates a new game with the specified difficulty
     /// </summary>
     /// <param name="difficultyParam">Difficulty parameter (can be GameDifficulty enum or string)</param>
-    private void NewGame(object difficultyParam)
+    private void NewGame(object? difficultyParam)
     {
         // Parse the difficulty parameter
         var difficulty = ParseDifficultyParameter(difficultyParam);
@@ -177,7 +177,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// </summary>
     /// <param name="difficultyParam">The difficulty parameter to parse</param>
     /// <returns>The parsed game difficulty</returns>
-    private GameEnums.GameDifficulty ParseDifficultyParameter(object difficultyParam)
+    private GameEnums.GameDifficulty ParseDifficultyParameter(object? difficultyParam)
     {
         return difficultyParam switch
         {

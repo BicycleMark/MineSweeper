@@ -19,7 +19,11 @@ public class GameStatusJsonConverter : JsonConverter<GameEnums.GameStatus>
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            string enumString = reader.GetString();
+            string? enumString = reader.GetString();
+            if (enumString == null)
+            {
+                return GameEnums.GameStatus.NotStarted; // Default value if string is null
+            }
             if (Enum.TryParse<GameEnums.GameStatus>(enumString, out var result))
             {
                 return result;
@@ -65,7 +69,11 @@ public class GameDifficultyJsonConverter : JsonConverter<GameEnums.GameDifficult
     {
         if (reader.TokenType == JsonTokenType.String)
         {
-            string enumString = reader.GetString();
+            string? enumString = reader.GetString();
+            if (enumString == null)
+            {
+                return GameEnums.GameDifficulty.Easy; // Default value if string is null
+            }
             if (Enum.TryParse<GameEnums.GameDifficulty>(enumString, out var result))
             {
                 return result;

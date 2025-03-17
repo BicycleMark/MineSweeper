@@ -17,7 +17,7 @@ public partial class MainPage : ContentPage
         Loaded += OnPageLoaded;
     }
     
-    private async void OnPageLoaded(object sender, EventArgs e)
+    private async void OnPageLoaded(object? sender, EventArgs e)
     {
         // Delay the game initialization to improve navigation performance
         await Task.Delay(100);
@@ -58,7 +58,7 @@ public partial class MainPage : ContentPage
         }
     }
     
-    private async void OnGoToDebugPageClicked(object sender, EventArgs e)
+    private async void OnGoToDebugPageClicked(object? sender, EventArgs e)
     {
         try
         {

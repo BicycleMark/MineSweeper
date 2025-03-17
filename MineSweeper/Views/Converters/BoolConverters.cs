@@ -5,7 +5,7 @@ namespace MineSweeper.Views.Converters;
 
 public class BoolToColorConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         // If the target type is Boolean, use the BoolToBoolConverter logic
         if (targetType == typeof(bool))
@@ -54,7 +54,7 @@ public class BoolToColorConverter : IValueConverter
         };
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
@@ -62,7 +62,7 @@ public class BoolToColorConverter : IValueConverter
 
 public class BoolToBoolConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool boolValue && parameter is string paramString)
         {
@@ -77,7 +77,7 @@ public class BoolToBoolConverter : IValueConverter
         return false;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
@@ -85,7 +85,7 @@ public class BoolToBoolConverter : IValueConverter
 
 public class BoolAndBoolConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool boolValue && parameter is bool paramBool)
         {
@@ -94,7 +94,7 @@ public class BoolAndBoolConverter : IValueConverter
         return false;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

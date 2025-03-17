@@ -37,7 +37,11 @@ public class SweeperItemJsonConverter : JsonConverter<SweeperItem>
                 throw new JsonException("Expected property name");
             }
 
-            string propertyName = reader.GetString();
+            string? propertyName = reader.GetString();
+            if (propertyName == null)
+            {
+                throw new JsonException("Property name cannot be null");
+            }
             reader.Read();
 
             switch (propertyName)
@@ -71,7 +75,11 @@ public class SweeperItemJsonConverter : JsonConverter<SweeperItem>
                                 throw new JsonException("Expected property name in Point object");
                             }
 
-                            string pointProperty = reader.GetString();
+                            string? pointProperty = reader.GetString();
+                            if (pointProperty == null)
+                            {
+                                throw new JsonException("Point property name cannot be null");
+                            }
                             reader.Read();
 
                             switch (pointProperty)

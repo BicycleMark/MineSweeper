@@ -15,6 +15,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         
+        <!-- Specify Java SDK version -->
+        <JavaSdkDirectory Condition="'$(TargetFramework)' == 'net9.0-android'">/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home</JavaSdkDirectory>
+        
         <!-- Make internals visible to test project -->
         <InternalsVisibleTo>MineSweeper.Tests</InternalsVisibleTo>
 
