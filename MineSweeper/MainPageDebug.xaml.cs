@@ -9,32 +9,65 @@ public partial class MainPageDebug : ContentPage
     // Constructor without ViewModel for initial testing
     public MainPageDebug()
     {
-        InitializeComponent();
-        
-        // Log that we're in the basic constructor
-        System.Diagnostics.Debug.WriteLine("MainPageDebug: Basic constructor called");
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: Basic constructor starting");
+            
+            // Initialize the XAML components
+            InitializeComponent();
+            
+            // Set a simple background color to verify the page is loading
+            BackgroundColor = Colors.LightBlue;
+            
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: Basic constructor completed successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in basic constructor: {ex}");
+            throw; // Rethrow to see the error
+        }
     }
     
     // Constructor with ViewModel for later phases
     public MainPageDebug(GameViewModel viewModel)
     {
-        InitializeComponent();
-        _viewModel = viewModel;
-        
-        // We'll uncomment this in later phases
-        // BindingContext = _viewModel;
-        
-        System.Diagnostics.Debug.WriteLine("MainPageDebug: ViewModel constructor called");
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: ViewModel constructor starting");
+            
+            InitializeComponent();
+            _viewModel = viewModel;
+            
+            // We'll uncomment this in later phases
+            // BindingContext = _viewModel;
+            
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: ViewModel constructor completed successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in ViewModel constructor: {ex}");
+            throw; // Rethrow to see the error
+        }
     }
     
     protected override void OnAppearing()
     {
-        base.OnAppearing();
-        System.Diagnostics.Debug.WriteLine("MainPageDebug: OnAppearing called");
-        
-        // Initialize all phases
-        InitializePhase1();
-        InitializePhase3();
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: OnAppearing starting");
+            
+            base.OnAppearing();
+            
+            // Initialize all phases
+            InitializePhase1();
+            InitializePhase3();
+            
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: OnAppearing completed successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in OnAppearing: {ex}");
+        }
     }
     
     private void InitializePhase1()
@@ -54,61 +87,13 @@ public partial class MainPageDebug : ContentPage
     
     private void InitializePhase3()
     {
-        System.Diagnostics.Debug.WriteLine("MainPageDebug: Phase 3 initialization - Direct UniformGrid test");
+        System.Diagnostics.Debug.WriteLine("MainPageDebug: Phase 3 initialization - Simplified for debugging");
         
-        // Log UniformGrid state
-        System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid is null? {uniformGrid == null}");
-        if (uniformGrid != null)
-        {
-            System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid Width={uniformGrid.Width}, Height={uniformGrid.Height}");
-            System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid Children count={uniformGrid.Children.Count}");
-            System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid Rows={uniformGrid.Rows}, Columns={uniformGrid.Columns}");
-            
-            // Add colored boxes to the UniformGrid programmatically
-            try
-            {
-                uniformGrid.Children.Clear();
-                
-                for (int i = 0; i < 25; i++)
-                {
-                    var row = i / 5;
-                    var col = i % 5;
-                    
-                    Color color;
-                    switch (i % 5)
-                    {
-                        case 0:
-                            color = Colors.Red;
-                            break;
-                        case 1:
-                            color = Colors.Blue;
-                            break;
-                        case 2:
-                            color = Colors.Green;
-                            break;
-                        case 3:
-                            color = Colors.Yellow;
-                            break;
-                        default:
-                            color = Colors.Purple;
-                            break;
-                    }
-                    
-                    var box = new BoxView { Color = color };
-                    Microsoft.Maui.Controls.Grid.SetRow(box, row);
-                    Microsoft.Maui.Controls.Grid.SetColumn(box, col);
-                    
-                    uniformGrid.Children.Add(box);
-                    System.Diagnostics.Debug.WriteLine($"MainPageDebug: Added box at row={row}, col={col}, color={color}");
-                }
-                
-                System.Diagnostics.Debug.WriteLine($"MainPageDebug: Added {uniformGrid.Children.Count} boxes to UniformGrid");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception adding boxes to UniformGrid: {ex}");
-            }
-        }
+        // We've removed the UniformGrid for now to simplify debugging
+        System.Diagnostics.Debug.WriteLine("MainPageDebug: Using simplified layout without UniformGrid");
+        
+        // Log that we're using the regular grid instead
+        System.Diagnostics.Debug.WriteLine($"MainPageDebug: Using regularGrid with 3x3 colored boxes");
     }
     
     private async void OnGoToMainPageClicked(object sender, EventArgs e)
