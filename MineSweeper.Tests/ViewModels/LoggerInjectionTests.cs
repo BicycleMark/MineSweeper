@@ -34,7 +34,10 @@ public class LoggerInjectionTests
         public TimeSpan Interval { get; set; }
         public bool IsRunning { get; private set; }
         public bool IsRepeating { get; set; } = true;
+        
+        #pragma warning disable CS0067 // The event is never used
         public event EventHandler? Tick;
+        #pragma warning restore CS0067
 
         public void Start() 
         {
