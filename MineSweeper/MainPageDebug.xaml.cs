@@ -1,10 +1,36 @@
+using Microsoft.Maui.Dispatching;
 using MineSweeper.ViewModels;
+using MineSweeper.Views.Controls;
+using MineSweeper.Models;
 
 namespace MineSweeper;
 
 public partial class MainPageDebug : ContentPage
 {
     private readonly GameViewModel? _viewModel;
+    private GameGrid? _gameGrid;
+    private readonly ILogger _logger = new DebugLogger();
+    
+    /// <summary>
+    /// Simple debug logger implementation for testing
+    /// </summary>
+    private class DebugLogger : ILogger
+    {
+        public void Log(string message)
+        {
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] {message}");
+        }
+
+        public void LogError(string message)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ERROR] {message}");
+        }
+
+        public void LogWarning(string message)
+        {
+            System.Diagnostics.Debug.WriteLine($"[WARNING] {message}");
+        }
+    }
     
     // Constructor without ViewModel for initial testing
     public MainPageDebug()
@@ -87,13 +113,84 @@ public partial class MainPageDebug : ContentPage
     
     private void InitializePhase3()
     {
-        System.Diagnostics.Debug.WriteLine("MainPageDebug: Phase 3 initialization - Simplified for debugging");
+        System.Diagnostics.Debug.WriteLine("MainPageDebug: Phase 3 initialization");
         
-        // We've removed the UniformGrid for now to simplify debugging
-        System.Diagnostics.Debug.WriteLine("MainPageDebug: Using simplified layout without UniformGrid");
-        
-        // Log that we're using the regular grid instead
-        System.Diagnostics.Debug.WriteLine($"MainPageDebug: Using regularGrid with 3x3 colored boxes");
+        // Just log information about the uniformGrid (now a regular Grid)
+        System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid is null? {uniformGrid == null}");
+        if (uniformGrid != null)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid Width={uniformGrid.Width}, Height={uniformGrid.Height}");
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: uniformGrid Children count={uniformGrid.Children.Count}");
+            
+            // Log each child's position
+            for (int i = 0; i < uniformGrid.Children.Count; i++)
+            {
+                var child = uniformGrid.Children[i];
+                var row = Microsoft.Maui.Controls.Grid.GetRow((View)child);
+                var column = Microsoft.Maui.Controls.Grid.GetColumn((View)child);
+                System.Diagnostics.Debug.WriteLine($"MainPageDebug: Child {i} at row={row}, column={column}");
+            }
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: uniformGrid is null");
+        }
+    }
+    
+    private void OnLaunchMainGridClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: OnLaunchMainGridClicked starting");
+            
+            // Toggle visibility of the game grid container
+            gameGridContainer.IsVisible = !gameGridContainer.IsVisible;
+            
+            if (gameGridContainer.IsVisible)
+            {
+                // Create the game grid if it doesn't exist
+                if (_gameGrid == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new GameGrid");
+                    
+                    // Create a simple GameViewModel if we don't have one
+                    var viewModel = _viewModel ?? new GameViewModel(
+                        Dispatcher,
+                        _logger,
+                        new GameModelFactory(_logger));
+                    
+                    // Create the GameGrid
+                    _gameGrid = new GameGrid
+                    {
+                        BindingContext = viewModel,
+                        HorizontalOptions = LayoutOptions.Fill,
+                        VerticalOptions = LayoutOptions.Fill
+                    };
+                    
+                    // Add the GameGrid to the container
+                    gameGridContainer.Content = _gameGrid;
+                    
+                    // Start a new game with Easy difficulty
+                    viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+                    
+                    System.Diagnostics.Debug.WriteLine("MainPageDebug: GameGrid created and added to container");
+                }
+                
+                // Update button text
+                ((Button)sender).Text = "Hide Main Grid";
+            }
+            else
+            {
+                // Update button text
+                ((Button)sender).Text = "Launch Main Grid";
+            }
+            
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: GameGrid container visibility: {gameGridContainer.IsVisible}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in OnLaunchMainGridClicked: {ex}");
+        }
     }
     
     private async void OnGoToMainPageClicked(object sender, EventArgs e)

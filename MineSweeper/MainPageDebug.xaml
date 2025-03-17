@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
              x:Class="MineSweeper.MainPageDebug"
              Title="Debug Page"
              BackgroundColor="LightBlue">
@@ -38,9 +39,57 @@
             <BoxView Grid.Row="2" Grid.Column="2" Color="Gray" />
         </Grid>
         
+        <!-- Label for UniformGrid -->
+        <Label Text="UniformGrid Example" 
+               FontSize="18"
+               HorizontalOptions="Center"
+               TextColor="Black"
+               Margin="0,20,0,10" />
+               
+        <!-- Grid for testing (instead of UniformGrid) -->
+        <Grid x:Name="uniformGrid"
+              RowDefinitions="*,*,*"
+              ColumnDefinitions="*,*,*"
+              RowSpacing="5"
+              ColumnSpacing="5"
+              HeightRequest="200"
+              HorizontalOptions="Fill">
+            
+            <BoxView Grid.Row="0" Grid.Column="0" Color="Red" />
+            <BoxView Grid.Row="0" Grid.Column="1" Color="Blue" />
+            <BoxView Grid.Row="0" Grid.Column="2" Color="Green" />
+            
+            <BoxView Grid.Row="1" Grid.Column="0" Color="Yellow" />
+            <BoxView Grid.Row="1" Grid.Column="1" Color="Purple" />
+            <BoxView Grid.Row="1" Grid.Column="2" Color="Orange" />
+            
+            <BoxView Grid.Row="2" Grid.Column="0" Color="Pink" />
+            <BoxView Grid.Row="2" Grid.Column="1" Color="Brown" />
+            <BoxView Grid.Row="2" Grid.Column="2" Color="Gray" />
+        </Grid>
+        
+        <!-- Container for GameGrid -->
+        <Border x:Name="gameGridContainer" 
+                IsVisible="False"
+                StrokeThickness="1"
+                Stroke="Black"
+                StrokeShape="RoundRectangle 8"
+                BackgroundColor="White"
+                Padding="8"
+                HeightRequest="300"
+                Margin="0,20,0,0">
+            <!-- GameGrid will be added here programmatically -->
+        </Border>
+        
+        <!-- Launch Main Grid Button -->
+        <Button Text="Launch Main Grid"
+                Margin="0,20,0,0"
+                HorizontalOptions="Center"
+                Clicked="OnLaunchMainGridClicked" />
+                
         <!-- Navigation Button -->
         <Button Text="Go to Main Page"
-                Margin="0,20,0,0"
+                Margin="0,10,0,0"
                 HorizontalOptions="Center"
                 Clicked="OnGoToMainPageClicked" />
     </VerticalStackLayout>

@@ -252,6 +252,9 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             _availableWidth = 100;
             _availableHeight = 100;
             
+            // Add handler for children changed
+            ChildAdded += OnChildAdded;
+            
             // Log initialization
             _logger.Log("UniformGrid initialized");
         }
@@ -260,10 +263,40 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             _logger.Log($"Exception in Initialize: {ex}");
         }
     }
+    
+    /// <summary>
+    /// Handles when a child is added to the grid
+    /// </summary>
+    private void OnChildAdded(object? sender, ElementEventArgs e)
+    {
+        try
+        {
+            if (e.Element is View view)
+            {
+                // Get the index of the child
+                var index = Children.IndexOf(view);
+                
+                // Calculate row and column based on index
+                var row = index / Math.Max(1, Columns);
+                var column = index % Math.Max(1, Columns);
+                
+                // Set the row and column on the child
+                Grid.SetRow(view, row);
+                Grid.SetColumn(view, column);
+                
+                _logger.Log($"Child added at index {index}, row={row}, column={column}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Log($"Exception in OnChildAdded: {ex}");
+        }
+    }
 
     // Private fields to store the available width and height
     private double _availableWidth;
     private double _availableHeight;
+    private bool _isUpdatingLayout = false;
     
     /// <summary>
     /// Updates the size of each item in the grid
@@ -272,6 +305,12 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     {
         try
         {
+            if (_isUpdatingLayout)
+            {
+                _logger.Log("Preventing layout loop in UpdateItemSize");
+                return;
+            }
+            
             // Ensure we have valid dimensions
             var rows = Math.Max(1, Rows);
             var columns = Math.Max(1, Columns);
@@ -286,9 +325,6 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             ItemSize = new Size(itemWidth, itemHeight);
             
             _logger.Log($"UpdateItemSize: Width={width}, Height={height}, Rows={rows}, Columns={columns}, ItemSize={ItemSize}");
-            
-            // Request a layout update
-            InvalidateMeasure();
         }
         catch (Exception ex)
         {
@@ -323,7 +359,15 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     {
         try
         {
-            _logger.Log($"MeasureOverride: widthConstraint={widthConstraint}, heightConstraint={heightConstraint}");
+            if (_isUpdatingLayout)
+            {
+                _logger.Log("Preventing layout loop in MeasureOverride");
+                return new Size(widthConstraint, heightConstraint);
+            }
+            
+            _isUpdatingLayout = true;
+            
+            _logger.Log($"MeasureOverride: widthConstraint={widthConstraint}, heightConstraint={heightConstraint}, Children.Count={Children.Count}");
             
             // Handle invalid constraints
             if (double.IsInfinity(widthConstraint) || widthConstraint <= 0)
@@ -343,19 +387,40 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             {
                 if (child is View view)
                 {
+                    // Ensure row and column are set
+                    var index = Children.IndexOf(view);
+                    var row = Grid.GetRow(view);
+                    var column = Grid.GetColumn(view);
+                    
+                    // If row or column are not set, calculate them based on index
+                    if (row == 0 && column == 0 && index > 0)
+                    {
+                        row = index / Math.Max(1, Columns);
+                        column = index % Math.Max(1, Columns);
+                        Grid.SetRow(view, row);
+                        Grid.SetColumn(view, column);
+                        _logger.Log($"Setting row={row}, column={column} for child at index {index}");
+                    }
+                    
                     view.Measure(ItemSize.Width, ItemSize.Height);
+                    _logger.Log($"Measured child at index {index}, row={row}, column={column}, size={ItemSize}");
                 }
             }
             
-            // Call base implementation
-            var size = base.MeasureOverride(widthConstraint, heightConstraint);
-            _logger.Log($"MeasureOverride result: {size}");
+            // Calculate the size based on the number of rows and columns
+            var resultWidth = ItemSize.Width * Columns;
+            var resultHeight = ItemSize.Height * Rows;
+            var result = new Size(resultWidth, resultHeight);
             
-            return size;
+            _logger.Log($"MeasureOverride result: {result}");
+            
+            _isUpdatingLayout = false;
+            return result;
         }
         catch (Exception ex)
         {
             _logger.Log($"Exception in MeasureOverride: {ex}");
+            _isUpdatingLayout = false;
             return new Size(widthConstraint, heightConstraint);
         }
     }
@@ -369,6 +434,14 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     {
         try
         {
+            if (_isUpdatingLayout)
+            {
+                _logger.Log("Preventing layout loop in ArrangeOverride");
+                return bounds.Size;
+            }
+            
+            _isUpdatingLayout = true;
+            
             _logger.Log($"ArrangeOverride: bounds={bounds}");
             
             // Update width and height
@@ -379,24 +452,25 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             UpdateItemSize();
             
             // Arrange each child
+            int index = 0;
             foreach (var child in Children)
             {
                 if (child is View view)
                 {
-                    var row = Grid.GetRow(view);
-                    var column = Grid.GetColumn(view);
-                    
-                    // Calculate position
-                    var x = column * ItemSize.Width;
-                    var y = row * ItemSize.Height;
+                    // Calculate position based on index
+                    int row = index / Math.Max(1, Columns);
+                    int column = index % Math.Max(1, Columns);
                     
                     // Create bounds for the child
+                    var x = column * ItemSize.Width;
+                    var y = row * ItemSize.Height;
                     var childBounds = new Rect(x, y, ItemSize.Width, ItemSize.Height);
                     
                     // Arrange the child
                     view.Arrange(childBounds);
                     
                     _logger.Log($"Arranged child at row={row}, column={column}, bounds={childBounds}");
+                    index++;
                 }
             }
             
@@ -404,11 +478,13 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             var size = base.ArrangeOverride(bounds);
             _logger.Log($"ArrangeOverride result: {size}");
             
+            _isUpdatingLayout = false;
             return size;
         }
         catch (Exception ex)
         {
             _logger.Log($"Exception in ArrangeOverride: {ex}");
+            _isUpdatingLayout = false;
             return bounds.Size;
         }
     }
