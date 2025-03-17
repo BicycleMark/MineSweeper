@@ -6,6 +6,7 @@
     <ContentView.Resources>
         <ResourceDictionary>
             <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+            <converters:BoolToBoolConverter x:Key="BoolToBoolConverter" />
             <converters:BoolAndBoolConverter x:Key="BoolAndBoolConverter" />
             
             <!-- Colors for different mine counts -->
@@ -29,7 +30,7 @@
             Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,1', Radius='2', Opacity='0.1'}">
         <Grid>
             <!-- Hidden state (not revealed) -->
-            <Grid IsVisible="{Binding IsRevealed, Converter={StaticResource BoolToColorConverter}, ConverterParameter='False,True'}">
+            <Grid IsVisible="{Binding IsRevealed, Converter={StaticResource BoolToBoolConverter}, ConverterParameter='False,True'}">
                 <!-- Flag icon (if flagged) -->
                 <Label Text="🚩" 
                        IsVisible="{Binding IsFlagged}"
@@ -51,7 +52,7 @@
                 
                 <!-- Mine count (if not a mine and has adjacent mines) -->
                 <Label Text="{Binding MineCount}" 
-                       IsVisible="{Binding IsMine, Converter={StaticResource BoolToColorConverter}, ConverterParameter='False,True'}"
+                       IsVisible="{Binding IsMine, Converter={StaticResource BoolToBoolConverter}, ConverterParameter='False,True'}"
                        HorizontalOptions="Center" 
                        VerticalOptions="Center" 
                        FontSize="16"

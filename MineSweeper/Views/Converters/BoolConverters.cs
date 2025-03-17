@@ -7,6 +7,13 @@ public class BoolToColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        // If the target type is Boolean, use the BoolToBoolConverter logic
+        if (targetType == typeof(bool))
+        {
+            return new BoolToBoolConverter().Convert(value, targetType, parameter, culture);
+        }
+        
+        // Otherwise, use the original color conversion logic
         if (value is bool boolValue && parameter is string paramString)
         {
             var colorNames = paramString.Split(',');
@@ -45,6 +52,29 @@ public class BoolToColorConverter : IValueConverter
             "white" => Colors.White,
             _ => Colors.Transparent
         };
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class BoolToBoolConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool boolValue && parameter is string paramString)
+        {
+            var boolValues = paramString.Split(',');
+            if (boolValues.Length >= 2)
+            {
+                bool trueValue = bool.Parse(boolValues[0].Trim());
+                bool falseValue = bool.Parse(boolValues[1].Trim());
+                return boolValue ? trueValue : falseValue;
+            }
+        }
+        return false;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

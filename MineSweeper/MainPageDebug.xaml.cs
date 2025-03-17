@@ -8,7 +8,8 @@ namespace MineSweeper;
 public partial class MainPageDebug : ContentPage
 {
     private readonly GameViewModel? _viewModel;
-    private GameGrid? _gameGrid;
+    private ContentView? _gameGrid;
+    private bool _useStandardGrid = false;
     private readonly ILogger _logger = new DebugLogger();
     
     /// <summary>
@@ -153,6 +154,83 @@ public partial class MainPageDebug : ContentPage
         }
     }
     
+    private void OnGridTypeChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            // Get the selected grid type
+            var selectedIndex = gridTypePicker.SelectedIndex;
+            _useStandardGrid = selectedIndex == 1; // 1 = Standard Grid, 0 = UniformGrid
+            
+            // Log the selection
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Grid type changed to {(selectedIndex == 1 ? "Standard Grid" : "UniformGrid")}");
+            
+            // If the grid is already visible, recreate it with the new type
+            if (gameGridContainer.IsVisible && _gameGrid != null)
+            {
+                // Store the current ViewModel
+                var viewModel = _gameGrid.BindingContext;
+                
+                // Clear the existing grid
+                gameGridContainer.Content = null;
+                _gameGrid = null;
+                
+                // Create a new grid of the selected type
+                CreateGameGrid(viewModel as GameViewModel);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in OnGridTypeChanged: {ex}");
+        }
+    }
+    
+    private void CreateGameGrid(GameViewModel? viewModel)
+    {
+        try
+        {
+            // Create a ViewModel if one wasn't provided
+            viewModel ??= new GameViewModel(
+                Dispatcher,
+                _logger,
+                new GameModelFactory(_logger));
+            
+            // Create the appropriate grid type
+            if (_useStandardGrid)
+            {
+                System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new StandardGameGrid");
+                _gameGrid = new StandardGameGrid
+                {
+                    BindingContext = viewModel,
+                    HorizontalOptions = LayoutOptions.Fill,
+                    VerticalOptions = LayoutOptions.Fill
+                };
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new GameGrid (UniformGrid)");
+                _gameGrid = new GameGrid
+                {
+                    BindingContext = viewModel,
+                    HorizontalOptions = LayoutOptions.Fill,
+                    VerticalOptions = LayoutOptions.Fill
+                };
+            }
+            
+            // Add the grid to the container
+            gameGridContainer.Content = _gameGrid;
+            
+            // Start a new game with Easy difficulty
+            viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+            
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: {(_useStandardGrid ? "StandardGameGrid" : "GameGrid")} created and added to container");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in CreateGameGrid: {ex}");
+        }
+    }
+    
     private void OnLaunchMainGridClicked(object sender, EventArgs e)
     {
         try
@@ -167,29 +245,8 @@ public partial class MainPageDebug : ContentPage
                 // Create the game grid if it doesn't exist
                 if (_gameGrid == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new GameGrid");
-                    
-                    // Create a simple GameViewModel if we don't have one
-                    var viewModel = _viewModel ?? new GameViewModel(
-                        Dispatcher,
-                        _logger,
-                        new GameModelFactory(_logger));
-                    
-                    // Create the GameGrid
-                    _gameGrid = new GameGrid
-                    {
-                        BindingContext = viewModel,
-                        HorizontalOptions = LayoutOptions.Fill,
-                        VerticalOptions = LayoutOptions.Fill
-                    };
-                    
-                    // Add the GameGrid to the container
-                    gameGridContainer.Content = _gameGrid;
-                    
-                    // Start a new game with Easy difficulty
-                    viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
-                    
-                    System.Diagnostics.Debug.WriteLine("MainPageDebug: GameGrid created and added to container");
+                    // Create the appropriate grid type
+                    CreateGameGrid(_viewModel);
                 }
                 
                 // Update button text

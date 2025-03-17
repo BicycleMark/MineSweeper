@@ -7,7 +7,8 @@
              BackgroundColor="LightBlue">
 
     <!-- Simplified layout for debugging -->
-    <VerticalStackLayout Padding="20" Spacing="20">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
         <Label Text="Debug Page" 
                FontSize="32" 
                HorizontalOptions="Center"
@@ -68,6 +69,35 @@
             <BoxView Grid.Row="2" Grid.Column="2" Color="Gray" />
         </Grid>
         
+        <!-- Label for Standard Grid -->
+        <Label Text="Standard Grid Example" 
+               FontSize="18"
+               HorizontalOptions="Center"
+               TextColor="Black"
+               Margin="0,20,0,10" />
+               
+        <!-- Standard Grid for comparison -->
+        <Grid x:Name="standardGrid"
+              RowDefinitions="*,*,*"
+              ColumnDefinitions="*,*,*"
+              RowSpacing="5"
+              ColumnSpacing="5"
+              HeightRequest="200"
+              HorizontalOptions="Fill">
+            
+            <BoxView Grid.Row="0" Grid.Column="0" Color="DarkRed" />
+            <BoxView Grid.Row="0" Grid.Column="1" Color="DarkBlue" />
+            <BoxView Grid.Row="0" Grid.Column="2" Color="DarkGreen" />
+            
+            <BoxView Grid.Row="1" Grid.Column="0" Color="Gold" />
+            <BoxView Grid.Row="1" Grid.Column="1" Color="Indigo" />
+            <BoxView Grid.Row="1" Grid.Column="2" Color="DarkOrange" />
+            
+            <BoxView Grid.Row="2" Grid.Column="0" Color="HotPink" />
+            <BoxView Grid.Row="2" Grid.Column="1" Color="Chocolate" />
+            <BoxView Grid.Row="2" Grid.Column="2" Color="DimGray" />
+        </Grid>
+        
         <!-- Container for GameGrid -->
         <Border x:Name="gameGridContainer" 
                 IsVisible="False"
@@ -81,9 +111,20 @@
             <!-- GameGrid will be added here programmatically -->
         </Border>
         
+        <!-- Grid Type Selection -->
+        <HorizontalStackLayout HorizontalOptions="Center" Spacing="10" Margin="0,20,0,0">
+            <Label Text="Grid Type:" VerticalOptions="Center" />
+            <Picker x:Name="gridTypePicker" SelectedIndexChanged="OnGridTypeChanged" WidthRequest="150">
+                <Picker.Items>
+                    <x:String>UniformGrid</x:String>
+                    <x:String>Standard Grid</x:String>
+                </Picker.Items>
+            </Picker>
+        </HorizontalStackLayout>
+        
         <!-- Launch Main Grid Button -->
         <Button Text="Launch Main Grid"
-                Margin="0,20,0,0"
+                Margin="0,10,0,0"
                 HorizontalOptions="Center"
                 Clicked="OnLaunchMainGridClicked" />
                 
@@ -92,5 +133,6 @@
                 Margin="0,10,0,0"
                 HorizontalOptions="Center"
                 Clicked="OnGoToMainPageClicked" />
-    </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

@@ -17,8 +17,11 @@ public partial class MainPage : ContentPage
         Loaded += OnPageLoaded;
     }
     
-    private void OnPageLoaded(object sender, EventArgs e)
+    private async void OnPageLoaded(object sender, EventArgs e)
     {
+        // Delay the game initialization to improve navigation performance
+        await Task.Delay(100);
+        
         // Start a new game with Easy difficulty
         _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
     }

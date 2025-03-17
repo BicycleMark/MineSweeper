@@ -51,7 +51,8 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
+    <ScrollView>
+        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -146,9 +147,13 @@
                 BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
                 Padding="8"
                 Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,4', Radius='8', Opacity='0.2'}">
-            <controls:GameGrid
+            <!-- Use StandardGameGrid instead of GameGrid for better performance -->
+            <controls:StandardGameGrid
                 PlayCommand="{Binding PlayCommand}" 
                 FlagCommand="{Binding FlagCommand}"
+                ItemsSource="{Binding Items}"
+                Rows="{Binding Rows}"
+                Columns="{Binding Columns}"
                 BindingContext="{Binding .}" />
         </Border>
         
@@ -168,4 +173,5 @@
                     Clicked="OnGoToDebugPageClicked" />
         </VerticalStackLayout>
     </Grid>
+    </ScrollView>
 </ContentPage>
