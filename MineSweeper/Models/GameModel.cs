@@ -2,6 +2,8 @@ namespace MineSweeper.Models;
 
 public partial class GameModel : ObservableObject
 {
+    private readonly ILogger? _logger;
+    
     public static class GameConstants
     {
         public static readonly Dictionary
@@ -77,8 +79,10 @@ public partial class GameModel : ObservableObject
     /// <param name="rows">Number of rows in the game</param>
     /// <param name="columns">Number of columns in the game</param>
     /// <param name="mines">Number of Mines to be generated in random spots</param>
-    public GameModel(int rows = 10, int columns = 10, int mines = 10)
+    /// <param name="logger">Optional logger for debugging</param>
+    public GameModel(int rows = 10, int columns = 10, int mines = 10, ILogger? logger = null)
     {
+        _logger = logger;
         _rows = rows;
         _columns = columns;
         _gameTime = 0;
@@ -89,6 +93,8 @@ public partial class GameModel : ObservableObject
         for (var i = 0; i < rows; i++)
         for (var j = 0; j < columns; j++)
             _items.Add(new SweeperItem());
+        
+        _logger?.Log($"GameModel created with {rows}x{columns} grid and {mines} mines");
     }
 
 
@@ -97,9 +103,11 @@ public partial class GameModel : ObservableObject
     /// The Rows, Columns and Mines are defined in the GameConstants
     /// <see cref="GameConstants.GameLevels"/>
     /// </summary>
-    /// <param name="gameDifficulty"></param>
-    public GameModel(GameEnums.GameDifficulty gameDifficulty)
+    /// <param name="gameDifficulty">The difficulty level</param>
+    /// <param name="logger">Optional logger for debugging</param>
+    public GameModel(GameEnums.GameDifficulty gameDifficulty, ILogger? logger = null)
     {
+        _logger = logger;
         var (rows, columns, mines) = GameConstants.GameLevels[gameDifficulty];
         _rows = rows;
         _columns = columns;
@@ -111,6 +119,8 @@ public partial class GameModel : ObservableObject
         for (var i = 0; i < rows; i++)
         for (var j = 0; j < columns; j++)
             _items.Add(new SweeperItem());
+        
+        _logger?.Log($"GameModel created with difficulty {gameDifficulty}: {rows}x{columns} grid and {mines} mines");
     }
 
     /// <summary>
@@ -149,18 +159,40 @@ public partial class GameModel : ObservableObject
     /// <returns>GameStatus</returns>
     private GameEnums.GameStatus EvaluateIfWon()
     {
+        _logger?.Log($"EvaluateIfWon called. Current GameStatus: {GameStatus}");
+        
         if (GameStatus == GameEnums.GameStatus.InProgress)
         {
-            // Linq that returns Count of all mines on the board that are not Flagged
-            var minesNotFlagged = Items!.Count(i => i.IsMine && !i.IsFlagged);
-            if (minesNotFlagged == 0)
+            // Only evaluate win condition if there are mines on the board
+            var minesOnBoard = Items!.Count(i => i.IsMine);
+            _logger?.Log($"Mines on board: {minesOnBoard}");
+            
+            if (minesOnBoard > 0)
             {
-                GameStatus = GameEnums.GameStatus.Won;
+                // Linq that returns Count of all mines on the board that are not Flagged
+                var minesNotFlagged = Items!.Count(i => i.IsMine && !i.IsFlagged);
+                var minesFlagged = Items!.Count(i => i.IsMine && i.IsFlagged);
+                _logger?.Log($"Mines not flagged: {minesNotFlagged}, Mines flagged: {minesFlagged}");
+                
+                if (minesNotFlagged == 0)
+                {
+                    GameStatus = GameEnums.GameStatus.Won;
+                    _logger?.Log("All mines flagged, game won!");
+                }
+                else
+                {
+                    _logger?.Log("Not all mines flagged, game continues");
+                    // GameStatus = GameEnums.GameStatus.InProgress;
+                }
             }
             else
             {
-                // GameStatus = GameEnums.GameStatus.InProgress;
+                _logger?.Log("No mines on board yet, cannot evaluate win condition");
             }
+        }
+        else
+        {
+            _logger?.Log($"Game not in progress, status remains: {GameStatus}");
         }
 
         return GameStatus;
@@ -175,34 +207,60 @@ public partial class GameModel : ObservableObject
     private void Flag(Point pt)
     {
         var (row, column) = ExtractRowColTuple(pt);
-        if (GameStatus == GameEnums.GameStatus.NotStarted) GameStatus = GameEnums.GameStatus.InProgress;
+        _logger?.Log($"Flag called at ({row},{column}). Current GameStatus: {GameStatus}, FlaggedItems: {FlaggedItems}");
+        
+        if (GameStatus == GameEnums.GameStatus.NotStarted)
+        {
+            GameStatus = GameEnums.GameStatus.InProgress;
+            _logger?.Log("Game status changed from NotStarted to InProgress");
+        }
 
-        if (!InBounds(row, column)) return;
+        if (!InBounds(row, column))
+        {
+            _logger?.LogWarning($"Point ({row},{column}) is out of bounds");
+            return;
+        }
 
         var item = this[row, column];
 
         if (item.IsRevealed)
+        {
+            _logger?.Log($"Item at ({row},{column}) is already revealed, cannot flag");
             return;
+        }
 
-        item.IsFlagged = !item.IsFlagged;
+        bool wasFlagged = item.IsFlagged;
+        item.IsFlagged = !wasFlagged;
+        _logger?.Log($"Item at ({row},{column}) flag toggled from {wasFlagged} to {item.IsFlagged}");
 
+        int oldFlaggedItems = FlaggedItems;
         FlaggedItems = CountFlaggedItems();
+        _logger?.Log($"FlaggedItems updated from {oldFlaggedItems} to {FlaggedItems}");
+        
+        int oldRemainingMines = RemainingMines;
         RemainingMines = Mines - FlaggedItems;
+        _logger?.Log($"RemainingMines updated from {oldRemainingMines} to {RemainingMines}");
 
+        GameEnums.GameStatus oldStatus = GameStatus;
         GameStatus = EvaluateIfWon();
+        if (oldStatus != GameStatus)
+        {
+            _logger?.Log($"Game status changed from {oldStatus} to {GameStatus}");
+        }
+        
+        _logger?.Log($"Flag operation completed. FlaggedItems: {FlaggedItems}, RemainingMines: {RemainingMines}");
     }
 
     /// <summary>
     /// Plays a game piece at a specific row and column
     /// </summary>
     /// <param name="pt">The Point to play</param>
-
-    // What is wrong with this code?
     [RelayCommand]
     private void Play(Point pt)
     {
         void InitializeGame(int rows, int columns, int mines, int firstRow, int firstColumn)
         {
+            _logger?.Log($"Initializing game with {rows}x{columns} grid and {mines} mines. First move at ({firstRow},{firstColumn})");
             var random = new Random();
             var minesPlaced = 0;
             while (minesPlaced < mines)
@@ -213,6 +271,7 @@ public partial class GameModel : ObservableObject
                 this[r, c].IsMine = true;
                 minesPlaced++;
             }
+            _logger?.Log($"Placed {minesPlaced} mines on the board");
 
             for (var i = 0; i < rows; i++)
             for (var j = 0; j < columns; j++)
@@ -225,16 +284,36 @@ public partial class GameModel : ObservableObject
                     it.Point = new Point(i, j);
                 }
             }
+            _logger?.Log("Calculated mine counts for all cells");
         }
 
         var (row, column) = ExtractRowColTuple(pt);
+        _logger?.Log($"Play called at ({row},{column}). Current GameStatus: {GameStatus}");
 
-        if (!InBounds(row, column) || this[row, column].IsFlagged || this[row, column].IsRevealed) return;
+        if (!InBounds(row, column))
+        {
+            _logger?.LogWarning($"Point ({row},{column}) is out of bounds");
+            return;
+        }
+        
+        if (this[row, column].IsFlagged)
+        {
+            _logger?.Log($"Cell at ({row},{column}) is flagged, cannot play");
+            return;
+        }
+        
+        if (this[row, column].IsRevealed)
+        {
+            _logger?.Log($"Cell at ({row},{column}) is already revealed");
+            return;
+        }
 
         if (GameStatus != GameEnums.GameStatus.InProgress)
         {
+            _logger?.Log("First play, initializing game board with mines");
             InitializeGame(Rows, Columns, Mines, row, column);
             GameStatus = GameEnums.GameStatus.InProgress;
+            _logger?.Log("Game status set to InProgress");
         }
 
         var item = this[row, column];
@@ -243,22 +322,29 @@ public partial class GameModel : ObservableObject
         {
             GameStatus = GameEnums.GameStatus.Lost;
             item.IsRevealed = true;
+            _logger?.Log($"Mine hit at ({row},{column}), game lost!");
             return;
         }
 
-
         if (item.IsRevealed)
+        {
+            _logger?.Log($"Cell at ({row},{column}) is already revealed");
             return;
+        }
 
         item.IsRevealed = true;
+        _logger?.Log($"Revealed cell at ({row},{column}), mine count: {item.MineCount}");
 
         if (item.MineCount == 0)
         {
+            _logger?.Log($"Cell at ({row},{column}) has no adjacent mines, revealing neighbors");
             var neighbors = GetNeighbors(row, column);
             foreach (var neighbor in neighbors)
                 if (!neighbor.IsRevealed && !neighbor.IsFlagged && GameStatus == GameEnums.GameStatus.InProgress)
                     Play(neighbor.Point);
         }
+        
+        _logger?.Log($"Play operation completed. GameStatus: {GameStatus}");
     }
 
     private int CountFlaggedItems()

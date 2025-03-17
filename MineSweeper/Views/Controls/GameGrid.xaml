@@ -2,9 +2,24 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
+             xmlns:models="clr-namespace:MineSweeper.Models"
              x:Class="MineSweeper.Views.Controls.GameGrid">
-    <Border x:Name="mainBorder">
-        <Grid x:Name="board" />
+    
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <DataTemplate x:Key="SweeperItemTemplate" x:DataType="models:SweeperItem">
+                <controls:SweeperItemTemplate />
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    
+    <Border x:Name="mainBorder" StrokeThickness="2" Stroke="DarkGray">
+        <controls:UniformGrid x:Name="board"
+                             Rows="{Binding Rows}"
+                             Columns="{Binding Columns}"
+                             ItemsSource="{Binding Items}"
+                             ItemTemplate="{StaticResource SweeperItemTemplate}" />
     </Border>
 
 </ContentView>

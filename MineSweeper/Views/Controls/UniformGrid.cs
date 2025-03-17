@@ -3,8 +3,10 @@ using Size = Microsoft.Maui.Graphics.Size;
 
 namespace MineSweeper.Views.Controls;
 
-public class UniformGrid : UniformItemsLayout
+public class UniformGrid : UniformItemsLayout, IGridLayout
 {
+    private IGridLayout _gridLayoutImplementation;
+
     /// <summary>
     /// 
     /// </summary>
@@ -34,6 +36,8 @@ public class UniformGrid : UniformItemsLayout
         // Re-add items with the new template
         foreach (var item in newValue)
         {
+            if (ItemTemplate is null)
+                ItemTemplate = new DataTemplate(() => new Label());
             var view = (View) ItemTemplate.CreateContent();
             view.BindingContext = item;
             // How to set each item's position in the grid?
@@ -43,8 +47,6 @@ public class UniformGrid : UniformItemsLayout
             Grid.SetColumn(view, column);
             Children.Add(view);
             index++;
-            
-            Children.Add(view);
         }
 
         // Update the item size
@@ -57,6 +59,7 @@ public class UniformGrid : UniformItemsLayout
             nameof(ItemTemplate),
             typeof(DataTemplate),
             typeof(UniformGrid),
+            null,
             propertyChanged: (bindable, oldValue, newValue) =>
             {
                 var control = (UniformGrid) bindable;
@@ -149,6 +152,7 @@ public class UniformGrid : UniformItemsLayout
 
     private void Initialize()
     {
+        _gridLayoutImplementation = this;
     }
 
     private void UpdateItemSize()
@@ -175,17 +179,45 @@ public class UniformGrid : UniformItemsLayout
 
     protected override Size ArrangeOverride(Rect bounds)
     {
-        if (ItemSize.Width == 0 || ItemSize.Height == 0) UpdateItemSize();
+        if (ItemSize.Width == 0 || ItemSize.Height == 0) 
+            UpdateItemSize();
         var sz = base.ArrangeOverride(bounds);
         return new Size(bounds.Width, bounds.Height);
     }
 
-    private RowDefinitionCollection _rowDefinitions;
-    protected RowDefinitionCollection RowDefinitions => _rowDefinitions ??= new RowDefinitionCollection();
+    
+   
+    
+    // IGridLayout implementation for UniformGrid
+    public int GetRow(IView view)
+    {
+        var index = Children.IndexOf((View)view);
+        return index / Columns;
+    }
 
-    private ColumnDefinitionCollection _columnDefinitions;
-    protected ColumnDefinitionCollection ColumnDefinitions => _columnDefinitions ??= new ColumnDefinitionCollection();
-    protected Size ItemSize { get; set; }
+    public int GetRowSpan(IView view)
+    {
+        return 1;
+    }
+
+    public int GetColumn(IView view)
+    {
+        var index = Children.IndexOf((View)view);
+        return index % Columns;
+    }
+
+    public int GetColumnSpan(IView view)
+    {
+        return 1;
+    }
+
+    public IReadOnlyList<IGridRowDefinition> RowDefinitions => new List<IGridRowDefinition>();
+
+    public IReadOnlyList<IGridColumnDefinition> ColumnDefinitions => new List<IGridColumnDefinition>();
+
+    public double RowSpacing => 0;
+    public double ColumnSpacing => 0;
+    private Size ItemSize { get; set; }
 
     #endregion
 }

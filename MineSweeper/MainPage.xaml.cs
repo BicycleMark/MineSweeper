@@ -1,44 +1,25 @@
-﻿using MineSweeper.Models;
-using MineSweeper.Views.Controls;
+using MineSweeper.Models;
+using MineSweeper.ViewModels;
 
 namespace MineSweeper;
 
 public partial class MainPage : ContentPage
 {
-    public MainPage()
+    private readonly GameViewModel _viewModel;
+    
+    public MainPage(GameViewModel viewModel)
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch (Exception ex)
-        {
-            // Log the exception or handle it as needed
-            Console.WriteLine($"Error during InitializeComponent: {ex.Message}");
-        }
+        InitializeComponent();
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+        
+        // Start a new game when the page is loaded
+        Loaded += OnPageLoaded;
     }
-
-
-    private void OnEasyClicked(object? sender, EventArgs e)
+    
+    private void OnPageLoaded(object sender, EventArgs e)
     {
-        throw new NotImplementedException();
-    }
-
-    private void NewGame_Clicked(object? sender, EventArgs e)
-    {
-        var gg = new UniformGrid();
-        gg.ItemsSource = new List<SweeperItem>
-        {
-            new() {IsMine = true},
-            new() {IsMine = false},
-            new() {IsMine = false},
-            new() {IsMine = false}
-        };
-        gg.ItemTemplate = new DataTemplate(() =>
-        {
-            var label = new Label();
-            label.SetBinding(Label.TextProperty, nameof(SweeperItem.IsMine));
-            return label;
-        });
+        // Start a new game with Easy difficulty
+        _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
     }
 }

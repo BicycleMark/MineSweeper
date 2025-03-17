@@ -146,6 +146,35 @@ public class GameModelTests
     [InlineData(GameEnums.GameDifficulty.Easy)]
     [InlineData(GameEnums.GameDifficulty.Medium)]
     [InlineData(GameEnums.GameDifficulty.Hard)]
+    public void Flag_FirstMove_InitializesGame(GameEnums.GameDifficulty gd)
+    {
+        // Arrange
+        var game = new GameModel(gd);
+        Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
+        Assert.Equal(0, game.Items.Count(i => i.IsMine));
+        
+        // Act - Flag a cell as the first move
+        var point = new Point(0, 0);
+        game.FlagCommand.Execute(point);
+        
+        // Assert
+        Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
+        Assert.True(game[0, 0].IsFlagged);
+        
+        // Verify no mines are placed yet (mines are only placed on first Play)
+        Assert.Equal(0, game.Items.Count(i => i.IsMine));
+        
+        // Verify FlaggedItems count is updated
+        Assert.Equal(1, game.FlaggedItems);
+        
+        // Verify RemainingMines is updated
+        Assert.Equal(game.Mines - 1, game.RemainingMines);
+    }
+
+    [Theory]
+    [InlineData(GameEnums.GameDifficulty.Easy)]
+    [InlineData(GameEnums.GameDifficulty.Medium)]
+    [InlineData(GameEnums.GameDifficulty.Hard)]
     public void FlagAllMinesAndEnsureGameWasWonTest(GameEnums.GameDifficulty gd)
     {
         var game = new GameModel(gd);

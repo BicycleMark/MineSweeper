@@ -1,9 +1,8 @@
-﻿using CommunityToolkit.Maui;
+﻿﻿﻿﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using MineSweeper.ViewModels;
 
-namespace MineSweeper
-
-;
+namespace MineSweeper;
 
 public static class MauiProgram
 {
@@ -18,8 +17,12 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
-        // Register FileSystem Dependency   
-        // builder.Services.AddSingleton(_ => File);
+        
+        // Register ViewModels
+        builder.Services.AddSingleton<GameViewModel>();
+        
+        // Register Pages
+        builder.Services.AddSingleton<MainPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
