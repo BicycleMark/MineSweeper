@@ -96,6 +96,22 @@ public partial class MainPageDebug : ContentPage
         }
     }
     
+    protected override void OnDisappearing()
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: OnDisappearing starting");
+            
+            base.OnDisappearing();
+            
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: OnDisappearing completed successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception in OnDisappearing: {ex}");
+        }
+    }
+    
     private void InitializePhase1()
     {
         System.Diagnostics.Debug.WriteLine("MainPageDebug: Phase 1 initialization");
@@ -195,7 +211,44 @@ public partial class MainPageDebug : ContentPage
     
     private async void OnGoToMainPageClicked(object sender, EventArgs e)
     {
-        // Navigate back to the main page
-        await Shell.Current.GoToAsync("///MainPage");
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: Navigation to MainPage starting");
+            
+            // Log the current state before navigation
+            if (gameGridContainer != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"MainPageDebug: Current GameGrid state - IsVisible: {gameGridContainer.IsVisible}");
+                if (_gameGrid != null)
+                {
+                    System.Diagnostics.Debug.WriteLine("MainPageDebug: GameGrid is initialized");
+                    // Log any relevant GameGrid state here
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("MainPageDebug: GameGrid is null");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("MainPageDebug: gameGridContainer is null");
+            }
+            
+            // Navigate to the main page using the registered route
+            if (Shell.Current != null)
+            {
+                // Use the route name without the "///" prefix
+                await Shell.Current.GoToAsync("//MainPage");
+                System.Diagnostics.Debug.WriteLine("MainPageDebug: Navigation to MainPage completed");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("MainPageDebug: Shell.Current is null, cannot navigate");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception during navigation to MainPage: {ex}");
+        }
     }
 }

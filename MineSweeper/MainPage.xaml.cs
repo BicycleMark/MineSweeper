@@ -23,9 +23,69 @@ public partial class MainPage : ContentPage
         _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
     }
     
+    protected override void OnAppearing()
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPage: OnAppearing starting");
+            
+            base.OnAppearing();
+            
+            System.Diagnostics.Debug.WriteLine("MainPage: OnAppearing completed successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPage: Exception in OnAppearing: {ex}");
+        }
+    }
+    
+    protected override void OnDisappearing()
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPage: OnDisappearing starting");
+            
+            base.OnDisappearing();
+            
+            System.Diagnostics.Debug.WriteLine("MainPage: OnDisappearing completed successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPage: Exception in OnDisappearing: {ex}");
+        }
+    }
+    
     private async void OnGoToDebugPageClicked(object sender, EventArgs e)
     {
-        // Navigate to the debug page
-        await Shell.Current.GoToAsync("///MainPageDebug");
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("MainPage: Navigation to MainPageDebug starting");
+            
+            // Log the current state before navigation
+            if (_viewModel != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"MainPage: Current ViewModel state - GameStatus: {_viewModel.GameStatus}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("MainPage: ViewModel is null");
+            }
+            
+            // Navigate to the debug page using the registered route
+            if (Shell.Current != null)
+            {
+                // Use the route name without the "///" prefix
+                await Shell.Current.GoToAsync("//MainPageDebug");
+                System.Diagnostics.Debug.WriteLine("MainPage: Navigation to MainPageDebug completed");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("MainPage: Shell.Current is null, cannot navigate");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"MainPage: Exception during navigation to MainPageDebug: {ex}");
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿namespace MineSweeper;
+﻿﻿﻿﻿﻿﻿﻿namespace MineSweeper;
 
 public partial class App : Application
 {
@@ -14,23 +14,24 @@ public partial class App : Application
     {
         try
         {
-            // Create MainPageDebug directly without using AppShell
-            System.Diagnostics.Debug.WriteLine("App: Creating MainPageDebug directly");
-            var mainPageDebug = new MainPageDebug();
-            System.Diagnostics.Debug.WriteLine("App: MainPageDebug created successfully");
+            // Use AppShell to enable navigation between pages
+            System.Diagnostics.Debug.WriteLine("App: Creating AppShell for navigation");
+            var appShell = new AppShell();
+            System.Diagnostics.Debug.WriteLine("App: AppShell created successfully");
             
-            // Create and return a window with MainPageDebug
-            var window = new Window(mainPageDebug);
-            System.Diagnostics.Debug.WriteLine("App: Window created with MainPageDebug");
+            // Create and return a window with AppShell
+            var window = new Window(appShell);
+            System.Diagnostics.Debug.WriteLine("App: Window created with AppShell");
             return window;
         }
         catch (Exception ex)
         {
             // Log any exceptions
-            System.Diagnostics.Debug.WriteLine($"App: Error creating MainPageDebug: {ex}");
+            System.Diagnostics.Debug.WriteLine($"App: Error creating AppShell: {ex}");
             
-            // Fall back to AppShell if there's an error
-            return new Window(new AppShell());
+            // Fall back to MainPageDebug directly if there's an error
+            System.Diagnostics.Debug.WriteLine("App: Falling back to MainPageDebug directly");
+            return new Window(new MainPageDebug());
         }
     }
 }

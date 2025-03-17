@@ -8,10 +8,15 @@
     Shell.FlyoutBehavior="Disabled"
     Title="MineSweeper Debug">
 
-    <!-- Only use MainPageDebug as the content -->
+    <!-- Register both MainPage and MainPageDebug -->
     <ShellContent
         Title="Debug"
         ContentTemplate="{DataTemplate local:MainPageDebug}"
         Route="MainPageDebug" />
+        
+    <ShellContent
+        Title="Main"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
 
 </Shell>

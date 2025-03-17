@@ -1,4 +1,4 @@
-﻿﻿using CommunityToolkit.Maui;
+﻿﻿﻿﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
@@ -26,9 +26,9 @@ public static class MauiProgram
         // Register ViewModels
         builder.Services.AddSingleton<GameViewModel>();
         
-        // Register Pages
-        builder.Services.AddSingleton<MainPage>();
-        builder.Services.AddSingleton<MainPageDebug>();
+        // Register Pages as transient to allow multiple instances
+        builder.Services.AddTransient<MainPage>();
+        builder.Services.AddTransient<MainPageDebug>();
 
 #if DEBUG
         builder.Logging.AddDebug();
