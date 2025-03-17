@@ -8,14 +8,15 @@
     Shell.FlyoutBehavior="Flyout"
     Title="MineSweeper">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-        
+    <!-- Make MainPageDebug the first ShellContent so it's loaded by default -->
     <ShellContent
         Title="Debug"
         ContentTemplate="{DataTemplate local:MainPageDebug}"
         Route="MainPageDebug" />
+        
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage" />
 
 </Shell>

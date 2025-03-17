@@ -1,4 +1,4 @@
-﻿namespace MineSweeper;
+﻿﻿﻿﻿﻿namespace MineSweeper;
 
 public partial class App : Application
 {
@@ -9,6 +9,18 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new AppShell());
+        // TEMPORARY: Directly create and use MainPageDebug without dependency injection
+        // This bypasses the AppShell and any navigation issues
+        try
+        {
+            System.Diagnostics.Debug.WriteLine("App: Creating MainPageDebug directly");
+            var mainPageDebug = new MainPageDebug();
+            return new Window(mainPageDebug);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"App: Error creating MainPageDebug: {ex}");
+            return new Window(new AppShell());
+        }
     }
 }

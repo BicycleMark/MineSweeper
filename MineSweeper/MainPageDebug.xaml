@@ -11,7 +11,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
@@ -33,9 +35,9 @@
                    HorizontalOptions="Center" />
         </Border>
 
-        <!-- Phase 2: Simple Grid with Colored Boxes -->
+        <!-- Phase 2: Standard Grid with Colored Boxes -->
         <Label Grid.Row="2" 
-               Text="Phase 2: Grid Layout Test" 
+               Text="Standard Grid Test" 
                FontSize="18" 
                HorizontalOptions="Center"
                Margin="0,0,0,10" />
@@ -46,12 +48,12 @@
                 StrokeShape="RoundRectangle 12"
                 BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
                 Padding="10"
-                HeightRequest="400"
+                HeightRequest="200"
                 WidthRequest="400"
                 HorizontalOptions="Center"
                 VerticalOptions="Start">
             
-            <!-- We'll replace this with UniformGrid in Phase 2 -->
+            <!-- Standard Grid for comparison -->
             <Grid x:Name="regularGrid"
                   RowDefinitions="*,*,*,*,*"
                   ColumnDefinitions="*,*,*,*,*"
@@ -89,18 +91,34 @@
                 <BoxView Grid.Row="4" Grid.Column="3" Color="Green" />
                 <BoxView Grid.Row="4" Grid.Column="4" Color="Yellow" />
             </Grid>
+        </Border>
+        
+        <!-- Phase 3: UniformGrid Test -->
+        <Label Grid.Row="4" 
+               Text="UniformGrid Test" 
+               FontSize="18" 
+               HorizontalOptions="Center"
+               Margin="0,20,0,10" />
+               
+        <Border Grid.Row="5"
+                Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
+                StrokeThickness="2"
+                StrokeShape="RoundRectangle 12"
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
+                Padding="10"
+                HeightRequest="200"
+                WidthRequest="400"
+                HorizontalOptions="Center"
+                VerticalOptions="Start">
             
-            <!-- Phase 2: We'll uncomment this in the next step -->
-            <!--
+            <!-- Direct UniformGrid test -->
             <controls:UniformGrid x:Name="uniformGrid"
                                  Rows="5"
-                                 Columns="5"
-                                 IsVisible="False" />
-            -->
+                                 Columns="5" />
         </Border>
         
         <!-- Navigation Button -->
-        <Button Grid.Row="4"
+        <Button Grid.Row="6"
                 Text="Go to Main Page"
                 Margin="0,20,0,0"
                 HorizontalOptions="Center"

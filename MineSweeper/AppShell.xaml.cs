@@ -1,4 +1,4 @@
-﻿namespace MineSweeper;
+﻿﻿﻿﻿namespace MineSweeper;
 
 public partial class AppShell : Shell
 {
