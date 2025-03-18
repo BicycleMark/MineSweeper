@@ -6,17 +6,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MineSweeper"
     Shell.FlyoutBehavior="Disabled"
-    Title="MineSweeper Debug">
+    Title="MineSweeper">
 
     <!-- Register both MainPage and MainPageDebug -->
-    <ShellContent
-        Title="Debug"
-        ContentTemplate="{DataTemplate local:MainPageDebug}"
-        Route="MainPageDebug" />
-        
     <ShellContent
         Title="Main"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
+        
+    <ShellContent
+        Title="Debug"
+        ContentTemplate="{DataTemplate local:MainPageDebug}"
+        Route="MainPageDebug" />
 
 </Shell>

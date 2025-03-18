@@ -294,8 +294,8 @@ public partial class MainPageDebug : ContentPage
             // Navigate to the main page using the registered route
             if (Shell.Current != null)
             {
-                // Use the route name without the "///" prefix
-                await Shell.Current.GoToAsync("//MainPage");
+                // Navigate back to the previous page in the navigation stack
+                await Shell.Current.GoToAsync("..");
                 System.Diagnostics.Debug.WriteLine("MainPageDebug: Navigation to MainPage completed");
             }
             else

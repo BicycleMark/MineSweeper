@@ -77,8 +77,8 @@ public partial class MainPage : ContentPage
             // Navigate to the debug page using the registered route
             if (Shell.Current != null)
             {
-                // Use the route name without the "///" prefix
-                await Shell.Current.GoToAsync("//MainPageDebug");
+                // Use the absolute route with a single slash
+                await Shell.Current.GoToAsync("/MainPageDebug");
                 System.Diagnostics.Debug.WriteLine("MainPage: Navigation to MainPageDebug completed");
             }
             else
