@@ -3,6 +3,7 @@ using System.Windows.Input;
 using MineSweeper.Models;
 using Microsoft.Maui.Dispatching;
 using System.Diagnostics;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MineSweeper.ViewModels;
 
@@ -32,11 +33,6 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
         _logger = logger;
         _modelFactory = modelFactory;
         _gameModel = _modelFactory.CreateModel(GameEnums.GameDifficulty.Easy);
-        
-        // Initialize commands
-        NewGameCommand = new RelayCommand<object>(NewGame);
-        PlayCommand = new RelayCommand<Point>(Play);
-        FlagCommand = new RelayCommand<Point>(Flag);
         
         // Initialize timer
         InitializeTimer();
@@ -120,37 +116,24 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// </summary>
     public void InvokeCheckGameStatus()
     {
-        CheckGameStatus();
+        OnGameStatusChanged(GameStatus);
     }
     #endif
 
     #endregion
 
+    // ICommand properties for IGameViewModel interface
+    ICommand IGameViewModel.NewGameCommand => NewGameCommand;
+    ICommand IGameViewModel.PlayCommand => PlayCommand;
+    ICommand IGameViewModel.FlagCommand => FlagCommand;
+
     #region Commands
-
-    /// <summary>
-    /// Command to start a new game with the specified difficulty
-    /// </summary>
-    public ICommand NewGameCommand { get; }
-    
-    /// <summary>
-    /// Command to play (reveal) a cell at the specified position
-    /// </summary>
-    public ICommand PlayCommand { get; }
-    
-    /// <summary>
-    /// Command to flag a cell at the specified position
-    /// </summary>
-    public ICommand FlagCommand { get; }
-
-    #endregion
-
-    #region Methods
 
     /// <summary>
     /// Creates a new game with the specified difficulty
     /// </summary>
     /// <param name="difficultyParam">Difficulty parameter (can be GameDifficulty enum or string)</param>
+    [RelayCommand]
     private void NewGame(object? difficultyParam)
     {
         // Parse the difficulty parameter
@@ -193,6 +176,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// Plays (reveals) a cell at the specified position
     /// </summary>
     /// <param name="point">The position to play</param>
+    [RelayCommand]
     private void Play(Point point)
     {
         // Handle first move if needed
@@ -204,14 +188,14 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
         // Update properties from model
         UpdatePropertiesFromModel();
         
-        // Check game status
-        CheckGameStatus();
+        // Game status changes will be handled by OnGameStatusChanged
     }
 
     /// <summary>
     /// Flags a cell at the specified position
     /// </summary>
     /// <param name="point">The position to flag</param>
+    [RelayCommand]
     private void Flag(Point point)
     {
         bool isFirstMove = _gameModel.GameStatus == GameEnums.GameStatus.NotStarted;
@@ -232,11 +216,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
         {
             EnsureGameInProgress();
         }
-        else
-        {
-            // Only check game status if it's not the first move
-            CheckGameStatus();
-        }
+        // Game status changes will be handled by OnGameStatusChanged
     }
 
     /// <summary>
@@ -302,22 +282,23 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     }
 
     /// <summary>
-    /// Checks the game status and takes appropriate actions
+    /// Called when the GameStatus property changes
     /// </summary>
-    private void CheckGameStatus()
+    /// <param name="value">The new game status value</param>
+    partial void OnGameStatusChanged(GameEnums.GameStatus value)
     {
         // Only take action if game is over
-        if (_gameModel.GameStatus != GameEnums.GameStatus.Won && 
-            _gameModel.GameStatus != GameEnums.GameStatus.Lost)
+        if (value != GameEnums.GameStatus.Won && 
+            value != GameEnums.GameStatus.Lost)
             return;
             
-        _logger.Log($"Game over with status: {_gameModel.GameStatus}");
+        _logger.Log($"Game over with status: {value}");
         
         // Stop timer
         _timer?.Stop();
         
         // Reveal all mines if game is lost
-        if (_gameModel.GameStatus == GameEnums.GameStatus.Lost)
+        if (value == GameEnums.GameStatus.Lost)
         {
             RevealAllMines();
         }
