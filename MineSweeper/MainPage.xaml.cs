@@ -19,11 +19,20 @@ public partial class MainPage : ContentPage
     
     private async void OnPageLoaded(object? sender, EventArgs e)
     {
-        // Delay the game initialization to improve navigation performance
-        await Task.Delay(100);
-        
-        // Start a new game with Easy difficulty
-        _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+        try
+        {
+            // Delay the game initialization to improve navigation performance
+            // This allows the UI to render before starting the potentially heavy game creation
+            await Task.Delay(200);
+            
+            // Start a new game with Easy difficulty
+            // The NewGameCommand will handle running on a background thread
+            _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in OnPageLoaded: {ex}");
+        }
     }
     
     protected override void OnAppearing()

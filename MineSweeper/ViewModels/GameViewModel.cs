@@ -163,7 +163,6 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     [RelayCommand]
     private async Task NewGame(object? difficultyParam)
     {
-        
         if (_disposed)
         {
             _logger?.LogWarning("Attempted to create new game after disposal");
@@ -178,24 +177,37 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         // Set loading state
         IsLoading = true;
         var stopwatch = Stopwatch.StartNew();
+        
         try
         {
-            
-            _logger.Log("========== Creating new game model =============");
             // Stop timer if running
             _timer?.Stop();
-
-            // Create new game model with selected difficulty using the factory
-
-            // For Hard difficulty, run on a background thread
-            await Task.Run(() => { _gameModel = _modelFactory.CreateModel(difficulty); });
             
+            // Create model on a background thread
+            IGameModel? newModel = null;
+            
+            _logger.Log("Creating game model on background thread");
+            
+            // Use Task.Run to offload the model creation to a background thread
+            await Task.Run(() => 
+            {
+                // Create the model
+                newModel = _modelFactory.CreateModel(difficulty);
+            });
+            
+            _logger.Log("Game model created, updating UI properties");
+            
+            // Store the new model
+            _gameModel = newModel!;
+            
+            // Update all properties in a batch
             GameDifficulty = difficulty;
-
-            // Update properties from model
-            UpdatePropertiesFromModel();
-
-            // Reset timer
+            Items = _gameModel.Items;
+            Rows = _gameModel.Rows;
+            Columns = _gameModel.Columns;
+            Mines = _gameModel.Mines;
+            RemainingMines = _gameModel.Mines - _gameModel.FlaggedItems;
+            GameStatus = _gameModel.GameStatus;
             GameTime = 0;
         }
         catch (Exception ex)
@@ -207,7 +219,8 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             // Clear loading state
             IsLoading = false;
             stopwatch.Stop();
-            _logger?.LogError($"Game Creation Time was {stopwatch.Elapsed.Seconds} seconds");
+            var elapsedMs = stopwatch.ElapsedMilliseconds;
+            _logger?.Log($"Game Creation Time was {elapsedMs}ms ({elapsedMs/1000.0:F2} seconds)");
         }
     }
     
@@ -257,7 +270,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     /// Flags a cell at the specified position
     /// </summary>
     /// <param name="point">The position to flag</param>
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanFlag))]
     private void Flag(Point point)
     {
         if (_disposed)
@@ -266,25 +279,27 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             return;
         }
         
-        bool isFirstMove = _gameModel.GameStatus == GameEnums.GameStatus.NotStarted;
         _logger.Log($"Flag method called at {point}");
-        
-        // Handle first move if needed
-        HandleFirstMoveIfNeeded();
         
         // Execute flag command on model
         _gameModel.FlagCommand.Execute(point);
         
         // Update properties from model
         UpdatePropertiesFromModel();
-        
-        // For the first move, ensure game status stays in progress
-        // This is because the model might set it to Won since no mines are placed yet
-        if (isFirstMove)
-        {
-            EnsureGameInProgress();
-        }
-        // Game status changes will be handled by OnGameStatusChanged
+    }
+    
+    /// <summary>
+    /// Determines whether the Flag command can be executed
+    /// </summary>
+    /// <param name="point">The position to flag</param>
+    /// <returns>True if the command can be executed, false otherwise</returns>
+    private bool CanFlag(Point point)
+    {
+        if (_disposed || _gameModel == null)
+            return false;
+            
+        // Only allow flagging when game is in progress (not before first move)
+        return _gameModel.GameStatus != GameEnums.GameStatus.NotStarted;
     }
 
     /// <summary>
@@ -387,6 +402,9 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             _logger?.LogWarning("GameStatus changed after disposal");
             return;
         }
+        
+        // Notify that CanFlag may have changed
+        FlagCommand.NotifyCanExecuteChanged();
         
         // Only take action if game is over
         if (value != GameEnums.GameStatus.Won && 

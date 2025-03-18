@@ -38,7 +38,7 @@ public partial class GameModel : ObservableObject, IGameModel
     /// <summary>
     /// The Remaining Mines left to be flagged correctly
     /// </summary>
-    [ObservableProperty] private int _remainingMines = 10;
+    [ObservableProperty] private int _remainingMines;
 
     /// <summary>
     /// The Time since first piece was played
@@ -87,12 +87,30 @@ public partial class GameModel : ObservableObject, IGameModel
         _columns = columns;
         _gameTime = 0;
         _gameStatus = GameEnums.GameStatus.NotStarted;
-        _items = new ObservableCollection<SweeperItem>();
         _mines = mines;
+        _remainingMines = mines; // Initialize RemainingMines to match Mines
 
+        _logger?.Log($"Starting creation of {rows}x{columns} grid with {mines} mines");
+        
+        // Pre-allocate capacity to avoid resizing
+        var capacity = rows * columns;
+        var itemsList = new List<SweeperItem>(capacity);
+        
+        // Create all items with their positions in one batch
         for (var i = 0; i < rows; i++)
-        for (var j = 0; j < columns; j++)
-            _items.Add(new SweeperItem());
+        {
+            for (var j = 0; j < columns; j++)
+            {
+                var item = new SweeperItem
+                {
+                    Point = new Point(i, j)
+                };
+                itemsList.Add(item);
+            }
+        }
+        
+        // Create ObservableCollection from the list in one operation
+        _items = new ObservableCollection<SweeperItem>(itemsList);
         
         _logger?.Log($"GameModel created with {rows}x{columns} grid and {mines} mines");
     }
@@ -112,13 +130,31 @@ public partial class GameModel : ObservableObject, IGameModel
         _rows = rows;
         _columns = columns;
         _mines = mines;
+        _remainingMines = mines; // Initialize RemainingMines to match Mines
         _gameTime = 0;
         _gameStatus = GameEnums.GameStatus.NotStarted;
-        _items = new ObservableCollection<SweeperItem>();
-
+        
+        _logger?.Log($"Starting creation of {gameDifficulty} grid: {rows}x{columns} with {mines} mines");
+        
+        // Pre-allocate capacity to avoid resizing
+        var capacity = rows * columns;
+        var itemsList = new List<SweeperItem>(capacity);
+        
+        // Create all items with their positions in one batch
         for (var i = 0; i < rows; i++)
-        for (var j = 0; j < columns; j++)
-            _items.Add(new SweeperItem());
+        {
+            for (var j = 0; j < columns; j++)
+            {
+                var item = new SweeperItem
+                {
+                    Point = new Point(i, j)
+                };
+                itemsList.Add(item);
+            }
+        }
+        
+        // Create ObservableCollection from the list in one operation
+        _items = new ObservableCollection<SweeperItem>(itemsList);
         
         _logger?.Log($"GameModel created with difficulty {gameDifficulty}: {rows}x{columns} grid and {mines} mines");
     }
@@ -346,10 +382,11 @@ public partial class GameModel : ObservableObject, IGameModel
         var (row, column) = ExtractRowColTuple(pt);
         _logger?.Log($"Flag called at ({row},{column}). Current GameStatus: {GameStatus}, FlaggedItems: {FlaggedItems}");
         
+        // Prevent flagging before first click (when game is not started)
         if (GameStatus == GameEnums.GameStatus.NotStarted)
         {
-            GameStatus = GameEnums.GameStatus.InProgress;
-            _logger?.Log("Game status changed from NotStarted to InProgress");
+            _logger?.Log("Cannot flag before first move");
+            return;
         }
 
         if (!InBounds(row, column))

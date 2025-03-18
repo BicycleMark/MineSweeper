@@ -433,7 +433,7 @@ public class GameViewModelTests
     #region Flag Command Tests
 
     [Fact]
-    public void Flag_FirstMove_StartsTimer()
+    public void Flag_FirstMove_NotAllowed()
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
@@ -466,8 +466,8 @@ public class GameViewModelTests
         Assert.NotNull(timer);
         Assert.False(timer!.IsRunning, "Timer should not be running before first move");
         
-        // Act
-        viewModel.FlagCommand.Execute(new Point(0, 0));
+        // Act - Check if flag command can execute
+        var canExecute = viewModel.FlagCommand.CanExecute(new Point(0, 0));
         
         // Debug output
         Console.WriteLine("--- Log Messages ---");
@@ -475,20 +475,63 @@ public class GameViewModelTests
         {
             Console.WriteLine($"LOG: {message}");
         }
-        Console.WriteLine("--- Warning Messages ---");
-        foreach (var message in mockLogger.WarningMessages)
-        {
-            Console.WriteLine($"WARNING: {message}");
-        }
-        Console.WriteLine("--- Error Messages ---");
-        foreach (var message in mockLogger.ErrorMessages)
-        {
-            Console.WriteLine($"ERROR: {message}");
-        }
         
         // Assert
+        Assert.False(canExecute, "Flag command should not be executable before first move");
+        Assert.False(timer!.IsRunning, "Timer should not be running after attempted flag before first move");
+    }
+    
+    [Fact]
+    public void Flag_AfterFirstPlay_StartsTimer()
+    {
+        // Arrange
+        var mockDispatcher = new MockDispatcher();
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock model with a game status that can be changed
+        var gameStatus = GameEnums.GameStatus.NotStarted;
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(() => gameStatus);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { 
+            // Update game status to InProgress when Play is called
+            gameStatus = GameEnums.GameStatus.InProgress;
+        }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        // Allow setting the GameStatus property
+        mockModel.SetupSet(m => m.GameStatus = It.IsAny<GameEnums.GameStatus>())
+            .Callback<GameEnums.GameStatus>(status => gameStatus = status);
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
+        
+        // Get the timer
+        var timer = viewModel.Timer as MockDispatcherTimer;
+        
+        // Verify timer is not running before any moves
         Assert.NotNull(timer);
-        Assert.True(timer!.IsRunning, "Timer should be running after first flag move");
+        Assert.False(timer!.IsRunning, "Timer should not be running before first move");
+        
+        // Act - First make a play move to start the game
+        viewModel.PlayCommand.Execute(new Point(0, 0));
+        
+        // Assert timer is running after play
+        Assert.True(timer!.IsRunning, "Timer should be running after first play move");
+        
+        // Now check if flag command can execute
+        var canExecute = viewModel.FlagCommand.CanExecute(new Point(1, 1));
+        Assert.True(canExecute, "Flag command should be executable after first play move");
     }
 
     [Fact]

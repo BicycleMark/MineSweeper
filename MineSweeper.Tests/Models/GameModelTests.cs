@@ -141,7 +141,7 @@ public class GameModelTests
     [InlineData(GameEnums.GameDifficulty.Easy)]
     [InlineData(GameEnums.GameDifficulty.Medium)]
     [InlineData(GameEnums.GameDifficulty.Hard)]
-    public void Flag_FirstMove_InitializesGame(GameEnums.GameDifficulty gd)
+    public void Flag_FirstMove_NotAllowed(GameEnums.GameDifficulty gd)
     {
         // Arrange
         var game = new GameModel(gd);
@@ -153,17 +153,21 @@ public class GameModelTests
         game.FlagCommand.Execute(point);
         
         // Assert
-        Assert.Equal(GameEnums.GameStatus.InProgress, game.GameStatus);
-        Assert.True(game[0, 0].IsFlagged);
+        // Game status should remain NotStarted
+        Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
         
-        // Verify no mines are placed yet (mines are only placed on first Play)
+        // Cell should not be flagged
+        Assert.False(game[0, 0].IsFlagged);
+        
+        // Verify no mines are placed yet
         Assert.Equal(0, game.Items.Count(i => i.IsMine));
         
-        // Verify FlaggedItems count is updated
-        Assert.Equal(1, game.FlaggedItems);
+        // Verify FlaggedItems count is not updated
+        Assert.Equal(0, game.FlaggedItems);
         
-        // Verify RemainingMines is updated
-        Assert.Equal(game.Mines - 1, game.RemainingMines);
+        // Verify RemainingMines matches the expected mines for the difficulty
+        var expectedMines = GameConstants.GameLevels[gd].mines;
+        Assert.Equal(expectedMines, game.RemainingMines);
     }
 
     [Theory]
