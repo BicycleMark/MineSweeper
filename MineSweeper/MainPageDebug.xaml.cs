@@ -266,46 +266,5 @@ public partial class MainPageDebug : ContentPage
         }
     }
     
-    private async void OnGoToMainPageClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            System.Diagnostics.Debug.WriteLine("MainPageDebug: Navigation to MainPage starting");
-            
-            // Log the current state before navigation
-            if (gameGridContainer != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"MainPageDebug: Current GameGrid state - IsVisible: {gameGridContainer.IsVisible}");
-                if (_gameGrid != null)
-                {
-                    System.Diagnostics.Debug.WriteLine("MainPageDebug: GameGrid is initialized");
-                    // Log any relevant GameGrid state here
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("MainPageDebug: GameGrid is null");
-                }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("MainPageDebug: gameGridContainer is null");
-            }
-            
-            // Navigate to the main page using the registered route
-            if (Shell.Current != null)
-            {
-                // Navigate back to the previous page in the navigation stack
-                await Shell.Current.GoToAsync("..");
-                System.Diagnostics.Debug.WriteLine("MainPageDebug: Navigation to MainPage completed");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("MainPageDebug: Shell.Current is null, cannot navigate");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"MainPageDebug: Exception during navigation to MainPage: {ex}");
-        }
-    }
+    // Navigation to Main Page is now handled through the flyout menu
 }

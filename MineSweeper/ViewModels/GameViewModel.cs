@@ -96,6 +96,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     private GameEnums.GameDifficulty _gameDifficulty = GameEnums.GameDifficulty.Easy;
     
     /// <summary>
+    /// Gets or sets whether the game is currently loading
+    /// </summary>
+    [ObservableProperty]
+    private bool _isLoading;
+    
+    /// <summary>
     /// Gets the underlying game model (for testing purposes).
     /// Returns null if the ViewModel has been disposed.
     /// </summary>
@@ -114,7 +120,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     /// <param name="status">The game status to set</param>
     public void SetGameStatus(GameEnums.GameStatus status)
     {
-        if (_disposed || _gameModel == null)
+        if (_disposed)
         {
             _logger?.LogWarning("Cannot set game status: model is null or disposed");
             return;
@@ -142,7 +148,8 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     #endregion
 
     // ICommand properties for IGameViewModel interface
-    ICommand IGameViewModel.NewGameCommand => NewGameCommand;
+    
+    IAsyncRelayCommand IGameViewModel.NewGameAsyncCommand => NewGameCommand;
     ICommand IGameViewModel.PlayCommand => PlayCommand;
     ICommand IGameViewModel.FlagCommand => FlagCommand;
 
@@ -152,9 +159,11 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     /// Creates a new game with the specified difficulty
     /// </summary>
     /// <param name="difficultyParam">Difficulty parameter (can be GameDifficulty enum or string)</param>
+    /// <returns>A task representing the asynchronous operation</returns>
     [RelayCommand]
-    private void NewGame(object? difficultyParam)
+    private async Task NewGame(object? difficultyParam)
     {
+        
         if (_disposed)
         {
             _logger?.LogWarning("Attempted to create new game after disposal");
@@ -166,18 +175,40 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         
         _logger.Log($"Starting new game with difficulty: {difficulty}");
         
-        // Stop timer if running
-        _timer?.Stop();
-        
-        // Create new game model with selected difficulty using the factory
-        _gameModel = _modelFactory.CreateModel(difficulty);
-        GameDifficulty = difficulty;
-        
-        // Update properties from model
-        UpdatePropertiesFromModel();
-        
-        // Reset timer
-        GameTime = 0;
+        // Set loading state
+        IsLoading = true;
+        var stopwatch = Stopwatch.StartNew();
+        try
+        {
+            
+            _logger.Log("========== Creating new game model =============");
+            // Stop timer if running
+            _timer?.Stop();
+
+            // Create new game model with selected difficulty using the factory
+
+            // For Hard difficulty, run on a background thread
+            await Task.Run(() => { _gameModel = _modelFactory.CreateModel(difficulty); });
+            
+            GameDifficulty = difficulty;
+
+            // Update properties from model
+            UpdatePropertiesFromModel();
+
+            // Reset timer
+            GameTime = 0;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError($"Error creating new game: {ex}");
+        }
+        finally
+        {
+            // Clear loading state
+            IsLoading = false;
+            stopwatch.Stop();
+            _logger?.LogError($"Game Creation Time was {stopwatch.Elapsed.Seconds} seconds");
+        }
     }
     
     /// <summary>

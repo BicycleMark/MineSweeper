@@ -54,7 +54,7 @@ public interface IGameViewModel : IDisposable
     /// <summary>
     /// Command to start a new game with the specified difficulty
     /// </summary>
-    ICommand NewGameCommand { get; }
+    IAsyncRelayCommand NewGameAsyncCommand { get; }
     
     /// <summary>
     /// Command to play (reveal) a cell at the specified position

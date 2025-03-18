@@ -131,7 +131,7 @@ public class GameViewModelTests
     [InlineData(GameEnums.GameDifficulty.Easy, 10, 10, 10)]
     [InlineData(GameEnums.GameDifficulty.Medium, 15, 15, 40)]
     [InlineData(GameEnums.GameDifficulty.Hard, 20, 20, 80)]
-    public void NewGame_WithDifficulty_SetsCorrectProperties(
+    public async Task NewGame_WithDifficulty_SetsCorrectProperties(
         GameEnums.GameDifficulty difficulty, 
         int expectedRows, 
         int expectedColumns, 
@@ -161,8 +161,19 @@ public class GameViewModelTests
         
         var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
-        // Act
-        viewModel.NewGameCommand.Execute(difficulty);
+        // Act - Get the command as IAsyncRelayCommand to await it
+        var command = viewModel.NewGameCommand as IAsyncRelayCommand;
+        if (command != null)
+        {
+            await command.ExecuteAsync(difficulty);
+        }
+        else
+        {
+            // Fallback to synchronous execution if not async
+            viewModel.NewGameCommand.Execute(difficulty);
+            // Give time for async operations to complete
+            await Task.Delay(100);
+        }
         
         // Assert
         Assert.Equal(difficulty, viewModel.GameDifficulty);
@@ -177,7 +188,7 @@ public class GameViewModelTests
     [InlineData("0", GameEnums.GameDifficulty.Easy)]
     [InlineData("1", GameEnums.GameDifficulty.Medium)]
     [InlineData("2", GameEnums.GameDifficulty.Hard)]
-    public void NewGame_WithStringParameter_ParsesCorrectly(
+    public async Task NewGame_WithStringParameter_ParsesCorrectly(
         string difficultyString, 
         GameEnums.GameDifficulty expectedDifficulty)
     {
@@ -205,15 +216,26 @@ public class GameViewModelTests
         
         var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
-        // Act
-        viewModel.NewGameCommand.Execute(difficultyString);
+        // Act - Get the command as IAsyncRelayCommand to await it
+        var command = viewModel.NewGameCommand as IAsyncRelayCommand;
+        if (command != null)
+        {
+            await command.ExecuteAsync(difficultyString);
+        }
+        else
+        {
+            // Fallback to synchronous execution if not async
+            viewModel.NewGameCommand.Execute(difficultyString);
+            // Give time for async operations to complete
+            await Task.Delay(100);
+        }
         
         // Assert
         Assert.Equal(expectedDifficulty, viewModel.GameDifficulty);
     }
 
     [Fact]
-    public void NewGame_WithInvalidParameter_DefaultsToEasy()
+    public async Task NewGame_WithInvalidParameter_DefaultsToEasy()
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
@@ -239,8 +261,19 @@ public class GameViewModelTests
         
         var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
         
-        // Act
-        viewModel.NewGameCommand.Execute("invalid");
+        // Act - Get the command as IAsyncRelayCommand to await it
+        var command = viewModel.NewGameCommand as IAsyncRelayCommand;
+        if (command != null)
+        {
+            await command.ExecuteAsync("invalid");
+        }
+        else
+        {
+            // Fallback to synchronous execution if not async
+            viewModel.NewGameCommand.Execute("invalid");
+            // Give time for async operations to complete
+            await Task.Delay(100);
+        }
         
         // Assert
         Assert.Equal(GameEnums.GameDifficulty.Easy, viewModel.GameDifficulty);
@@ -250,7 +283,7 @@ public class GameViewModelTests
     }
 
     [Fact]
-    public void NewGame_ResetsGameTime()
+    public async Task NewGame_ResetsGameTime()
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
@@ -280,8 +313,19 @@ public class GameViewModelTests
         var gameTimeProperty = typeof(GameViewModel).GetProperty("GameTime");
         gameTimeProperty?.SetValue(viewModel, 100);
         
-        // Act
-        viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+        // Act - Get the command as IAsyncRelayCommand to await it
+        var command = viewModel.NewGameCommand as IAsyncRelayCommand;
+        if (command != null)
+        {
+            await command.ExecuteAsync(GameEnums.GameDifficulty.Easy);
+        }
+        else
+        {
+            // Fallback to synchronous execution if not async
+            viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+            // Give time for async operations to complete
+            await Task.Delay(100);
+        }
         
         // Assert
         Assert.Equal(0, viewModel.GameTime);

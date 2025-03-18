@@ -58,37 +58,5 @@ public partial class MainPage : ContentPage
         }
     }
     
-    private async void OnGoToDebugPageClicked(object? sender, EventArgs e)
-    {
-        try
-        {
-            System.Diagnostics.Debug.WriteLine("MainPage: Navigation to MainPageDebug starting");
-            
-            // Log the current state before navigation
-            if (_viewModel != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"MainPage: Current ViewModel state - GameStatus: {_viewModel.GameStatus}");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("MainPage: ViewModel is null");
-            }
-            
-            // Navigate to the debug page using the registered route
-            if (Shell.Current != null)
-            {
-                // Use the absolute route with a single slash
-                await Shell.Current.GoToAsync("/MainPageDebug");
-                System.Diagnostics.Debug.WriteLine("MainPage: Navigation to MainPageDebug completed");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("MainPage: Shell.Current is null, cannot navigate");
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"MainPage: Exception during navigation to MainPageDebug: {ex}");
-        }
-    }
+    // Navigation to Debug page is now handled through the flyout menu
 }

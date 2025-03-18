@@ -128,11 +128,7 @@
                 HorizontalOptions="Center"
                 Clicked="OnLaunchMainGridClicked" />
                 
-        <!-- Navigation Button -->
-        <Button Text="Go to Main Page"
-                Margin="0,10,0,0"
-                HorizontalOptions="Center"
-                Clicked="OnGoToMainPageClicked" />
+        <!-- Navigation is now handled through the flyout menu -->
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

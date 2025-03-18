@@ -51,12 +51,28 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <ScrollView>
-        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
+    <Grid>
+        <!-- Loading Overlay -->
+        <Grid IsVisible="{Binding IsLoading}"
+              BackgroundColor="{AppThemeBinding Light=#80FFFFFF, Dark=#80000000}"
+              ZIndex="999">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="16">
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                  Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                                  HeightRequest="50" 
+                                  WidthRequest="50" />
+                <Label Text="Loading game..." 
+                       FontSize="18" 
+                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+        
+        <ScrollView>
+            <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="0.1*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -110,38 +126,8 @@
             </Border>
         </Grid>
         
-        <!-- Difficulty Selection -->
-        <Grid Grid.Row="2" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            
-            <Button Grid.Column="0" Text="Easy" 
-                    Command="{Binding NewGameCommand}" 
-                    CommandParameter="0"
-                    Style="{StaticResource GameButtonStyle}"
-                    BackgroundColor="{StaticResource Tertiary}"
-                    Margin="0,0,8,0" />
-            
-            <Button Grid.Column="1" Text="Medium" 
-                    Command="{Binding NewGameCommand}" 
-                    CommandParameter="1"
-                    Style="{StaticResource GameButtonStyle}"
-                    BackgroundColor="{StaticResource Primary}"
-                    Margin="4,0,4,0" />
-            
-            <Button Grid.Column="2" Text="Hard" 
-                    Command="{Binding NewGameCommand}" 
-                    CommandParameter="2"
-                    Style="{StaticResource GameButtonStyle}"
-                    BackgroundColor="{StaticResource Secondary}"
-                    Margin="8,0,0,0" />
-        </Grid>
-        
         <!-- Game Grid -->
-        <Border Grid.Row="3"
+        <Border Grid.Row="2"
                 StrokeShape="RoundRectangle 12"
                 Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
                 StrokeThickness="2"
@@ -159,20 +145,15 @@
         </Border>
         
         <!-- Instructions -->
-        <VerticalStackLayout Grid.Row="4" Margin="0,16,0,0" Spacing="4">
+        <VerticalStackLayout Grid.Row="3" Margin="0,16,0,0" Spacing="4">
             <Label Text="Tap to reveal a cell" 
                    HorizontalOptions="Center" 
                    Style="{StaticResource GameLabelStyle}" />
             <Label Text="Double-tap to flag a mine" 
                    HorizontalOptions="Center" 
                    Style="{StaticResource GameLabelStyle}" />
-            
-            <!-- Debug Navigation Button -->
-            <Button Text="Go to Debug Page"
-                    Margin="0,10,0,0"
-                    HorizontalOptions="Center"
-                    Clicked="OnGoToDebugPageClicked" />
         </VerticalStackLayout>
     </Grid>
-    </ScrollView>
+        </ScrollView>
+    </Grid>
 </ContentPage>

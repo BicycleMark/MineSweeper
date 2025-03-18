@@ -5,18 +5,75 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MineSweeper"
-    Shell.FlyoutBehavior="Disabled"
+    xmlns:controls="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
+    x:DataType="local:AppShell"
+    Shell.FlyoutBehavior="Flyout"
+    FlyoutBackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
     Title="MineSweeper">
 
-    <!-- Register both MainPage and MainPageDebug -->
+    <!-- Shell Styles -->
+    <Shell.Resources>
+        <Style TargetType="FlyoutItem">
+            <Setter Property="Shell.TabBarIsVisible" Value="False"/>
+            <Setter Property="FlyoutDisplayOptions" Value="AsMultipleItems"/>
+        </Style>
+    </Shell.Resources>
+
+    <!-- Flyout Header -->
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" 
+              HeightRequest="100" Padding="20">
+            <Label Text="MineSweeper" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   TextColor="White" 
+                   VerticalOptions="Center"/>
+        </Grid>
+    </Shell.FlyoutHeader>
+    
+    <!-- Custom Flyout Item Template -->
+    <Shell.ItemTemplate>
+        <DataTemplate x:DataType="controls:BaseShellItem">
+            <Grid Padding="20,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Text="{Binding Title}" 
+                       Grid.Column="1"
+                       FontSize="24" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+    
+    <!-- Main Page (Default) - This is the initial page shown but not in flyout menu -->
     <ShellContent
         Title="Main"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
-        
+        Route="MainPage"
+        FlyoutItemIsVisible="False" />
+
+    <!-- Game Difficulty Menu Items -->
+    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent
+            Title="Easy Game"
+            Route="EasyGame" />
+            
+        <ShellContent
+            Title="Medium Game"
+            Route="MediumGame" />
+            
+        <ShellContent
+            Title="Hard Game"
+            Route="HardGame" />
+    </FlyoutItem>
+
+    <!-- Separator -->
+    <MenuItem Text="-" />
+
+    <!-- Debug Page Menu Item -->
     <ShellContent
-        Title="Debug"
+        Title="Debug Page"
         ContentTemplate="{DataTemplate local:MainPageDebug}"
         Route="MainPageDebug" />
-
 </Shell>
