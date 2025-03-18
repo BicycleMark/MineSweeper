@@ -6,9 +6,10 @@ using MineSweeper.Models;
 namespace MineSweeper.ViewModels;
 
 /// <summary>
-/// Interface for the game view model, providing access to game state, operations, and UI-related functionality
+/// Interface for the game view model, providing access to game state, operations, and UI-related functionality.
+/// Implements IDisposable to ensure proper cleanup of resources.
 /// </summary>
-public interface IGameViewModel
+public interface IGameViewModel : IDisposable
 {
     /// <summary>
     /// Gets the collection of sweeper items (cells) in the game grid
@@ -66,25 +67,29 @@ public interface IGameViewModel
     ICommand FlagCommand { get; }
     
     /// <summary>
-    /// Gets the underlying game model (for testing purposes)
+    /// Gets the underlying game model (for testing purposes).
+    /// Returns null if the ViewModel has been disposed.
     /// </summary>
-    IGameModel Model { get; }
+    IGameModel? Model { get; }
     
     /// <summary>
-    /// Gets the game timer (for testing purposes)
+    /// Gets the game timer (for testing purposes).
+    /// Returns null if the ViewModel has been disposed.
     /// </summary>
     IDispatcherTimer? Timer { get; }
     
     // Testing helper methods
     #if DEBUG
     /// <summary>
-    /// Sets the game status directly (for testing purposes)
+    /// Sets the game status directly (for testing purposes).
+    /// Does nothing if the ViewModel has been disposed.
     /// </summary>
     /// <param name="status">The game status to set</param>
     void SetGameStatus(GameEnums.GameStatus status);
     
     /// <summary>
-    /// Invokes the CheckGameStatus method directly (for testing purposes)
+    /// Invokes the CheckGameStatus method directly (for testing purposes).
+    /// Does nothing if the ViewModel has been disposed.
     /// </summary>
     void InvokeCheckGameStatus();
     #endif

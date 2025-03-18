@@ -700,4 +700,101 @@ public class GameViewModelTests
     }
 
     #endregion
+
+    #region IDisposable Tests
+
+    [Fact]
+    public void Dispose_StopsTimerAndClearsResources()
+    {
+        // Arrange
+        var mockDispatcher = new MockDispatcher();
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
+        
+        // Start the timer
+        viewModel.PlayCommand.Execute(new Point(0, 0));
+        
+        // Get the timer
+        var timer = viewModel.Timer as MockDispatcherTimer;
+        
+        // Verify timer is running
+        Assert.NotNull(timer);
+        Assert.True(timer!.IsRunning, "Timer should be running after first move");
+        
+        // Act
+        viewModel.Dispose();
+        
+        // Assert
+        Assert.Null(viewModel.Timer);
+        Assert.Null(viewModel.Model);
+        
+        // Verify commands still work but don't do anything after disposal
+        viewModel.PlayCommand.Execute(new Point(0, 0)); // Should not throw
+        viewModel.FlagCommand.Execute(new Point(0, 0)); // Should not throw
+        viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy); // Should not throw
+        
+        // Verify debug methods don't throw after disposal
+        viewModel.SetGameStatus(GameEnums.GameStatus.Lost); // Should not throw
+        viewModel.InvokeCheckGameStatus(); // Should not throw
+    }
+
+    [Fact]
+    public void DisposedViewModel_ReturnsNullForModelAndTimer()
+    {
+        // Arrange
+        var mockDispatcher = new MockDispatcher();
+        var mockLogger = new MockLogger();
+        var mockFactory = new Mock<IGameModelFactory>();
+        
+        // Setup mock factory with mock model
+        var mockModel = new Mock<IGameModel>();
+        
+        // Setup mock model properties
+        mockModel.Setup(m => m.Rows).Returns(10);
+        mockModel.Setup(m => m.Columns).Returns(10);
+        mockModel.Setup(m => m.Mines).Returns(10);
+        mockModel.Setup(m => m.FlaggedItems).Returns(0);
+        mockModel.Setup(m => m.RemainingMines).Returns(10);
+        mockModel.Setup(m => m.GameStatus).Returns(GameEnums.GameStatus.NotStarted);
+        mockModel.Setup(m => m.PlayCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.FlagCommand).Returns(new RelayCommand<Point>(p => { }));
+        mockModel.Setup(m => m.Items).Returns(new ObservableCollection<SweeperItem>());
+        
+        mockFactory.Setup(f => f.CreateModel(It.IsAny<GameEnums.GameDifficulty>()))
+            .Returns(mockModel.Object);
+        
+        var viewModel = new GameViewModel(mockDispatcher, mockLogger, mockFactory.Object);
+        
+        // Verify Model and Timer are not null before disposal
+        Assert.NotNull(viewModel.Model);
+        Assert.NotNull(viewModel.Timer);
+        
+        // Act
+        viewModel.Dispose();
+        
+        // Assert
+        Assert.Null(viewModel.Model);
+        Assert.Null(viewModel.Timer);
+    }
+
+    #endregion
 }
