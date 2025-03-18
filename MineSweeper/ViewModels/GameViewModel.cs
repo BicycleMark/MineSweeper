@@ -8,15 +8,20 @@ using CommunityToolkit.Mvvm.Input;
 namespace MineSweeper.ViewModels;
 
 /// <summary>
-/// ViewModel for the Minesweeper game, implementing the MVVM pattern
+/// ViewModel for the Minesweeper game, implementing the MVVM pattern.
+/// This implementation uses a pull-based approach for most property updates,
+/// with event-driven updates for critical properties like GameStatus.
+/// Properties are updated from the model using the UpdatePropertiesFromModel method,
+/// which should be called after any operation that changes the model state.
 /// </summary>
-public partial class GameViewModel : ObservableObject, IGameViewModel
+public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposable
 {
     private readonly IDispatcher _dispatcher;
     private IDispatcherTimer? _timer;
     private readonly IGameModelFactory _modelFactory;
     private IGameModel _gameModel;
     private readonly ILogger _logger;
+    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the GameViewModel class
@@ -29,9 +34,9 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
         ILogger logger,
         IGameModelFactory modelFactory)
     {
-        _dispatcher = dispatcher;
-        _logger = logger;
-        _modelFactory = modelFactory;
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
         _gameModel = _modelFactory.CreateModel(GameEnums.GameDifficulty.Easy);
         
         // Initialize timer
@@ -91,14 +96,16 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     private GameEnums.GameDifficulty _gameDifficulty = GameEnums.GameDifficulty.Easy;
     
     /// <summary>
-    /// Gets the underlying game model (for testing purposes)
+    /// Gets the underlying game model (for testing purposes).
+    /// Returns null if the ViewModel has been disposed.
     /// </summary>
-    public IGameModel Model => _gameModel;
+    public IGameModel? Model => _disposed ? null : _gameModel;
     
     /// <summary>
-    /// Gets the game timer (for testing purposes)
+    /// Gets the game timer (for testing purposes).
+    /// Returns null if the ViewModel has been disposed.
     /// </summary>
-    public IDispatcherTimer? Timer => _timer;
+    public IDispatcherTimer? Timer => _disposed ? null : _timer;
     
     #if DEBUG
     /// <summary>
@@ -107,6 +114,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// <param name="status">The game status to set</param>
     public void SetGameStatus(GameEnums.GameStatus status)
     {
+        if (_disposed || _gameModel == null)
+        {
+            _logger?.LogWarning("Cannot set game status: model is null or disposed");
+            return;
+        }
+        
         _gameModel.GameStatus = status;
         GameStatus = status;
     }
@@ -116,6 +129,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// </summary>
     public void InvokeCheckGameStatus()
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Cannot invoke check game status: disposed");
+            return;
+        }
+        
         OnGameStatusChanged(GameStatus);
     }
     #endif
@@ -136,6 +155,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     [RelayCommand]
     private void NewGame(object? difficultyParam)
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to create new game after disposal");
+            return;
+        }
+        
         // Parse the difficulty parameter
         var difficulty = ParseDifficultyParameter(difficultyParam);
         
@@ -179,6 +204,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     [RelayCommand]
     private void Play(Point point)
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to play after disposal");
+            return;
+        }
+        
         // Handle first move if needed
         HandleFirstMoveIfNeeded();
         
@@ -198,6 +229,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     [RelayCommand]
     private void Flag(Point point)
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to flag after disposal");
+            return;
+        }
+        
         bool isFirstMove = _gameModel.GameStatus == GameEnums.GameStatus.NotStarted;
         _logger.Log($"Flag method called at {point}");
         
@@ -224,6 +261,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// </summary>
     private void HandleFirstMoveIfNeeded()
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to handle first move after disposal");
+            return;
+        }
+        
         if (_gameModel.GameStatus != GameEnums.GameStatus.NotStarted)
             return;
             
@@ -242,6 +285,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// </summary>
     private void EnsureGameInProgress()
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to ensure game in progress after disposal");
+            return;
+        }
+        
         if (GameStatus == GameEnums.GameStatus.InProgress && _timer?.IsRunning == true)
             return;
             
@@ -262,10 +311,23 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     }
 
     /// <summary>
-    /// Updates the ViewModel properties from the Model
+    /// Updates the ViewModel properties from the Model.
+    /// This method should be called after any operation that changes the Model state.
     /// </summary>
     private void UpdatePropertiesFromModel()
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to update properties after disposal");
+            return;
+        }
+        
+        if (_gameModel == null)
+        {
+            _logger?.LogWarning("Cannot update properties: game model is null");
+            return;
+        }
+        
         // Update basic properties
         Items = _gameModel.Items;
         Rows = _gameModel.Rows;
@@ -282,11 +344,19 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     }
 
     /// <summary>
-    /// Called when the GameStatus property changes
+    /// Called when the GameStatus property changes.
+    /// This is an example of the event-driven part of our hybrid approach,
+    /// where critical state changes trigger automatic reactions.
     /// </summary>
     /// <param name="value">The new game status value</param>
     partial void OnGameStatusChanged(GameEnums.GameStatus value)
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("GameStatus changed after disposal");
+            return;
+        }
+        
         // Only take action if game is over
         if (value != GameEnums.GameStatus.Won && 
             value != GameEnums.GameStatus.Lost)
@@ -309,6 +379,12 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     /// </summary>
     private void RevealAllMines()
     {
+        if (_disposed)
+        {
+            _logger?.LogWarning("Attempted to reveal mines after disposal");
+            return;
+        }
+        
         _logger.Log("Requesting model to reveal all mines");
         
         // Use the model's implementation to reveal all mines
@@ -323,7 +399,52 @@ public partial class GameViewModel : ObservableObject, IGameViewModel
     {
         _timer = _dispatcher.CreateTimer();
         _timer.Interval = TimeSpan.FromSeconds(1);
-        _timer.Tick += (s, e) => GameTime++;
+        _timer.Tick += (s, e) => 
+        {
+            if (!_disposed)
+            {
+                GameTime++;
+            }
+        };
+    }
+
+    #endregion
+
+    #region IDisposable Implementation
+
+    /// <summary>
+    /// Disposes resources used by the ViewModel
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    /// <summary>
+    /// Disposes resources used by the ViewModel
+    /// </summary>
+    /// <param name="disposing">True if called from Dispose(), false if called from finalizer</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        
+        if (disposing)
+        {
+            // Dispose managed resources
+            _timer?.Stop();
+            _timer = null;
+        }
+        
+        _disposed = true;
+    }
+    
+    /// <summary>
+    /// Finalizer
+    /// </summary>
+    ~GameViewModel()
+    {
+        Dispose(false);
     }
 
     #endregion
