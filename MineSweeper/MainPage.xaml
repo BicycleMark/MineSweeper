@@ -56,6 +56,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="0.1*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -140,7 +141,7 @@
         </Grid>
         
         <!-- Game Grid -->
-        <Border Grid.Row="3" 
+        <Border Grid.Row="3"
                 StrokeShape="RoundRectangle 12"
                 Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
                 StrokeThickness="2"
