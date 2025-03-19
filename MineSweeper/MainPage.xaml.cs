@@ -6,10 +6,13 @@ namespace MineSweeper;
 public partial class MainPage : ContentPage
 {
     private readonly GameViewModel _viewModel;
+
+    private readonly ILogger _logger;
     
     public MainPage(GameViewModel viewModel)
     {
         InitializeComponent();
+        _logger = new CustomDebugLogger();
         _viewModel = viewModel;
         BindingContext = _viewModel;
         

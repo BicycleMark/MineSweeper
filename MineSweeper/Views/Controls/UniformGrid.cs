@@ -410,15 +410,20 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     public UniformGrid()
     {
         // Initialize the control
+        // Get customDebugLogger from the ServiceCollection
+        
         Initialize();
+        if (_logger is null)
+             _logger = new CustomDebugLogger();
+        _logger?.Log("UniformGrid: Initialized");
     }
 
     /// <summary>
-    /// Initializes a new instance of the UniformGrid class with a logger
+    /// Initializes a new instance of the UniformGrid class with a customDebugLogger
     /// </summary>
-    public UniformGrid(ILogger logger)
+    public UniformGrid(ILogger customDebugLogger)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = customDebugLogger ?? throw new ArgumentNullException(nameof(customDebugLogger));
         
         // Initialize the control
         Initialize();

@@ -27,7 +27,7 @@ public interface ILogger
 /// <summary>
 /// Console implementation of ILogger that writes messages to the console
 /// </summary>
-public class ConsoleLogger : ILogger
+public class ConsoleCustomDebugLogger : ILogger
 {
     /// <summary>
     /// Logs an informational message to the console
@@ -58,10 +58,10 @@ public class ConsoleLogger : ILogger
 }
 
 /// <summary>
-/// Custom debug logger implementation to demonstrate dependency injection is working
+/// Custom debug customDebugLogger implementation to demonstrate dependency injection is working
 /// </summary>
 /// <remarks>
-/// This logger prefixes messages with "CUSTOM" to distinguish them from the standard logger
+/// This customDebugLogger prefixes messages with "CUSTOM" to distinguish them from the standard customDebugLogger
 /// </remarks>
 public class CustomDebugLogger : ILogger
 {

@@ -7,7 +7,7 @@ namespace MineSweeper.Views.Controls;
 
 public partial class DirectUniformGameGrid : ContentView
 {
-    private readonly ILogger _logger;
+    private readonly ILogger _customDebugLogger;
     #region Bindable Properties
 
     public static readonly BindableProperty PlayCommandProperty = BindableProperty.Create(
@@ -95,11 +95,14 @@ public partial class DirectUniformGameGrid : ContentView
     // Dictionary to track which cells have been tapped
     private readonly Dictionary<int, bool> _tappedCells = new();
     private DateTime _lastTapTime = DateTime.MinValue;
+    private readonly ILogger  _logger;
     private const int DoubleTapThresholdMs = 300; // Double tap threshold in milliseconds
 
 public DirectUniformGameGrid()
 {
     InitializeComponent();
+    if (_logger is null)
+        _logger = new CustomDebugLogger();
     
     // Add tap gesture recognizer for normal play and double-tap for flagging
     this.Loaded += OnLoaded;
@@ -108,24 +111,11 @@ public DirectUniformGameGrid()
     this.SizeChanged += OnSizeChanged;
 }
 
-public DirectUniformGameGrid(ILogger logger)
-{
-    _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    InitializeComponent();
-    
-    _logger?.Log("DirectUniformGameGrid: Constructor called");
-    
-    // Add tap gesture recognizer for normal play and double-tap for flagging
-    this.Loaded += OnLoaded;
-    
-    // Add handler for SizeChanged event
-    this.SizeChanged += OnSizeChanged;
-}
     
     private void OnSizeChanged(object? sender, EventArgs e)
     {
-        _logger?.Log($"DirectUniformGameGrid: SizeChanged - Width={Width}, Height={Height}");
-        _logger?.Log($"DirectUniformGameGrid: board size - Width={board?.Width ?? 0}, Height={board?.Height ?? 0}");
+        _customDebugLogger?.Log($"DirectUniformGameGrid: SizeChanged - Width={Width}, Height={Height}");
+        _customDebugLogger?.Log($"DirectUniformGameGrid: board size - Width={board?.Width ?? 0}, Height={board?.Height ?? 0}");
     }
     
     #region Property Change Handlers
@@ -169,12 +159,12 @@ public DirectUniformGameGrid(ILogger logger)
                 board.Rows = Rows;
                 board.Columns = Columns;
                 
-                _logger?.Log($"DirectUniformGameGrid: Updated grid size - Rows={Rows}, Columns={Columns}");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: Updated grid size - Rows={Rows}, Columns={Columns}");
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError($"DirectUniformGameGrid: Exception in UpdateGridSize: {ex}");
+            _customDebugLogger?.LogError($"DirectUniformGameGrid: Exception in UpdateGridSize: {ex}");
         }
     }
     
@@ -185,7 +175,7 @@ public DirectUniformGameGrid(ILogger logger)
             // Update the UniformGrid properties
             if (board != null)
             {
-                _logger?.Log($"DirectUniformGameGrid: UpdateGrid called with ItemsSource count = {ItemsSource?.Count() ?? 0}, Rows={Rows}, Columns={Columns}");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: UpdateGrid called with ItemsSource count = {ItemsSource?.Count() ?? 0}, Rows={Rows}, Columns={Columns}");
                 
                 // Make the board transparent to see the cells
                 board.BackgroundColor = Colors.Transparent;
@@ -199,7 +189,7 @@ public DirectUniformGameGrid(ILogger logger)
                     var items = ItemsSource.ToList();
                     int totalItems = items.Count;
                     
-                    _logger?.Log($"DirectUniformGameGrid: Creating {totalItems} cells manually");
+                    _customDebugLogger?.Log($"DirectUniformGameGrid: Creating {totalItems} cells manually");
                     
                     for (int i = 0; i < totalItems; i++)
                     {
@@ -221,20 +211,20 @@ public DirectUniformGameGrid(ILogger logger)
                         
                         if (i < 5) // Log only the first few items to avoid flooding the log
                         {
-                            _logger?.Log($"DirectUniformGameGrid: Created cell for item {i} at row={row}, column={column}");
+                            _customDebugLogger?.Log($"DirectUniformGameGrid: Created cell for item {i} at row={row}, column={column}");
                         }
                     }
                     
-                    _logger?.Log($"DirectUniformGameGrid: Added {board.Children.Count} cells to the board");
+                    _customDebugLogger?.Log($"DirectUniformGameGrid: Added {board.Children.Count} cells to the board");
                 }
                 
                 // Set the rows and columns
                 board.Rows = Rows;
                 board.Columns = Columns;
                 
-                _logger?.Log($"DirectUniformGameGrid: Updated grid with {board.Children.Count} cells");
-                _logger?.Log($"DirectUniformGameGrid: board.Rows = {board.Rows}, board.Columns = {board.Columns}");
-                _logger?.Log($"DirectUniformGameGrid: board.Width = {board.Width}, board.Height = {board.Height}");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: Updated grid with {board.Children.Count} cells");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: board.Rows = {board.Rows}, board.Columns = {board.Columns}");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: board.Width = {board.Width}, board.Height = {board.Height}");
                 
                 // Force a layout update
                 board.InvalidateMeasure();
@@ -242,7 +232,7 @@ public DirectUniformGameGrid(ILogger logger)
                 // Set a minimum size for the board if it's not being sized properly
                 if (board.Width <= 0 || board.Height <= 0)
                 {
-                    _logger?.Log($"DirectUniformGameGrid: Setting minimum size for board");
+                    _customDebugLogger?.Log($"DirectUniformGameGrid: Setting minimum size for board");
                     board.MinimumWidthRequest = 400;
                     board.MinimumHeightRequest = 400;
                 }
@@ -252,12 +242,12 @@ public DirectUniformGameGrid(ILogger logger)
             }
             else
             {
-                _logger?.LogWarning("DirectUniformGameGrid: board is null in UpdateGrid");
+                _customDebugLogger?.LogWarning("DirectUniformGameGrid: board is null in UpdateGrid");
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError($"DirectUniformGameGrid: Exception in UpdateGrid: {ex}");
+            _customDebugLogger?.LogError($"DirectUniformGameGrid: Exception in UpdateGrid: {ex}");
         }
     }
     
@@ -378,20 +368,20 @@ public DirectUniformGameGrid(ILogger logger)
             // Execute the appropriate command
             if (isDoubleTap)
             {
-                _logger?.Log($"DirectUniformGameGrid: Double tap detected at point={point}");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: Double tap detected at point={point}");
                 if (FlagCommand?.CanExecute(null) == true)
                     FlagCommand.Execute(point);
             }
             else
             {
-                _logger?.Log($"DirectUniformGameGrid: Single tap detected at point={point}");
+                _customDebugLogger?.Log($"DirectUniformGameGrid: Single tap detected at point={point}");
                 if (PlayCommand?.CanExecute(null) == true)
                     PlayCommand.Execute(point);
             }
         }
         catch (Exception ex)
         {
-            _logger?.LogError($"DirectUniformGameGrid: Exception in OnCellTapped: {ex}");
+            _customDebugLogger?.LogError($"DirectUniformGameGrid: Exception in OnCellTapped: {ex}");
         }
     }
     
@@ -417,16 +407,16 @@ public DirectUniformGameGrid(ILogger logger)
             if (board != null)
             {
                 board.GestureRecognizers.Add(tapGesture);
-                _logger?.Log("DirectUniformGameGrid: Added tap gesture recognizer to board");
+                _customDebugLogger?.Log("DirectUniformGameGrid: Added tap gesture recognizer to board");
             }
             else
             {
-                _logger?.LogWarning("DirectUniformGameGrid: board is null in OnLoaded");
+                _customDebugLogger?.LogWarning("DirectUniformGameGrid: board is null in OnLoaded");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError($"DirectUniformGameGrid: Exception in OnLoaded: {ex}");
+            _customDebugLogger.LogError($"DirectUniformGameGrid: Exception in OnLoaded: {ex}");
         }
     }
 
@@ -435,20 +425,20 @@ public DirectUniformGameGrid(ILogger logger)
         // Check if board is null
         if (board == null)
         {
-            _logger.LogWarning("DirectUniformGameGrid: board is null in OnCellTapped");
+            _customDebugLogger.LogWarning("DirectUniformGameGrid: board is null in OnCellTapped");
             return;
         }
         
         if (board.Width <= 0 || board.Height <= 0 || Rows <= 0 || Columns <= 0)
         {
-            _logger.LogWarning($"DirectUniformGameGrid: Invalid dimensions - Width={board.Width}, Height={board.Height}, Rows={Rows}, Columns={Columns}");
+            _customDebugLogger.LogWarning($"DirectUniformGameGrid: Invalid dimensions - Width={board.Width}, Height={board.Height}, Rows={Rows}, Columns={Columns}");
             return;
         }
 
         // Get the tap location
         if (e is not TappedEventArgs tappedEventArgs)
         {
-            _logger.LogWarning("DirectUniformGameGrid: Event is not TappedEventArgs");
+            _customDebugLogger.LogWarning("DirectUniformGameGrid: Event is not TappedEventArgs");
             return;
         }
 
@@ -456,7 +446,7 @@ public DirectUniformGameGrid(ILogger logger)
         var location = tappedEventArgs.GetPosition(board);
         if (location == null)
         {
-            _logger?.LogWarning("DirectUniformGameGrid: Tap location is null");
+            _customDebugLogger?.LogWarning("DirectUniformGameGrid: Tap location is null");
             return;
         }
 
@@ -470,7 +460,7 @@ public DirectUniformGameGrid(ILogger logger)
         // Ensure we're within bounds
         if (row < 0 || row >= Rows || column < 0 || column >= Columns)
         {
-            _logger?.LogWarning("DirectUniformGameGrid: Tap outside grid bounds");
+            _customDebugLogger?.LogWarning("DirectUniformGameGrid: Tap outside grid bounds");
             return;
         }
         
@@ -488,13 +478,13 @@ public DirectUniformGameGrid(ILogger logger)
         // Execute the appropriate command
         if (isDoubleTap)
         {
-            _logger?.Log($"DirectUniformGameGrid: Double tap detected at row={row}, column={column}");
+            _customDebugLogger?.Log($"DirectUniformGameGrid: Double tap detected at row={row}, column={column}");
             if (FlagCommand?.CanExecute(null) == true)
                 FlagCommand.Execute(new Point(row, column));
         }
         else
         {
-            _logger?.Log($"DirectUniformGameGrid: Single tap detected at row={row}, column={column}");
+            _customDebugLogger?.Log($"DirectUniformGameGrid: Single tap detected at row={row}, column={column}");
             if (PlayCommand?.CanExecute(null) == true)
                 PlayCommand.Execute(new Point(row, column));
         }

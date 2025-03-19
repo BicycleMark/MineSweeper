@@ -10,28 +10,9 @@ public partial class MainPageDebug : ContentPage
     private readonly GameViewModel? _viewModel;
     private ContentView? _gameGrid;
     private bool _useStandardGrid = false;
-    private readonly ILogger _logger = new DebugLogger();
+    private readonly ILogger _customDebugLogger = new CustomDebugLogger();
     
-    /// <summary>
-    /// Simple debug logger implementation for testing
-    /// </summary>
-    private class DebugLogger : ILogger
-    {
-        public void Log(string message)
-        {
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] {message}");
-        }
-
-        public void LogError(string message)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ERROR] {message}");
-        }
-
-        public void LogWarning(string message)
-        {
-            System.Diagnostics.Debug.WriteLine($"[WARNING] {message}");
-        }
-    }
+   
     
     // Constructor without ViewModel for initial testing
     public MainPageDebug()
@@ -192,12 +173,12 @@ public partial class MainPageDebug : ContentPage
             // Create a ViewModel if one wasn't provided
             viewModel ??= new GameViewModel(
                 Dispatcher,
-                _logger,
-                new GameModelFactory(_logger));
+                _customDebugLogger,
+                new GameModelFactory(_customDebugLogger));
             
             // Create DirectUniformGameGrid (optimized grid)
             System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new DirectUniformGameGrid");
-            _gameGrid = new DirectUniformGameGrid(_logger)
+            _gameGrid = new DirectUniformGameGrid()
             {
                 BindingContext = viewModel,
                 HorizontalOptions = LayoutOptions.Fill,

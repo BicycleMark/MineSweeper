@@ -36,7 +36,7 @@ public class GameViewModelTests
         }
     }
 
-    private class MockLogger : ILogger
+    private class MockCustomDebugLogger : ILogger
     {
         public List<string> LogMessages { get; } = new List<string>();
         public List<string> ErrorMessages { get; } = new List<string>();
@@ -89,7 +89,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -139,7 +139,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -194,7 +194,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -239,7 +239,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -287,7 +287,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -340,7 +340,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -382,7 +382,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Create a collection of 100 SweeperItems (10x10 grid)
@@ -437,7 +437,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -486,7 +486,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock model with a game status that can be changed
@@ -539,7 +539,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -623,7 +623,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -660,7 +660,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock model with a game status that can be changed
@@ -727,7 +727,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Create a collection of SweeperItems with one mine
@@ -795,7 +795,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model
@@ -849,7 +849,7 @@ public class GameViewModelTests
     {
         // Arrange
         var mockDispatcher = new MockDispatcher();
-        var mockLogger = new MockLogger();
+        var mockLogger = new MockCustomDebugLogger();
         var mockFactory = new Mock<IGameModelFactory>();
         
         // Setup mock factory with mock model

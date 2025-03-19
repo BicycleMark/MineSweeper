@@ -5,15 +5,15 @@ namespace MineSweeper.Models;
 /// </summary>
 public class GameModelFactory : IGameModelFactory
 {
-    private readonly ILogger _logger;
+    private readonly ILogger _customDebugLogger;
 
     /// <summary>
-    /// Constructor with dependency injection for logger
+    /// Constructor with dependency injection for customDebugLogger
     /// </summary>
-    /// <param name="logger">Logger for debugging</param>
-    public GameModelFactory(ILogger logger)
+    /// <param name="customDebugLoggerr debugging</param>
+    public GameModelFactory(ILogger customDebugLogger)
     {
-        _logger = logger;
+        _customDebugLogger = customDebugLogger;
     }
 
     /// <summary>
@@ -23,6 +23,6 @@ public class GameModelFactory : IGameModelFactory
     /// <returns>A new game model</returns>
     public IGameModel CreateModel(GameEnums.GameDifficulty difficulty)
     {
-        return new GameModel(difficulty, _logger);
+        return new GameModel(difficulty, _customDebugLogger);
     }
 }

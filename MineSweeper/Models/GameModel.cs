@@ -79,7 +79,7 @@ public partial class GameModel : ObservableObject, IGameModel
     /// <param name="rows">Number of rows in the game</param>
     /// <param name="columns">Number of columns in the game</param>
     /// <param name="mines">Number of Mines to be generated in random spots</param>
-    /// <param name="logger">Optional logger for debugging</param>
+    /// <param name="logger">Optional customDebugLogger for debugging</param>
     public GameModel(int rows = 10, int columns = 10, int mines = 10, ILogger? logger = null)
     {
         _logger = logger;
@@ -122,7 +122,7 @@ public partial class GameModel : ObservableObject, IGameModel
     /// <see cref="GameConstants.GameLevels"/>
     /// </summary>
     /// <param name="gameDifficulty">The difficulty level</param>
-    /// <param name="logger">Optional logger for debugging</param>
+    /// <param name="logger">Optional customDebugLogger for debugging</param>
     public GameModel(GameEnums.GameDifficulty gameDifficulty, ILogger? logger = null)
     {
         _logger = logger;
