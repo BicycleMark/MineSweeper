@@ -34,7 +34,7 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=560beff0_002D9018_002D4f80_002D94aa_002Dd1000631bf63/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from &amp;lt;MineSweeper.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/markwardell/src/MineSweeper/MineSweeper.Tests" Presentation="&amp;lt;MineSweeper.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingIsOn="True" ContinuousTestingMode="3" IsActive="True" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=58c56b00_002Df81e_002D48fd_002Da74f_002Dc8e84271fcf4/@EntryIndexedValue">&lt;SessionState ContinuousTestingIsOn="True" ContinuousTestingMode="3" Name="Continuous Testing" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/Users/markwardell/src/MineSweeper/MineSweeper.Tests" Presentation="&amp;lt;MineSweeper.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	
@@ -48,4 +48,7 @@
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::8207114C-9511-45BC-B2FB-70F51B10347B::net9.0::MineSweeper.Tests.Models.GameModelTests.CreateGameAndPlayOneItemTest&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ec585768_002Dc8b5_002D4c44_002Da1a7_002D632df03925f4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;MineSweeper.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/Users/markwardell/src/MineSweeper/MineSweeper.Tests" Presentation="&amp;lt;MineSweeper.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

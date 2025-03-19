@@ -73,10 +73,16 @@
 
     <ItemGroup>
         <MauiXaml Remove="Views\Controls\UniformGrid.xaml"/>
+        <MauiXaml Remove="Views\Controls\StandardGameGrid.xaml"/>
+        <MauiXaml Remove="Views\Controls\GameGrid.xaml"/>
+        <MauiXaml Remove="Views\Controls\SweeperItemTemplate.xaml"/>
     </ItemGroup>
 
     <ItemGroup>
         <Compile Remove="Views\Controls\UniformGrid.xaml.cs"/>
+        <Compile Remove="Views\Controls\StandardGameGrid.xaml.cs"/>
+        <Compile Remove="Views\Controls\GameGrid.xaml.cs"/>
+        <Compile Remove="Views\Controls\SweeperItemTemplate.xaml.cs"/>
     </ItemGroup>
 
 </Project>

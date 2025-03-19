@@ -195,27 +195,14 @@ public partial class MainPageDebug : ContentPage
                 _logger,
                 new GameModelFactory(_logger));
             
-            // Create the appropriate grid type
-            if (_useStandardGrid)
+            // Create DirectUniformGameGrid (optimized grid)
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new DirectUniformGameGrid");
+            _gameGrid = new DirectUniformGameGrid(_logger)
             {
-                System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new StandardGameGrid");
-                _gameGrid = new StandardGameGrid
-                {
-                    BindingContext = viewModel,
-                    HorizontalOptions = LayoutOptions.Fill,
-                    VerticalOptions = LayoutOptions.Fill
-                };
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("MainPageDebug: Creating new GameGrid (UniformGrid)");
-                _gameGrid = new GameGrid
-                {
-                    BindingContext = viewModel,
-                    HorizontalOptions = LayoutOptions.Fill,
-                    VerticalOptions = LayoutOptions.Fill
-                };
-            }
+                BindingContext = viewModel,
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions = LayoutOptions.Fill
+            };
             
             // Add the grid to the container
             gameGridContainer.Content = _gameGrid;
@@ -223,7 +210,7 @@ public partial class MainPageDebug : ContentPage
             // Start a new game with Easy difficulty
             viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
             
-            System.Diagnostics.Debug.WriteLine($"MainPageDebug: {(_useStandardGrid ? "StandardGameGrid" : "GameGrid")} created and added to container");
+            System.Diagnostics.Debug.WriteLine("MainPageDebug: DirectUniformGameGrid created and added to container");
         }
         catch (Exception ex)
         {

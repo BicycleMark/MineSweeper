@@ -1,4 +1,6 @@
 using CommunityToolkit.Maui.Layouts;
+using Microsoft.Maui.Controls.Shapes;
+using MineSweeper.Models;
 using Size = Microsoft.Maui.Graphics.Size;
 
 namespace MineSweeper.Views.Controls;
@@ -9,6 +11,15 @@ namespace MineSweeper.Views.Controls;
 public class UniformGrid : UniformItemsLayout, IGridLayout
 {
     private IGridLayout? _gridLayoutImplementation;
+    
+    // Flag to indicate if a batch update is in progress
+    private bool _batchUpdateInProgress = false;
+    
+    // Dictionary to cache views for reuse
+    private readonly Dictionary<object, View> _viewCache = new();
+    
+    // Logger for debugging
+    private readonly ILogger? _logger;
 
     /// <summary>
     /// Bindable property for the items source
@@ -31,7 +42,19 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     public IEnumerable<object>? ItemsSource
     {
         get => (IEnumerable<object>?) GetValue(ItemsSourceProperty);
-        set => SetValue(ItemsSourceProperty, value);
+        set 
+        {
+            _logger?.Log($"UniformGrid: Setting ItemsSource, type: {value?.GetType().Name ?? "null"}");
+            if (value != null)
+            {
+                _logger?.Log($"UniformGrid: ItemsSource count: {value.Count()}");
+                foreach (var item in value.Take(1))
+                {
+                    _logger?.Log($"UniformGrid: First item type: {item.GetType().Name}");
+                }
+            }
+            SetValue(ItemsSourceProperty, value);
+        }
     }
     
     /// <summary>
@@ -43,47 +66,149 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     {
         try
         {
+            _logger?.Log($"UniformGrid: OnItemsSourceChanged called. New items: {newValue?.Count() ?? 0}");
+            _logger?.Log($"UniformGrid: Current dimensions - Width={Width}, Height={Height}, Rows={Rows}, Columns={Columns}");
+            _logger?.Log($"UniformGrid: Current ItemSize={ItemSize}");
+            
+            // Start batch update
+            _batchUpdateInProgress = true;
+            
             // Clear existing items
             Children.Clear();
 
             // If new value is null, just return
             if (newValue == null)
             {
-                _logger.Log("ItemsSource is null");
+                _logger?.Log("UniformGrid: ItemsSource is null, returning");
+                _batchUpdateInProgress = false;
                 return;
             }
 
-            var index = 0;
-            // Re-add items with the new template
-            foreach (var item in newValue)
+            // Check if ItemTemplate is null
+            if (ItemTemplate is null)
             {
-                if (ItemTemplate is null)
+                _logger?.Log("UniformGrid: ItemTemplate is null, creating default template");
+                
+                // Create a default template that shows mines and flags
+                ItemTemplate = new DataTemplate(() => 
                 {
-                    _logger.Log("ItemTemplate is null, using default Label template");
-                    ItemTemplate = new DataTemplate(() => new Label());
+                    var grid = new Grid
+                    {
+                        BackgroundColor = Colors.LightGray
+                    };
+                    
+                    // Flag emoji (when flagged)
+                    var flagLabel = new Label
+                    {
+                        Text = "🚩",
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.Center,
+                        FontSize = 16,
+                        TextColor = Colors.Red
+                    };
+                    flagLabel.SetBinding(Label.IsVisibleProperty, "IsFlagged");
+                    
+                    // Mine emoji (when is mine)
+                    var mineLabel = new Label
+                    {
+                        Text = "💣",
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.Center,
+                        FontSize = 16,
+                        TextColor = Colors.Black
+                    };
+                    mineLabel.SetBinding(Label.IsVisibleProperty, "IsMine");
+                    
+                    // Mine count (when not a mine and count > 0)
+                    var countLabel = new Label
+                    {
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.Center,
+                        FontSize = 14,
+                        FontAttributes = FontAttributes.Bold,
+                        TextColor = Colors.Blue
+                    };
+                    countLabel.SetBinding(Label.TextProperty, "MineCount");
+                    
+                    grid.Add(flagLabel);
+                    grid.Add(mineLabel);
+                    grid.Add(countLabel);
+                    
+                    return grid;
+                });
+            }
+            
+            // Process items in batches for better performance
+            var items = newValue.ToList(); // Materialize the collection to avoid multiple enumeration
+            int totalItems = items.Count;
+            int batchSize = 50;
+            
+            for (int batchStart = 0; batchStart < totalItems; batchStart += batchSize)
+            {
+                int batchEnd = Math.Min(batchStart + batchSize, totalItems);
+                
+                for (int i = batchStart; i < batchEnd; i++)
+                {
+                    var item = items[i];
+                    
+                    // Try to reuse an existing view from the cache
+                    View view;
+                    if (_viewCache.TryGetValue(item, out var cachedView))
+                    {
+                        view = cachedView;
+                    }
+                    else
+                    {
+                        // Create a new view from the template
+                        var content = (View)ItemTemplate.CreateContent();
+                        
+                        // Set the binding context for the content
+                        content.BindingContext = item;
+                        
+                        // Add a border around the view to make it more visible
+                        var border = new Border
+                        {
+                            BackgroundColor = Colors.LightGray,
+                            Stroke = Colors.Gray,
+                            StrokeThickness = 1,
+                            StrokeShape = new RoundRectangle { CornerRadius = 2 },
+                            Padding = 0,
+                            Margin = 0,
+                            HorizontalOptions = LayoutOptions.Fill,
+                            VerticalOptions = LayoutOptions.Fill,
+                            Content = content
+                        };
+                        
+                        view = border;
+                        
+                        // Cache the view for future reuse
+                        _viewCache[item] = view;
+                    }
+                    
+                    // Set position in grid
+                    var row = i / Math.Max(1, Columns);
+                    var column = i % Math.Max(1, Columns);
+                    Grid.SetRow(view, row);
+                    Grid.SetColumn(view, column);
+                    
+                    Children.Add(view);
                 }
-                
-                var view = (View) ItemTemplate.CreateContent();
-                view.BindingContext = item;
-                
-                // Set position in grid
-                var row = index / Math.Max(1, Columns);
-                var column = index % Math.Max(1, Columns);
-                Grid.SetRow(view, row);
-                Grid.SetColumn(view, column);
-                
-                Children.Add(view);
-                index++;
             }
 
             // Update the item size
             UpdateItemSize();
             
-            _logger.Log($"ItemsSource changed, added {index} items");
+            // Force a layout update
+            InvalidateMeasure();
         }
         catch (Exception ex)
         {
-            _logger.Log($"Exception in OnItemsSourceChanged: {ex}");
+            _logger?.LogError($"UniformGrid: Exception in OnItemsSourceChanged: {ex}");
+        }
+        finally
+        {
+            // End batch update
+            _batchUpdateInProgress = false;
         }
     }
 
@@ -120,41 +245,95 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     {
         try
         {
+            _logger?.Log($"UniformGrid: OnItemTemplateChanged called. New template is null? {newValue == null}");
+            
             // If new template is null or items source is null, just return
             if (newValue == null || ItemsSource == null)
             {
-                _logger.Log("ItemTemplate or ItemsSource is null");
+                _logger?.Log("UniformGrid: New template or ItemsSource is null, returning");
                 return;
             }
             
+            // Start batch update
+            _batchUpdateInProgress = true;
+            
+            // Clear view cache to force recreation with new template
+            _viewCache.Clear();
+            
             // Clear existing items
             Children.Clear();
-            var index = 0;
 
-            // Re-add items with the new template
-            foreach (var item in ItemsSource)
+            // Process items in batches for better performance
+            var items = ItemsSource.ToList(); // Materialize the collection to avoid multiple enumeration
+            int totalItems = items.Count;
+            int batchSize = 50;
+            
+            _logger?.Log($"UniformGrid: Processing {totalItems} items with new template");
+            
+            for (int batchStart = 0; batchStart < totalItems; batchStart += batchSize)
             {
-                var view = (View) newValue.CreateContent();
-                view.BindingContext = item;
+                int batchEnd = Math.Min(batchStart + batchSize, totalItems);
                 
-                // Set position in grid
-                var row = index / Math.Max(1, Columns);
-                var column = index % Math.Max(1, Columns);
-                Grid.SetRow(view, row);
-                Grid.SetColumn(view, column);
-                
-                Children.Add(view);
-                index++;
+                for (int i = batchStart; i < batchEnd; i++)
+                {
+                    var item = items[i];
+                    
+                    // Create a new view from the template
+                    var content = (View)newValue.CreateContent();
+                    
+                    // Set the binding context for the content
+                    content.BindingContext = item;
+                    
+                    // Add a border around the view to make it more visible
+                    var border = new Border
+                    {
+                        BackgroundColor = Colors.LightGray,
+                        Stroke = Colors.Gray,
+                        StrokeThickness = 1,
+                        StrokeShape = new RoundRectangle { CornerRadius = 2 },
+                        Padding = 0,
+                        Margin = 0,
+                        HorizontalOptions = LayoutOptions.Fill,
+                        VerticalOptions = LayoutOptions.Fill,
+                        Content = content
+                    };
+                    
+                    var view = border;
+                    
+                    // Cache the view for future reuse
+                    _viewCache[item] = view;
+                    
+                    // Set position in grid
+                    var row = i / Math.Max(1, Columns);
+                    var column = i % Math.Max(1, Columns);
+                    Grid.SetRow(view, row);
+                    Grid.SetColumn(view, column);
+                    
+                    Children.Add(view);
+                    
+                    if (i < 5) // Log only the first few items to avoid flooding the log
+                    {
+                        _logger?.Log($"UniformGrid: Created view for item {i}, content type: {content.GetType().Name}");
+                    }
+                }
             }
+
+            _logger?.Log($"UniformGrid: Added {Children.Count} children to the grid");
 
             // Update the item size
             UpdateItemSize();
             
-            _logger.Log($"ItemTemplate changed, added {index} items");
+            // Force a layout update
+            InvalidateMeasure();
         }
         catch (Exception ex)
         {
-            _logger.Log($"Exception in OnItemTemplateChanged: {ex}");
+            _logger?.LogError($"UniformGrid: Exception in OnItemTemplateChanged: {ex}");
+        }
+        finally
+        {
+            // End batch update
+            _batchUpdateInProgress = false;
         }
     }
 
@@ -188,7 +367,6 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <param name="newValue">The new number of rows</param>
     private void OnRowsChanged(int oldValue, int newValue)
     {
-        _logger.Log($"Rows changed from {oldValue} to {newValue}");
         UpdateItemSize();
     }
 
@@ -223,7 +401,6 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <param name="newValue">The new number of columns</param>
     private void OnColumnsChanged(int oldValue, int newValue)
     {
-        _logger.Log($"Columns changed from {oldValue} to {newValue}");
         UpdateItemSize();
     }
 
@@ -236,6 +413,19 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
         Initialize();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the UniformGrid class with a logger
+    /// </summary>
+    public UniformGrid(ILogger logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        
+        // Initialize the control
+        Initialize();
+        
+        _logger?.Log("UniformGrid: Initialized");
+    }
+
     #region Private Methods
 
     /// <summary>
@@ -243,25 +433,15 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// </summary>
     private void Initialize()
     {
-        try
-        {
-            // Set this instance as the grid layout implementation
-            _gridLayoutImplementation = this;
-            
-            // Set default values
-            _availableWidth = 100;
-            _availableHeight = 100;
-            
-            // Add handler for children changed
-            ChildAdded += OnChildAdded;
-            
-            // Log initialization
-            _logger.Log("UniformGrid initialized");
-        }
-        catch (Exception ex)
-        {
-            _logger.Log($"Exception in Initialize: {ex}");
-        }
+        // Set this instance as the grid layout implementation
+        _gridLayoutImplementation = this;
+        
+        // Set default values
+        _availableWidth = 100;
+        _availableHeight = 100;
+        
+        // Add handler for children changed
+        ChildAdded += OnChildAdded;
     }
     
     /// <summary>
@@ -269,27 +449,18 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// </summary>
     private void OnChildAdded(object? sender, ElementEventArgs e)
     {
-        try
+        if (e.Element is View view && !_batchUpdateInProgress)
         {
-            if (e.Element is View view)
-            {
-                // Get the index of the child
-                var index = Children.IndexOf(view);
-                
-                // Calculate row and column based on index
-                var row = index / Math.Max(1, Columns);
-                var column = index % Math.Max(1, Columns);
-                
-                // Set the row and column on the child
-                Grid.SetRow(view, row);
-                Grid.SetColumn(view, column);
-                
-                _logger.Log($"Child added at index {index}, row={row}, column={column}");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Log($"Exception in OnChildAdded: {ex}");
+            // Get the index of the child
+            var index = Children.IndexOf(view);
+            
+            // Calculate row and column based on index
+            var row = index / Math.Max(1, Columns);
+            var column = index % Math.Max(1, Columns);
+            
+            // Set the row and column on the child
+            Grid.SetRow(view, row);
+            Grid.SetColumn(view, column);
         }
     }
 
@@ -303,47 +474,53 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// </summary>
     private void UpdateItemSize()
     {
-        try
+        if (_isUpdatingLayout || _batchUpdateInProgress)
+            return;
+        
+        _logger?.Log($"UniformGrid: UpdateItemSize called with _availableWidth={_availableWidth}, _availableHeight={_availableHeight}, Rows={Rows}, Columns={Columns}, Children={Children.Count}");
+        
+        // Ensure we have valid dimensions
+        var rows = Math.Max(1, Rows);
+        var columns = Math.Max(1, Columns);
+        
+        // Ensure we have valid available space
+        var width = Math.Max(1, _availableWidth);
+        var height = Math.Max(1, _availableHeight);
+        
+        _logger?.Log($"UniformGrid: Using width={width}, height={height}, rows={rows}, columns={columns}");
+        
+        // Calculate item size
+        var itemWidth = width / columns;
+        var itemHeight = height / rows;
+        ItemSize = new Size(itemWidth, itemHeight);
+        
+        _logger?.Log($"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}");
+        
+        // Set a fixed size for each child to improve performance
+        foreach (var child in Children)
         {
-            if (_isUpdatingLayout)
+            if (child is View view)
             {
-                _logger.Log("Preventing layout loop in UpdateItemSize");
-                return;
+                view.WidthRequest = itemWidth - 2; // Subtract border thickness
+                view.HeightRequest = itemHeight - 2; // Subtract border thickness
+                
+                // If the view is a Border, set its properties
+                if (view is Border border)
+                {
+                    border.StrokeThickness = 1;
+                    border.Stroke = Colors.Gray;
+                    border.BackgroundColor = Colors.White;
+                    border.Margin = 1;
+                    border.Padding = 0;
+                }
             }
-            
-            // Ensure we have valid dimensions
-            var rows = Math.Max(1, Rows);
-            var columns = Math.Max(1, Columns);
-            
-            // Ensure we have valid available space
-            var width = Math.Max(1, _availableWidth);
-            var height = Math.Max(1, _availableHeight);
-            
-            // Calculate item size
-            var itemWidth = width / columns;
-            var itemHeight = height / rows;
-            ItemSize = new Size(itemWidth, itemHeight);
-            
-            _logger.Log($"UpdateItemSize: Width={width}, Height={height}, Rows={rows}, Columns={columns}, ItemSize={ItemSize}");
         }
-        catch (Exception ex)
-        {
-            _logger.Log($"Exception in UpdateItemSize: {ex}");
-        }
+        
+        _logger?.Log($"UniformGrid: Updated size for {Children.Count} children");
+        
+        // Force a layout update
+        InvalidateMeasure();
     }
-    
-    /// <summary>
-    /// Logger for debugging
-    /// </summary>
-    private class Logger
-    {
-        public void Log(string message)
-        {
-            System.Diagnostics.Debug.WriteLine($"UniformGrid: {message}");
-        }
-    }
-    
-    private readonly Logger _logger = new Logger();
 
     #endregion
 
@@ -357,24 +534,27 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <returns>The size of the control</returns>
     protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
     {
+        if (_isUpdatingLayout || _batchUpdateInProgress)
+            return new Size(widthConstraint, heightConstraint);
+        
+        _isUpdatingLayout = true;
+        
         try
         {
-            if (_isUpdatingLayout)
-            {
-                _logger.Log("Preventing layout loop in MeasureOverride");
-                return new Size(widthConstraint, heightConstraint);
-            }
-            
-            _isUpdatingLayout = true;
-            
-            _logger.Log($"MeasureOverride: widthConstraint={widthConstraint}, heightConstraint={heightConstraint}, Children.Count={Children.Count}");
+            _logger?.Log($"UniformGrid: MeasureOverride called with width={widthConstraint}, height={heightConstraint}, Children={Children.Count}");
             
             // Handle invalid constraints
             if (double.IsInfinity(widthConstraint) || widthConstraint <= 0)
+            {
+                _logger?.Log($"UniformGrid: Invalid width constraint: {widthConstraint}, using default of 1000");
                 widthConstraint = 1000;
+            }
             if (double.IsInfinity(heightConstraint) || heightConstraint <= 0)
+            {
+                _logger?.Log($"UniformGrid: Invalid height constraint: {heightConstraint}, using default of 1000");
                 heightConstraint = 1000;
-                
+            }
+                    
             // Store the available size for later use
             _availableWidth = widthConstraint;
             _availableHeight = heightConstraint;
@@ -382,46 +562,18 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             // Update item size based on new constraints
             UpdateItemSize();
             
-            // Measure each child
-            foreach (var child in Children)
-            {
-                if (child is View view)
-                {
-                    // Ensure row and column are set
-                    var index = Children.IndexOf(view);
-                    var row = Grid.GetRow(view);
-                    var column = Grid.GetColumn(view);
-                    
-                    // If row or column are not set, calculate them based on index
-                    if (row == 0 && column == 0 && index > 0)
-                    {
-                        row = index / Math.Max(1, Columns);
-                        column = index % Math.Max(1, Columns);
-                        Grid.SetRow(view, row);
-                        Grid.SetColumn(view, column);
-                        _logger.Log($"Setting row={row}, column={column} for child at index {index}");
-                    }
-                    
-                    view.Measure(ItemSize.Width, ItemSize.Height);
-                    _logger.Log($"Measured child at index {index}, row={row}, column={column}, size={ItemSize}");
-                }
-            }
-            
             // Calculate the size based on the number of rows and columns
             var resultWidth = ItemSize.Width * Columns;
             var resultHeight = ItemSize.Height * Rows;
             var result = new Size(resultWidth, resultHeight);
             
-            _logger.Log($"MeasureOverride result: {result}");
+            _logger?.Log($"UniformGrid: MeasureOverride returning width={result.Width}, height={result.Height}");
             
-            _isUpdatingLayout = false;
             return result;
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.Log($"Exception in MeasureOverride: {ex}");
             _isUpdatingLayout = false;
-            return new Size(widthConstraint, heightConstraint);
         }
     }
 
@@ -432,17 +584,14 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <returns>The size of the control</returns>
     protected override Size ArrangeOverride(Rect bounds)
     {
+        if (_isUpdatingLayout || _batchUpdateInProgress)
+            return bounds.Size;
+        
+        _isUpdatingLayout = true;
+        
         try
         {
-            if (_isUpdatingLayout)
-            {
-                _logger.Log("Preventing layout loop in ArrangeOverride");
-                return bounds.Size;
-            }
-            
-            _isUpdatingLayout = true;
-            
-            _logger.Log($"ArrangeOverride: bounds={bounds}");
+            _logger?.Log($"UniformGrid: ArrangeOverride called with bounds={bounds}, Children={Children.Count}");
             
             // Update width and height
             _availableWidth = bounds.Width;
@@ -451,41 +600,114 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             // Update item size
             UpdateItemSize();
             
-            // Arrange each child
-            int index = 0;
-            foreach (var child in Children)
+            // Arrange each child in batches to improve performance
+            int batchSize = 50;
+            int totalChildren = Children.Count;
+            
+            _logger?.Log($"UniformGrid: Arranging {totalChildren} children with ItemSize={ItemSize}");
+            
+            // If we have no children but we have an ItemsSource, create the children now
+            if (totalChildren == 0 && ItemsSource != null && ItemsSource.Any())
             {
-                if (child is View view)
+                _logger?.Log($"UniformGrid: No children but ItemsSource has {ItemsSource.Count()} items. Creating children now.");
+                
+                // Force recreation of all items
+                _viewCache.Clear();
+                Children.Clear();
+                
+                var items = ItemsSource.ToList();
+                totalChildren = items.Count;
+                
+                for (int i = 0; i < totalChildren; i++)
                 {
-                    // Calculate position based on index
-                    int row = index / Math.Max(1, Columns);
-                    int column = index % Math.Max(1, Columns);
+                    var item = items[i];
                     
-                    // Create bounds for the child
-                    var x = column * ItemSize.Width;
-                    var y = row * ItemSize.Height;
-                    var childBounds = new Rect(x, y, ItemSize.Width, ItemSize.Height);
+                    // Create a new view from the template
+                    if (ItemTemplate == null)
+                    {
+                        _logger?.Log("UniformGrid: ItemTemplate is null in ArrangeOverride, creating default template");
+                        // Create a default template
+                        ItemTemplate = new DataTemplate(() => new Grid { BackgroundColor = Colors.LightGray });
+                    }
+                    var content = (View)ItemTemplate.CreateContent();
                     
-                    // Arrange the child
-                    view.Arrange(childBounds);
+                    // Set the binding context for the content
+                    content.BindingContext = item;
                     
-                    _logger.Log($"Arranged child at row={row}, column={column}, bounds={childBounds}");
-                    index++;
+                    // Add a border around the view to make it more visible
+                    var border = new Border
+                    {
+                        BackgroundColor = Colors.White,
+                        Stroke = Colors.Gray,
+                        StrokeThickness = 1,
+                        StrokeShape = new RoundRectangle { CornerRadius = 2 },
+                        Padding = 0,
+                        Margin = 1,
+                        HorizontalOptions = LayoutOptions.Fill,
+                        VerticalOptions = LayoutOptions.Fill,
+                        Content = content
+                    };
+                    
+                    var view = border;
+                    
+                    // Set position in grid
+                    var row = i / Math.Max(1, Columns);
+                    var column = i % Math.Max(1, Columns);
+                    Grid.SetRow(view, row);
+                    Grid.SetColumn(view, column);
+                    
+                    // Add to children
+                    Children.Add(view);
+                    
+                    // Cache the view for future reuse
+                    _viewCache[item] = view;
+                    
+                    if (i < 5) // Log only the first few items to avoid flooding the log
+                    {
+                        _logger?.Log($"UniformGrid: Created view for item {i}, content type: {content.GetType().Name}");
+                    }
+                }
+                
+                // Update total children count
+                totalChildren = Children.Count;
+                _logger?.Log($"UniformGrid: Created {totalChildren} children");
+            }
+            
+            for (int batchStart = 0; batchStart < totalChildren; batchStart += batchSize)
+            {
+                int batchEnd = Math.Min(batchStart + batchSize, totalChildren);
+                
+                for (int index = batchStart; index < batchEnd; index++)
+                {
+                    if (Children[index] is View view)
+                    {
+                        // Calculate position based on index
+                        int row = index / Math.Max(1, Columns);
+                        int column = index % Math.Max(1, Columns);
+                        
+                        // Create bounds for the child
+                        var x = column * ItemSize.Width;
+                        var y = row * ItemSize.Height;
+                        var childBounds = new Rect(x, y, ItemSize.Width, ItemSize.Height);
+                        
+                        // Arrange the child
+                        view.Arrange(childBounds);
+                        
+                        if (index < 5) // Log only the first few items to avoid flooding the log
+                        {
+                            _logger?.Log($"UniformGrid: Arranged child {index} at row={row}, column={column}, bounds={childBounds}");
+                        }
+                    }
                 }
             }
             
-            // Call base implementation
-            var size = base.ArrangeOverride(bounds);
-            _logger.Log($"ArrangeOverride result: {size}");
+            _logger?.Log($"UniformGrid: ArrangeOverride returning size={bounds.Size}");
             
-            _isUpdatingLayout = false;
-            return size;
-        }
-        catch (Exception ex)
-        {
-            _logger.Log($"Exception in ArrangeOverride: {ex}");
-            _isUpdatingLayout = false;
             return bounds.Size;
+        }
+        finally
+        {
+            _isUpdatingLayout = false;
         }
     }
 
@@ -500,23 +722,15 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <returns>The row index</returns>
     public int GetRow(IView view)
     {
-        try
+        if (view is View maviView)
         {
-            if (view is View maviView)
+            var index = Children.IndexOf(maviView);
+            if (index >= 0)
             {
-                var index = Children.IndexOf(maviView);
-                if (index >= 0)
-                {
-                    return index / Math.Max(1, Columns);
-                }
+                return index / Math.Max(1, Columns);
             }
-            return 0;
         }
-        catch (Exception ex)
-        {
-            _logger.Log($"Exception in GetRow: {ex}");
-            return 0;
-        }
+        return 0;
     }
 
     /// <summary>
@@ -536,23 +750,15 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <returns>The column index</returns>
     public int GetColumn(IView view)
     {
-        try
+        if (view is View maviView)
         {
-            if (view is View maviView)
+            var index = Children.IndexOf(maviView);
+            if (index >= 0)
             {
-                var index = Children.IndexOf(maviView);
-                if (index >= 0)
-                {
-                    return index % Math.Max(1, Columns);
-                }
+                return index % Math.Max(1, Columns);
             }
-            return 0;
         }
-        catch (Exception ex)
-        {
-            _logger.Log($"Exception in GetColumn: {ex}");
-            return 0;
-        }
+        return 0;
     }
 
     /// <summary>
@@ -588,7 +794,19 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     /// <summary>
     /// Gets or sets the size of each item in the grid
     /// </summary>
-    private Size ItemSize { get; set; } = new Size(1, 1);
+    private Size _itemSize = new Size(1, 1);
+    private Size ItemSize
+    {
+        get => _itemSize;
+        set
+        {
+            if (_itemSize != value)
+            {
+                _logger?.Log($"UniformGrid: ItemSize changed from {_itemSize} to {value}");
+                _itemSize = value;
+            }
+        }
+    }
 
     #endregion
 }

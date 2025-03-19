@@ -27,7 +27,13 @@ public partial class MainPage : ContentPage
             
             // Start a new game with Easy difficulty
             // The NewGameCommand will handle running on a background thread
-            _viewModel.NewGameCommand.Execute(GameEnums.GameDifficulty.Easy);
+            System.Diagnostics.Debug.WriteLine("MainPage: Starting game creation");
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
+            
+            stopwatch.Stop();
+            System.Diagnostics.Debug.WriteLine($"MainPage: Game creation completed in {stopwatch.ElapsedMilliseconds}ms");
         }
         catch (Exception ex)
         {
