@@ -62,11 +62,19 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid>
+    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
         <!-- Loading Overlay - Semi-transparent to allow interaction during progressive loading -->
         <Grid IsVisible="{Binding IsLoading, Converter={StaticResource BoolConverter}}"
               BackgroundColor="{AppThemeBinding Light=#80FFFFFF, Dark=#80000000}"
-              ZIndex="999">
+              ZIndex="999"
+              Grid.RowSpan="4">
             <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="16">
                 <ActivityIndicator IsRunning="{Binding IsLoading}" 
                                   Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
@@ -84,7 +92,8 @@
               BackgroundColor="Transparent"
               ZIndex="998"
               IsEnabled="False"
-              InputTransparent="True">
+              InputTransparent="True"
+              Grid.RowSpan="4">
             <VerticalStackLayout HorizontalOptions="Center" 
                                 VerticalOptions="End" 
                                 Spacing="8"
@@ -99,15 +108,6 @@
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
-        
-        <ScrollView>
-            <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
         
         <!-- Game Title -->
         <Label Grid.Row="0" Text="MineSweeper" 
@@ -225,7 +225,8 @@
         </Border>
         
         <!-- Instructions -->
-        <VerticalStackLayout Grid.Row="3" Margin="0,16,0,0" Spacing="4">
+        <VerticalStackLayout Grid.Row="3" Margin="0,16,0,0" Spacing="4"
+                           IsVisible="{Binding IsGridFullyLoaded, Converter={StaticResource BoolConverter}}">
             <Label Text="Tap to reveal a cell" 
                    HorizontalOptions="Center" 
                    Style="{StaticResource GameLabelStyle}" />
@@ -233,7 +234,5 @@
                    HorizontalOptions="Center" 
                    Style="{StaticResource GameLabelStyle}" />
         </VerticalStackLayout>
-    </Grid>
-        </ScrollView>
     </Grid>
 </ContentPage>
