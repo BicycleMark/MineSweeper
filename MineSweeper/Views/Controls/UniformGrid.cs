@@ -614,160 +614,57 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             _availableWidth = bounds.Width;
             _availableHeight = bounds.Height;
             
-            // Calculate exact total width and height
-            double totalWidth = bounds.Width;
-            double totalHeight = bounds.Height;
+            // Calculate the ideal cell size based on the requested dimensions
+            double idealCellWidth = bounds.Width / Math.Max(1, Columns);
+            double idealCellHeight = bounds.Height / Math.Max(1, Rows);
             
-            // Calculate exact cell dimensions to avoid rounding errors
-            double exactCellWidth = totalWidth / Math.Max(1, Columns);
-            double exactCellHeight = totalHeight / Math.Max(1, Rows);
+            // Use the smallest dimension to maintain square cells, if desired
+            // Comment out these two lines if you want rectangular cells
+            double minDimension = Math.Min(idealCellWidth, idealCellHeight);
+            idealCellWidth = idealCellHeight = minDimension;
             
-            // Update item size with the exact dimensions
-            ItemSize = new Size(exactCellWidth, exactCellHeight);
+            // Calculate the actual grid size
+            double gridWidth = idealCellWidth * Columns;
+            double gridHeight = idealCellHeight * Rows;
             
-            // Update item size for all children
-            UpdateItemSize();
+            // Now calculate offsets to center the grid
+            double offsetX = (bounds.Width - gridWidth) / 2;
+            double offsetY = (bounds.Height - gridHeight) / 2;
             
-            // Arrange each child in batches to improve performance
-            int batchSize = 50;
+            _logger?.Log($"UniformGrid: Grid dimensions - gridWidth={gridWidth}, gridHeight={gridHeight}");
+            _logger?.Log($"UniformGrid: Centering offsets - offsetX={offsetX}, offsetY={offsetY}");
+            
+            // Update item size
+            ItemSize = new Size(idealCellWidth, idealCellHeight);
+            
+            // Arrange each child
             int totalChildren = Children.Count;
-            
-            _logger?.Log($"UniformGrid: Arranging {totalChildren} children with ItemSize={ItemSize}");
-            
-            // If we have no children but we have an ItemsSource, create the children now
-            if (totalChildren == 0 && ItemsSource != null && ItemsSource.Any())
+
+            // Rest of your arrangement logic...
+            for (int index = 0; index < totalChildren; index++)
             {
-                _logger?.Log($"UniformGrid: No children but ItemsSource has {ItemsSource.Count()} items. Creating children now.");
-                
-                // Force recreation of all items
-                _viewCache.Clear();
-                Children.Clear();
-                
-                var items = ItemsSource.ToList();
-                totalChildren = items.Count;
-                
-                for (int i = 0; i < totalChildren; i++)
+                if (Children[index] is View view)
                 {
-                    var item = items[i];
+                    // Calculate position based on index
+                    int row = index / Math.Max(1, Columns);
+                    int column = index % Math.Max(1, Columns);
                     
-                    // Create a new view from the template
-                    if (ItemTemplate == null)
+                    // Calculate position with offset to center the grid
+                    double x = offsetX + column * idealCellWidth;
+                    double y = offsetY + row * idealCellHeight;
+                    
+                    // Create bounds for the child
+                    var childBounds = new Rect(x, y, idealCellWidth, idealCellHeight);
+                    
+                    // Arrange the child
+                    view.Arrange(childBounds);
+                    
+                    if (index < 5) // Log only the first few items
                     {
-                        _logger?.Log("UniformGrid: ItemTemplate is null in ArrangeOverride, creating default template");
-                        // Create a default template
-                        ItemTemplate = new DataTemplate(() => new Grid { BackgroundColor = Colors.LightGray });
-                    }
-                    var content = (View)ItemTemplate.CreateContent();
-                    
-                    // Set the binding context for the content
-                    content.BindingContext = item;
-                    
-                    // Calculate border thickness proportionally
-                    var borderThickness = Math.Max(1, Math.Min(exactCellWidth, exactCellHeight) * 0.02);
-                    var margin = borderThickness / 2;
-                    
-                    // Add a border around the view to make it more visible
-                    var border = new Border
-                    {
-                        BackgroundColor = Colors.White,
-                        Stroke = Colors.Gray,
-                        StrokeThickness = borderThickness,
-                        StrokeShape = new RoundRectangle { CornerRadius = 2 },
-                        Padding = 0,
-                        Margin = margin,
-                        HorizontalOptions = LayoutOptions.Fill,
-                        VerticalOptions = LayoutOptions.Fill,
-                        Content = content
-                    };
-                    
-                    var view = border;
-                    
-                    // Set position in grid
-                    var row = i / Math.Max(1, Columns);
-                    var column = i % Math.Max(1, Columns);
-                    Grid.SetRow(view, row);
-                    Grid.SetColumn(view, column);
-                    
-                    // Add to children
-                    Children.Add(view);
-                    
-                    // Cache the view for future reuse
-                    _viewCache[item] = view;
-                    
-                    if (i < 5) // Log only the first few items to avoid flooding the log
-                    {
-                        _logger?.Log($"UniformGrid: Created view for item {i}, content type: {content.GetType().Name}");
-                    }
-                }
-                
-                // Update total children count
-                totalChildren = Children.Count;
-                _logger?.Log($"UniformGrid: Created {totalChildren} children");
-            }
-            
-            // Calculate any remaining pixels to distribute
-            double remainingWidth = totalWidth - (exactCellWidth * Columns);
-            double remainingHeight = totalHeight - (exactCellHeight * Rows);
-            
-            // Arrays to track extra pixel distribution
-            bool[] extraWidthColumns = new bool[Columns];
-            bool[] extraHeightRows = new bool[Rows];
-            
-            // Distribute extra pixels evenly
-            for (int i = 0; i < remainingWidth; i++)
-            {
-                extraWidthColumns[i % Columns] = true;
-            }
-            
-            for (int i = 0; i < remainingHeight; i++)
-            {
-                extraHeightRows[i % Rows] = true;
-            }
-            
-            for (int batchStart = 0; batchStart < totalChildren; batchStart += batchSize)
-            {
-                int batchEnd = Math.Min(batchStart + batchSize, totalChildren);
-                
-                for (int index = batchStart; index < batchEnd; index++)
-                {
-                    if (Children[index] is View view)
-                    {
-                        // Calculate position based on index
-                        int row = index / Math.Max(1, Columns);
-                        int column = index % Math.Max(1, Columns);
-                        
-                        // Calculate position with extra pixel distribution if needed
-                        double x = 0;
-                        for (int c = 0; c < column; c++)
-                        {
-                            x += exactCellWidth + (extraWidthColumns[c] ? 1 : 0);
-                        }
-                        
-                        double y = 0;
-                        for (int r = 0; r < row; r++)
-                        {
-                            y += exactCellHeight + (extraHeightRows[r] ? 1 : 0);
-                        }
-                        
-                        // Calculate cell size with extra pixel if needed
-                        double cellWidth = exactCellWidth + (extraWidthColumns[column] ? 1 : 0);
-                        double cellHeight = exactCellHeight + (extraHeightRows[row] ? 1 : 0);
-                        
-                        // Create bounds for the child
-                        var childBounds = new Rect(x, y, cellWidth, cellHeight);
-                        
-                        // Arrange the child
-                        view.Arrange(childBounds);
-                        
-                        if (index < 5) // Log only the first few items to avoid flooding the log
-                        {
-                            _logger?.Log($"UniformGrid: Arranged child {index} at row={row}, column={column}, bounds={childBounds}");
-                        }
+                        _logger?.Log($"UniformGrid: Arranged child {index} at row={row}, column={column}, bounds={childBounds}");
                     }
                 }
             }
-            
-            _logger?.Log($"UniformGrid: ArrangeOverride returning size={bounds.Size}");
             
             return bounds.Size;
         }

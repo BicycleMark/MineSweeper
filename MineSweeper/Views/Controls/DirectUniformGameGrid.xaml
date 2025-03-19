@@ -7,7 +7,7 @@
     
     <Border x:Name="mainBorder" 
             StrokeThickness="2" 
-            Stroke="Blue"
+            Stroke="Transparent"
             Padding="4"
             BackgroundColor="Transparent"
             HorizontalOptions="Fill"
