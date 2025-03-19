@@ -34,6 +34,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         ILogger customDebugLogger,
         IGameModelFactory modelFactory)
     {
+        _logger = customDebugLogger ?? new CustomDebugLogger();
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         _customDebugLogger = customDebugLogger ?? throw new ArgumentNullException(nameof(customDebugLogger));
         _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
@@ -42,7 +43,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         // Initialize timer
         InitializeTimer();
         
-        _customDebugLogger?.Log("GameViewModel initialized");
+        _logger?.Log("GameViewModel initialized");
     }
 
     #region Properties
@@ -172,6 +173,8 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     [ObservableProperty]
     private int _loadingProgress;
 
+    private readonly  ILogger _logger;
+
     /// <summary>
     /// Creates a new game with the specified difficulty
     /// </summary>
@@ -182,14 +185,14 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to create new game after disposal");
+            _logger?.LogWarning("Attempted to create new game after disposal");
             return;
         }
         
         // Parse the difficulty parameter
         var difficulty = ParseDifficultyParameter(difficultyParam);
         
-        _customDebugLogger?.Log($"Starting new game with difficulty: {difficulty}");
+        _logger?.Log($"Starting new game with difficulty: {difficulty}");
         
         // Set loading state
         IsLoading = true;
@@ -206,7 +209,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             // Create model on a background thread
             IGameModel? newModel = null;
             
-            _customDebugLogger?.Log("Creating game model on background thread");
+            _logger?.Log("Creating game model on background thread");
             
             // Phase 1: Model Creation
             phaseStopwatch.Restart();
@@ -217,21 +220,21 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
                 newModel = _modelFactory.CreateModel(difficulty);
             });
             phaseStopwatch.Stop();
-            _customDebugLogger?.Log($"Phase 1 - Model Creation: {phaseStopwatch.ElapsedMilliseconds}ms");
+            _logger?.Log($"Phase 1 - Model Creation: {phaseStopwatch.ElapsedMilliseconds}ms");
             
-            _customDebugLogger?.Log("Game model created, updating UI properties");
+            _logger?.Log("Game model created, updating UI properties");
             
             // Phase 2: Store model and prepare for UI update
             phaseStopwatch.Restart();
             // Store the new model
             if (newModel == null)
             {
-                _customDebugLogger?.LogError("Failed to create game model");
+                _logger?.LogError("Failed to create game model");
                 return;
             }
             _gameModel = newModel;
             phaseStopwatch.Stop();
-            _customDebugLogger?.Log($"Phase 2 - Store Model: {phaseStopwatch.ElapsedMilliseconds}ms");
+            _logger?.Log($"Phase 2 - Store Model: {phaseStopwatch.ElapsedMilliseconds}ms");
             
             // Phase 3: Update basic UI properties
             phaseStopwatch.Restart();
@@ -247,7 +250,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             // Create a new ObservableCollection for items
             Items = new ObservableCollection<SweeperItem>();
             phaseStopwatch.Stop();
-            _customDebugLogger?.Log($"Phase 3 - Update Basic UI Properties: {phaseStopwatch.ElapsedMilliseconds}ms");
+            _logger?.Log($"Phase 3 - Update Basic UI Properties: {phaseStopwatch.ElapsedMilliseconds}ms");
             
             // Phase 4: Progressive loading of items
             phaseStopwatch.Restart();
@@ -259,11 +262,11 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             await LoadItemsProgressively(_gameModel.Items);
             
             phaseStopwatch.Stop();
-            _customDebugLogger?.Log($"Phase 4 - Progressive Item Loading: {phaseStopwatch.ElapsedMilliseconds}ms");
+            _logger?.Log($"Phase 4 - Progressive Item Loading: {phaseStopwatch.ElapsedMilliseconds}ms");
         }
         catch (Exception ex)
         {
-            _customDebugLogger?.LogError($"Error creating new game: {ex}");
+            _logger?.LogError($"Error creating new game: {ex}");
         }
         finally
         {
@@ -273,7 +276,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             LoadingProgress = 100;
             totalStopwatch.Stop();
             var elapsedMs = totalStopwatch.ElapsedMilliseconds;
-            _customDebugLogger?.Log($"Game Creation Time was {elapsedMs}ms ({elapsedMs/1000.0:F2} seconds)");
+            _logger?.Log($"Game Creation Time was {elapsedMs}ms ({elapsedMs/1000.0:F2} seconds)");
         }
     }
     
@@ -285,14 +288,14 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (sourceItems == null || sourceItems.Count == 0)
         {
-            _customDebugLogger?.LogWarning("No items to load progressively");
+            _logger?.LogWarning("No items to load progressively");
             return;
         }
         
         int totalItems = sourceItems.Count;
         int processedItems = 0;
         
-        _customDebugLogger?.Log($"Starting progressive loading of {totalItems} items with batch size {BatchSize}");
+        _logger?.Log($"Starting progressive loading of {totalItems} items with batch size {BatchSize}");
         
         // Process items in batches
         for (int i = 0; i < totalItems; i += BatchSize)
@@ -317,7 +320,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             await Task.Delay(1); // Minimal delay to allow UI updates
         }
         
-        _customDebugLogger?.Log($"Completed progressive loading of {processedItems} items");
+        _logger?.Log($"Completed progressive loading of {processedItems} items");
     }
     
     /// <summary>
@@ -346,7 +349,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to play after disposal");
+            _logger?.LogWarning("Attempted to play after disposal");
             return;
         }
         
@@ -371,11 +374,11 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to flag after disposal");
+            _logger?.LogWarning("Attempted to flag after disposal");
             return;
         }
         
-        _customDebugLogger?.Log($"Flag method called at {point}");
+        _logger?.Log($"Flag method called at {point}");
         
         // Execute flag command on model
         _gameModel.FlagCommand.Execute(point);
@@ -405,14 +408,14 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to handle first move after disposal");
+            _logger?.LogWarning("Attempted to handle first move after disposal");
             return;
         }
         
         if (_gameModel.GameStatus != GameEnums.GameStatus.NotStarted)
             return;
             
-        _customDebugLogger?.Log("First move detected, starting timer");
+        _logger?.Log("First move detected, starting timer");
         
         // Start timer
         _timer?.Start();
@@ -429,14 +432,14 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to ensure game in progress after disposal");
+            _logger?.LogWarning("Attempted to ensure game in progress after disposal");
             return;
         }
         
         if (GameStatus == GameEnums.GameStatus.InProgress && _timer?.IsRunning == true)
             return;
             
-        _customDebugLogger?.LogWarning("Ensuring game stays in progress state");
+        _logger?.LogWarning("Ensuring game stays in progress state");
         
         // Reset game status if needed
         if (GameStatus != GameEnums.GameStatus.InProgress)
@@ -460,13 +463,13 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to update properties after disposal");
+            _logger?.LogWarning("Attempted to update properties after disposal");
             return;
         }
         
         if (_gameModel == null)
         {
-            _customDebugLogger?.LogWarning("Cannot update properties: game model is null");
+            _logger?.LogWarning("Cannot update properties: game model is null");
             return;
         }
         
@@ -482,7 +485,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         // Update game status
         GameStatus = _gameModel.GameStatus;
         
-        _customDebugLogger?.Log($"Properties updated: Status={GameStatus}, RemainingMines={RemainingMines}");
+        _logger?.Log($"Properties updated: Status={GameStatus}, RemainingMines={RemainingMines}");
     }
 
     /// <summary>
@@ -495,7 +498,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("GameStatus changed after disposal");
+            _logger?.LogWarning("GameStatus changed after disposal");
             return;
         }
         
@@ -507,7 +510,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             value != GameEnums.GameStatus.Lost)
             return;
             
-        _customDebugLogger?.Log($"Game over with status: {value}");
+        _logger?.Log($"Game over with status: {value}");
         
         // Stop timer
         _timer?.Stop();
@@ -526,11 +529,11 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Attempted to reveal mines after disposal");
+            _logger?.LogWarning("Attempted to reveal mines after disposal");
             return;
         }
         
-        _customDebugLogger?.Log("Requesting model to reveal all mines");
+        _logger?.Log("Requesting model to reveal all mines");
         
         // Use the model's implementation to reveal all mines
         // This follows MVVM pattern by delegating model operations to the model

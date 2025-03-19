@@ -7,15 +7,15 @@
     
     <Border x:Name="mainBorder" 
             StrokeThickness="2" 
-            Stroke="Black"
+            Stroke="Blue"
             Padding="4"
             BackgroundColor="Transparent"
             HorizontalOptions="Fill"
             VerticalOptions="Fill">
         <!-- Use UniformGrid directly for better performance -->
         <controls:UniformGrid x:Name="board"
-                             HorizontalOptions="Fill"
-                             VerticalOptions="Fill"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
                              BackgroundColor="Transparent" />
     </Border>
 </ContentView>

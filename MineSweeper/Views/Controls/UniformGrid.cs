@@ -405,6 +405,71 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     }
 
     /// <summary>
+    /// Updates the size of each item in the grid
+    /// </summary>
+    private void UpdateItemSize()
+    {
+        if (_isUpdatingLayout || _batchUpdateInProgress)
+            return;
+        
+        _logger?.Log($"UniformGrid: UpdateItemSize called with _availableWidth={_availableWidth}, _availableHeight={_availableHeight}, Rows={Rows}, Columns={Columns}, Children={Children.Count}");
+        
+        // Ensure we have valid dimensions
+        var rows = Math.Max(1, Rows);
+        var columns = Math.Max(1, Columns);
+        
+        // Ensure we have valid available space
+        var width = Math.Max(1, _availableWidth);
+        var height = Math.Max(1, _availableHeight);
+        
+        _logger?.Log($"UniformGrid: Using width={width}, height={height}, rows={rows}, columns={columns}");
+        
+        // Calculate item size with precise division to avoid rounding errors
+        // Use Math.Floor to ensure we don't exceed the available space
+        var itemWidth = Math.Floor(width / columns * 100) / 100;
+        var itemHeight = Math.Floor(height / rows * 100) / 100;
+        
+        // Calculate border and margin as a proportion of cell size rather than fixed pixels
+        // This ensures the borders scale appropriately with the grid size
+        var borderThickness = Math.Max(1, Math.Min(itemWidth, itemHeight) * 0.02);
+        var margin = borderThickness / 2;
+        
+        // Store the calculated item size
+        ItemSize = new Size(itemWidth, itemHeight);
+        
+        _logger?.Log($"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}, borderThickness={borderThickness}, margin={margin}");
+        
+        // Set a proportional size for each child to improve scaling
+        foreach (var child in Children)
+        {
+            if (child is View view)
+            {
+                // Calculate the exact cell content size by subtracting the border and margin
+                var contentWidth = itemWidth - (borderThickness * 2) - (margin * 2);
+                var contentHeight = itemHeight - (borderThickness * 2) - (margin * 2);
+                
+                view.WidthRequest = contentWidth;
+                view.HeightRequest = contentHeight;
+                
+                // If the view is a Border, set its properties with proportional values
+                if (view is Border border)
+                {
+                    border.StrokeThickness = borderThickness;
+                    border.Stroke = Colors.Gray;
+                    border.BackgroundColor = Colors.White;
+                    border.Margin = margin;
+                    border.Padding = 0;
+                }
+            }
+        }
+        
+        _logger?.Log($"UniformGrid: Updated size for {Children.Count} children");
+        
+        // Force a layout update
+        InvalidateMeasure();
+    }
+
+    /// <summary>
     /// Initializes a new instance of the UniformGrid class
     /// </summary>
     public UniformGrid()
@@ -473,71 +538,6 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     private double _availableWidth;
     private double _availableHeight;
     private bool _isUpdatingLayout = false;
-    
-    /// <summary>
-    /// Updates the size of each item in the grid
-    /// </summary>
-    private void UpdateItemSize()
-    {
-        if (_isUpdatingLayout || _batchUpdateInProgress)
-            return;
-        
-        _logger?.Log($"UniformGrid: UpdateItemSize called with _availableWidth={_availableWidth}, _availableHeight={_availableHeight}, Rows={Rows}, Columns={Columns}, Children={Children.Count}");
-        
-        // Ensure we have valid dimensions
-        var rows = Math.Max(1, Rows);
-        var columns = Math.Max(1, Columns);
-        
-        // Ensure we have valid available space
-        var width = Math.Max(1, _availableWidth);
-        var height = Math.Max(1, _availableHeight);
-        
-        _logger?.Log($"UniformGrid: Using width={width}, height={height}, rows={rows}, columns={columns}");
-        
-        // Calculate item size with precise division to avoid rounding errors
-        // Use Math.Floor to ensure we don't exceed the available space
-        var itemWidth = Math.Floor(width / columns * 100) / 100;
-        var itemHeight = Math.Floor(height / rows * 100) / 100;
-        
-        // Calculate border and margin as a proportion of cell size rather than fixed pixels
-        // This ensures the borders scale appropriately with the grid size
-        var borderThickness = Math.Max(1, Math.Min(itemWidth, itemHeight) * 0.02);
-        var margin = borderThickness / 2;
-        
-        // Store the calculated item size
-        ItemSize = new Size(itemWidth, itemHeight);
-        
-        _logger?.Log($"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}, borderThickness={borderThickness}, margin={margin}");
-        
-        // Set a proportional size for each child to improve scaling
-        foreach (var child in Children)
-        {
-            if (child is View view)
-            {
-                // Calculate the exact cell content size by subtracting the border and margin
-                var contentWidth = itemWidth - (borderThickness * 2) - (margin * 2);
-                var contentHeight = itemHeight - (borderThickness * 2) - (margin * 2);
-                
-                view.WidthRequest = contentWidth;
-                view.HeightRequest = contentHeight;
-                
-                // If the view is a Border, set its properties with proportional values
-                if (view is Border border)
-                {
-                    border.StrokeThickness = borderThickness;
-                    border.Stroke = Colors.Gray;
-                    border.BackgroundColor = Colors.White;
-                    border.Margin = margin;
-                    border.Padding = 0;
-                }
-            }
-        }
-        
-        _logger?.Log($"UniformGrid: Updated size for {Children.Count} children");
-        
-        // Force a layout update
-        InvalidateMeasure();
-    }
 
     #endregion
 
