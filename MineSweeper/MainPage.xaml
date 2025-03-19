@@ -176,6 +176,7 @@
                 ItemsSource="{Binding Items}"
                 Rows="{Binding Rows}"
                 Columns="{Binding Columns}"
+                IsGridFullyLoaded="{Binding IsGridFullyLoaded}"
                 HorizontalOptions="Fill"
                 VerticalOptions="Fill">
                 <controls:DirectUniformGameGrid.ItemTemplate>
