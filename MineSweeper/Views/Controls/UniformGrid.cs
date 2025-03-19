@@ -494,28 +494,40 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
         
         _logger?.Log($"UniformGrid: Using width={width}, height={height}, rows={rows}, columns={columns}");
         
-        // Calculate item size
-        var itemWidth = width / columns;
-        var itemHeight = height / rows;
+        // Calculate item size with precise division to avoid rounding errors
+        // Use Math.Floor to ensure we don't exceed the available space
+        var itemWidth = Math.Floor(width / columns * 100) / 100;
+        var itemHeight = Math.Floor(height / rows * 100) / 100;
+        
+        // Calculate border and margin as a proportion of cell size rather than fixed pixels
+        // This ensures the borders scale appropriately with the grid size
+        var borderThickness = Math.Max(1, Math.Min(itemWidth, itemHeight) * 0.02);
+        var margin = borderThickness / 2;
+        
+        // Store the calculated item size
         ItemSize = new Size(itemWidth, itemHeight);
         
-        _logger?.Log($"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}");
+        _logger?.Log($"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}, borderThickness={borderThickness}, margin={margin}");
         
-        // Set a fixed size for each child to improve performance
+        // Set a proportional size for each child to improve scaling
         foreach (var child in Children)
         {
             if (child is View view)
             {
-                view.WidthRequest = itemWidth - 2; // Subtract border thickness
-                view.HeightRequest = itemHeight - 2; // Subtract border thickness
+                // Calculate the exact cell content size by subtracting the border and margin
+                var contentWidth = itemWidth - (borderThickness * 2) - (margin * 2);
+                var contentHeight = itemHeight - (borderThickness * 2) - (margin * 2);
                 
-                // If the view is a Border, set its properties
+                view.WidthRequest = contentWidth;
+                view.HeightRequest = contentHeight;
+                
+                // If the view is a Border, set its properties with proportional values
                 if (view is Border border)
                 {
-                    border.StrokeThickness = 1;
+                    border.StrokeThickness = borderThickness;
                     border.Stroke = Colors.Gray;
                     border.BackgroundColor = Colors.White;
-                    border.Margin = 1;
+                    border.Margin = margin;
                     border.Padding = 0;
                 }
             }
@@ -602,7 +614,18 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
             _availableWidth = bounds.Width;
             _availableHeight = bounds.Height;
             
-            // Update item size
+            // Calculate exact total width and height
+            double totalWidth = bounds.Width;
+            double totalHeight = bounds.Height;
+            
+            // Calculate exact cell dimensions to avoid rounding errors
+            double exactCellWidth = totalWidth / Math.Max(1, Columns);
+            double exactCellHeight = totalHeight / Math.Max(1, Rows);
+            
+            // Update item size with the exact dimensions
+            ItemSize = new Size(exactCellWidth, exactCellHeight);
+            
+            // Update item size for all children
             UpdateItemSize();
             
             // Arrange each child in batches to improve performance
@@ -639,15 +662,19 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
                     // Set the binding context for the content
                     content.BindingContext = item;
                     
+                    // Calculate border thickness proportionally
+                    var borderThickness = Math.Max(1, Math.Min(exactCellWidth, exactCellHeight) * 0.02);
+                    var margin = borderThickness / 2;
+                    
                     // Add a border around the view to make it more visible
                     var border = new Border
                     {
                         BackgroundColor = Colors.White,
                         Stroke = Colors.Gray,
-                        StrokeThickness = 1,
+                        StrokeThickness = borderThickness,
                         StrokeShape = new RoundRectangle { CornerRadius = 2 },
                         Padding = 0,
-                        Margin = 1,
+                        Margin = margin,
                         HorizontalOptions = LayoutOptions.Fill,
                         VerticalOptions = LayoutOptions.Fill,
                         Content = content
@@ -678,6 +705,25 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
                 _logger?.Log($"UniformGrid: Created {totalChildren} children");
             }
             
+            // Calculate any remaining pixels to distribute
+            double remainingWidth = totalWidth - (exactCellWidth * Columns);
+            double remainingHeight = totalHeight - (exactCellHeight * Rows);
+            
+            // Arrays to track extra pixel distribution
+            bool[] extraWidthColumns = new bool[Columns];
+            bool[] extraHeightRows = new bool[Rows];
+            
+            // Distribute extra pixels evenly
+            for (int i = 0; i < remainingWidth; i++)
+            {
+                extraWidthColumns[i % Columns] = true;
+            }
+            
+            for (int i = 0; i < remainingHeight; i++)
+            {
+                extraHeightRows[i % Rows] = true;
+            }
+            
             for (int batchStart = 0; batchStart < totalChildren; batchStart += batchSize)
             {
                 int batchEnd = Math.Min(batchStart + batchSize, totalChildren);
@@ -690,10 +736,25 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
                         int row = index / Math.Max(1, Columns);
                         int column = index % Math.Max(1, Columns);
                         
+                        // Calculate position with extra pixel distribution if needed
+                        double x = 0;
+                        for (int c = 0; c < column; c++)
+                        {
+                            x += exactCellWidth + (extraWidthColumns[c] ? 1 : 0);
+                        }
+                        
+                        double y = 0;
+                        for (int r = 0; r < row; r++)
+                        {
+                            y += exactCellHeight + (extraHeightRows[r] ? 1 : 0);
+                        }
+                        
+                        // Calculate cell size with extra pixel if needed
+                        double cellWidth = exactCellWidth + (extraWidthColumns[column] ? 1 : 0);
+                        double cellHeight = exactCellHeight + (extraHeightRows[row] ? 1 : 0);
+                        
                         // Create bounds for the child
-                        var x = column * ItemSize.Width;
-                        var y = row * ItemSize.Height;
-                        var childBounds = new Rect(x, y, ItemSize.Width, ItemSize.Height);
+                        var childBounds = new Rect(x, y, cellWidth, cellHeight);
                         
                         // Arrange the child
                         view.Arrange(childBounds);

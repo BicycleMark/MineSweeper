@@ -278,21 +278,32 @@ public partial class DirectUniformGameGrid : ContentView
     /// </summary>
     private View CreateCellForItem(SweeperItem item)
     {
-        // Create a border for the cell
+        // Calculate proportional border thickness and margin based on the current size
+        // This ensures consistent scaling when the game changes size
+        double cellSize = Math.Min(Width / Math.Max(1, Columns), Height / Math.Max(1, Rows));
+        double borderThickness = Math.Max(1, cellSize * 0.02); // 2% of cell size, minimum 1px
+        double cornerRadius = Math.Max(2, cellSize * 0.05); // 5% of cell size, minimum 2px
+        double padding = borderThickness;
+        double margin = borderThickness / 2;
+        
+        // Create a border for the cell with proportional sizing
         var border = new Border
         {
             BackgroundColor = item.IsRevealed ? Colors.LightGray : Colors.DarkGray,
             Stroke = Colors.Gray,
-            StrokeThickness = 1,
-            StrokeShape = new RoundRectangle { CornerRadius = 2 },
-            Padding = 2,
-            Margin = 1,
+            StrokeThickness = borderThickness,
+            StrokeShape = new RoundRectangle { CornerRadius = cornerRadius },
+            Padding = padding,
+            Margin = margin,
             HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Fill
         };
         
         // Create a grid to hold the content
         var grid = new Grid();
+        
+        // Calculate font size proportionally to cell size
+        double fontSize = Math.Max(12, cellSize * 0.4); // 40% of cell size, minimum 12px
         
         // Flag emoji (when flagged and not revealed)
         if (item.IsFlagged && !item.IsRevealed)
@@ -302,7 +313,7 @@ public partial class DirectUniformGameGrid : ContentView
                 Text = "🚩",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = 16,
+                FontSize = fontSize,
                 TextColor = Colors.Red
             };
             grid.Add(flagLabel);
@@ -316,7 +327,7 @@ public partial class DirectUniformGameGrid : ContentView
                 Text = "💣",
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = 16,
+                FontSize = fontSize,
                 TextColor = Colors.Black
             };
             grid.Add(mineLabel);
@@ -330,7 +341,7 @@ public partial class DirectUniformGameGrid : ContentView
                 Text = item.MineCount.ToString(),
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = 14,
+                FontSize = Math.Max(10, fontSize * 0.9), // Slightly smaller than emoji
                 FontAttributes = FontAttributes.Bold,
                 TextColor = GetColorForMineCount(item.MineCount)
             };
