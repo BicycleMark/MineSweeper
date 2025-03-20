@@ -1,4 +1,8 @@
-﻿﻿﻿﻿﻿﻿﻿namespace MineSweeper;
+﻿﻿#if IOS || MACCATALYST
+using Foundation;  // Add this for NSNumber and NSString
+using UIKit;      // Add this for UIInterfaceOrientation
+#endif
+namespace MineSweeper;
 
 public partial class App : Application
 {
@@ -8,6 +12,19 @@ public partial class App : Application
         
         // Add debug logging
         System.Diagnostics.Debug.WriteLine("App: Constructor called");
+           // Lock orientation to portrait on all platforms
+        Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping("OrientationLock", (handler, view) =>
+        {
+#if IOS || MACCATALYST
+            var nativeWindow = handler.PlatformView;
+            UIKit.UIDevice.CurrentDevice.SetValueForKey(
+                NSNumber.FromNInt((int)UIKit.UIInterfaceOrientation.Portrait),
+                new NSString("orientation"));
+#elif ANDROID
+            var activity = Platform.CurrentActivity;
+            activity.RequestedOrientation = Android.Content.PM.ScreenOrientation.Portrait;
+#endif
+        });
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

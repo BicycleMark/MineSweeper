@@ -76,6 +76,7 @@ public partial class MainPage : ContentPage
         }
     }
     
+    // Navigation to Debug page is now handled through the flyout menu
     private void OnCellTapped(object sender, EventArgs e)
 {
     // Find the tapped cell

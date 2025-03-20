@@ -2,7 +2,7 @@ using System.Globalization;
 using MineSweeper.Views.Converters;
 using Xunit;
 
-namespace MineSweeperTests.Views.Converters;
+namespace MineSweeper.Tests.Views.Converters;
 
 public class BoolConvertersTests
 {

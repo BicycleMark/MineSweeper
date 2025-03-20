@@ -411,34 +411,36 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
     {
         if (_isUpdatingLayout || _batchUpdateInProgress)
             return;
-        
-        _logger?.Log($"UniformGrid: UpdateItemSize called with _availableWidth={_availableWidth}, _availableHeight={_availableHeight}, Rows={Rows}, Columns={Columns}, Children={Children.Count}");
-        
+
+        _logger?.Log(
+            $"UniformGrid: UpdateItemSize called with _availableWidth={_availableWidth}, _availableHeight={_availableHeight}, Rows={Rows}, Columns={Columns}, Children={Children.Count}");
+
         // Ensure we have valid dimensions
         var rows = Math.Max(1, Rows);
         var columns = Math.Max(1, Columns);
-        
+
         // Ensure we have valid available space
         var width = Math.Max(1, _availableWidth);
         var height = Math.Max(1, _availableHeight);
-        
+
         _logger?.Log($"UniformGrid: Using width={width}, height={height}, rows={rows}, columns={columns}");
-        
+
         // Calculate item size with precise division to avoid rounding errors
         // Use Math.Floor to ensure we don't exceed the available space
         var itemWidth = Math.Floor(width / columns * 100) / 100;
         var itemHeight = Math.Floor(height / rows * 100) / 100;
-        
+
         // Calculate border and margin as a proportion of cell size rather than fixed pixels
         // This ensures the borders scale appropriately with the grid size
         var borderThickness = Math.Max(1, Math.Min(itemWidth, itemHeight) * 0.02);
         var margin = borderThickness / 2;
-        
+
         // Store the calculated item size
         ItemSize = new Size(itemWidth, itemHeight);
-        
-        _logger?.Log($"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}, borderThickness={borderThickness}, margin={margin}");
-        
+
+        _logger?.Log(
+            $"UniformGrid: Setting item size to width={itemWidth}, height={itemHeight}, borderThickness={borderThickness}, margin={margin}");
+
         // Set a proportional size for each child to improve scaling
         foreach (var child in Children)
         {
@@ -447,26 +449,60 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
                 // Calculate the exact cell content size by subtracting the border and margin
                 var contentWidth = itemWidth - (borderThickness * 2) - (margin * 2);
                 var contentHeight = itemHeight - (borderThickness * 2) - (margin * 2);
-                
+
                 view.WidthRequest = contentWidth;
                 view.HeightRequest = contentHeight;
-                
+
                 // If the view is a Border, set its properties with proportional values
                 if (view is Border border)
                 {
                     border.StrokeThickness = borderThickness;
                     border.Stroke = Colors.Gray;
                     border.BackgroundColor = Colors.White;
-                    border.Margin = margin;
+                    border.Margin = 0; // Remove margin to avoid throwing off centering
                     border.Padding = 0;
+
+                    // Ensure content also has no margin or padding
+                    if (border.Content is Layout layout)
+                    {
+                        layout.Margin = 0;
+                        layout.Padding = 0;
+                    }
                 }
             }
         }
-        
-        _logger?.Log($"UniformGrid: Updated size for {Children.Count} children");
-        
-        // Force a layout update
-        InvalidateMeasure();
+
+        foreach (var child in Children)
+        {
+            if (child is View view)
+            {
+                // Set exact sizing without fractional pixels
+                view.WidthRequest = Math.Floor(itemWidth);
+                view.HeightRequest = Math.Floor(itemHeight);
+
+                if (view is Border border)
+                {
+                    // Ensure border properties don't cause alignment issues
+                    border.StrokeThickness = 1; // Fixed 1px border
+                    border.Margin = 0;
+                    border.Padding = 0;
+
+                    // Set content alignment
+                    if (border.Content is View contentView)
+                    {
+                        contentView.HorizontalOptions = LayoutOptions.Center;
+                        contentView.VerticalOptions = LayoutOptions.Center;
+                        contentView.Margin = 0;
+                        
+                        // Only set Padding if the view is a Layout
+                        if (contentView is Layout layout)
+                        {
+                            layout.Padding = 0;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -610,60 +646,103 @@ public class UniformGrid : UniformItemsLayout, IGridLayout
         {
             _logger?.Log($"UniformGrid: ArrangeOverride called with bounds={bounds}, Children={Children.Count}");
             
-            // Update width and height
-            _availableWidth = bounds.Width;
-            _availableHeight = bounds.Height;
+            // Ensure valid bounds
+            if (bounds.Width <= 0 || bounds.Height <= 0)
+            {
+                _logger?.Log($"UniformGrid: Invalid bounds {bounds}, skipping arrangement");
+                return bounds.Size;
+            }
             
-            // Calculate the ideal cell size based on the requested dimensions
-            double idealCellWidth = bounds.Width / Math.Max(1, Columns);
-            double idealCellHeight = bounds.Height / Math.Max(1, Rows);
+            // IMPORTANT CHANGE: Use slightly less than available width to ensure there's space on both sides
+            // This ensures we don't fill the entire width, enabling proper centering
+            double effectiveWidth = Math.Floor(bounds.Width * 0.98); // Use 98% of available width
+            double effectiveHeight = Math.Floor(bounds.Height * 0.98); // Use 98% of available height
             
-            // Use the smallest dimension to maintain square cells, if desired
-            // Comment out these two lines if you want rectangular cells
-            double minDimension = Math.Min(idealCellWidth, idealCellHeight);
-            idealCellWidth = idealCellHeight = minDimension;
+            // Calculate cell size based on the effective dimensions
+            double cellWidth = Math.Floor(effectiveWidth / Columns);
+            double cellHeight = Math.Floor(effectiveHeight / Rows);
             
-            // Calculate the actual grid size
-            double gridWidth = idealCellWidth * Columns;
-            double gridHeight = idealCellHeight * Rows;
+            // Use the smallest dimension for square cells
+            double squareCellSize = Math.Min(cellWidth, cellHeight);
             
-            // Now calculate offsets to center the grid
-            double offsetX = (bounds.Width - gridWidth) / 2;
-            double offsetY = (bounds.Height - gridHeight) / 2;
+            // Calculate the exact total grid size (integer values)
+            double gridWidth = squareCellSize * Columns;
+            double gridHeight = squareCellSize * Rows;
             
-            _logger?.Log($"UniformGrid: Grid dimensions - gridWidth={gridWidth}, gridHeight={gridHeight}");
-            _logger?.Log($"UniformGrid: Centering offsets - offsetX={offsetX}, offsetY={offsetY}");
+            // Calculate the exact centering offsets to ensure perfect symmetry
+            double offsetX = Math.Floor((bounds.Width - gridWidth) / 2);
+
+            // Adjust for odd widths to ensure perfect centering
+            if ((bounds.Width - gridWidth) % 2 == 1) {
+                // If there's an odd number of pixels to distribute, add 0.5 to center exactly
+                offsetX += 0.5;
+            }
+
+            // For safety, ensure a minimum margin
+            if (offsetX < 2) {
+                offsetX = 2;
+            }
+            
+            double offsetY = Math.Floor((bounds.Height - gridHeight) / 2);
+            
+            _logger?.Log($"UniformGrid: Bounds width={bounds.Width}, Grid width={gridWidth}");
+            _logger?.Log($"UniformGrid: Total offset for width={bounds.Width - gridWidth}");
+            _logger?.Log($"UniformGrid: Centering at integer offset=({offsetX},{offsetY})");
             
             // Update item size
-            ItemSize = new Size(idealCellWidth, idealCellHeight);
+            ItemSize = new Size(squareCellSize, squareCellSize);
             
             // Arrange each child
             int totalChildren = Children.Count;
-
-            // Rest of your arrangement logic...
-            for (int index = 0; index < totalChildren; index++)
+            
+            // Track leftmost and rightmost positions for verification
+            double leftmostX = double.MaxValue;
+            double rightmostX = double.MinValue;
+            
+            // Only calculate margins if we have children
+            if (totalChildren > 0)
             {
-                if (Children[index] is View view)
+                for (int index = 0; index < totalChildren; index++)
                 {
-                    // Calculate position based on index
-                    int row = index / Math.Max(1, Columns);
-                    int column = index % Math.Max(1, Columns);
-                    
-                    // Calculate position with offset to center the grid
-                    double x = offsetX + column * idealCellWidth;
-                    double y = offsetY + row * idealCellHeight;
-                    
-                    // Create bounds for the child
-                    var childBounds = new Rect(x, y, idealCellWidth, idealCellHeight);
-                    
-                    // Arrange the child
-                    view.Arrange(childBounds);
-                    
-                    if (index < 5) // Log only the first few items
+                    if (Children[index] is View view)
                     {
-                        _logger?.Log($"UniformGrid: Arranged child {index} at row={row}, column={column}, bounds={childBounds}");
+                        // Calculate grid position
+                        int row = index / Columns;
+                        int column = index % Columns;
+                        
+                        // Calculate exact pixel position with precise centering
+                        double x = offsetX + (column * squareCellSize);
+                        double y = offsetY + (row * squareCellSize);
+                        
+                        // Create bounds for the child with exact dimensions
+                        var childBounds = new Rect(x, y, squareCellSize, squareCellSize);
+                        
+                        // Track leftmost and rightmost positions
+                        if (column == 0 && x < leftmostX) leftmostX = x;
+                        if (column == Columns - 1 && (x + squareCellSize) > rightmostX) rightmostX = x + squareCellSize;
+                        
+                        view.Arrange(childBounds);
+                        
+                        // Log all positioned cells in the first row for debugging
+                        if (row == 0 || index == totalChildren - 1)
+                        {
+                            _logger?.Log($"UniformGrid: Cell at ({row},{column}) positioned at x={x}, width={squareCellSize}");
+                        }
                     }
                 }
+
+                // Log the calculated margins to verify centering
+                double leftMargin = leftmostX != double.MaxValue ? leftmostX : offsetX;
+                double rightMargin = rightmostX != double.MinValue ? bounds.Width - rightmostX : bounds.Width - (offsetX + gridWidth);
+                
+                _logger?.Log($"UniformGrid: Left margin={leftMargin:F1}, Right margin={rightMargin:F1}");
+                _logger?.Log($"UniformGrid: Margin difference={(leftMargin - rightMargin):F1}px");
+            }
+            else
+            {
+                // When there are no children, just log the theoretical margins
+                _logger?.Log($"UniformGrid: No children to arrange. Theoretical left margin={offsetX}");
+                _logger?.Log($"UniformGrid: Theoretical right margin={bounds.Width - (offsetX + gridWidth)}");
             }
             
             return bounds.Size;

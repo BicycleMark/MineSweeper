@@ -6,8 +6,8 @@
              x:Class="MineSweeper.Views.Controls.DirectUniformGameGrid">
     
     <Border x:Name="mainBorder" 
-            StrokeThickness="2" 
-            Stroke="Transparent"
+            StrokeThickness="0" 
+            
             Padding="4"
             BackgroundColor="Transparent"
             HorizontalOptions="Fill"
