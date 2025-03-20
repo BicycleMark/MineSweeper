@@ -76,5 +76,17 @@ public partial class MainPage : ContentPage
         }
     }
     
-    // Navigation to Debug page is now handled through the flyout menu
+    private void OnCellTapped(object sender, EventArgs e)
+{
+    // Find the tapped cell
+    if (sender is Element element && element.BindingContext is SweeperItem item)
+    {
+        System.Diagnostics.Debug.WriteLine($"Cell tapped at: {item.Point}");
+        // Call your view model's Play method directly
+        if (BindingContext is GameViewModel vm)
+        {
+            vm.PlayCommand.Execute(item.Point);
+        }
+    }
+}
 }

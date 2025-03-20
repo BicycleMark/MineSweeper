@@ -350,11 +350,14 @@ public partial class DirectUniformGameGrid : ContentView
         
         // Set the grid as the border's content
         border.Content = grid;
+        /*
+        // Removed these gesturee recognizer for now. Copilot said so.
         
-        // Set up a tap gesture recognizer for the cell
         var tapGesture = new TapGestureRecognizer();
         tapGesture.Tapped += (sender, e) => OnCellTapped(sender, e, item.Point);
         border.GestureRecognizers.Add(tapGesture);
+        */
+        
         
         return border;
     }
@@ -378,6 +381,7 @@ public partial class DirectUniformGameGrid : ContentView
         };
     }
     
+    /*
     /// <summary>
     /// Handles tapping on a cell
     /// </summary>
@@ -417,6 +421,7 @@ public partial class DirectUniformGameGrid : ContentView
             _logger?.LogError($"DirectUniformGameGrid: Exception in OnCellTapped: {ex}");
         }
     }
+    */
     
     #endregion
     
@@ -431,15 +436,16 @@ public partial class DirectUniformGameGrid : ContentView
             
             // Initialize the grid
             UpdateGridSize();
-            
+            /*
             // Now that the control is loaded, add the tap gesture recognizer
             var tapGesture = new TapGestureRecognizer();
             tapGesture.Tapped += OnCellTapped;
+            */
             
             // Check if board is not null before adding the gesture recognizer
             if (board != null)
             {
-                board.GestureRecognizers.Add(tapGesture);
+                //board.GestureRecognizers.Add(tapGesture);
                 _logger?.Log("DirectUniformGameGrid: Added tap gesture recognizer to board");
             }
             else
@@ -452,7 +458,7 @@ public partial class DirectUniformGameGrid : ContentView
             _logger?.LogError($"DirectUniformGameGrid: Exception in OnLoaded: {ex}");
         }
     }
-
+/*
     private void OnCellTapped(object? sender, TappedEventArgs e)
     {
         // Check if board is null
@@ -522,6 +528,7 @@ public partial class DirectUniformGameGrid : ContentView
                 PlayCommand.Execute(new Point(row, column));
         }
     }
+    */
     
     #endregion
 }

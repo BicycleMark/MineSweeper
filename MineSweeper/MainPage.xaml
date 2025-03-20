@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
@@ -7,7 +8,7 @@
              xmlns:converters="clr-namespace:MineSweeper.Views.Converters"
              x:Class="MineSweeper.MainPage"
              x:DataType="viewmodels:GameViewModel">
-    
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <!-- Converters -->
@@ -19,7 +20,7 @@
             <converters:BoolConverter x:Key="BoolConverter" />
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:ProgressConverter x:Key="ProgressConverter" />
-            
+
             <!-- Game Button Style -->
             <Style x:Key="GameButtonStyle" TargetType="Button">
                 <Setter Property="FontSize" Value="14" />
@@ -27,7 +28,8 @@
                 <Setter Property="Margin" Value="5" />
                 <Setter Property="Padding" Value="10,8" />
                 <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                <Setter Property="BackgroundColor"
+                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
                 <Setter Property="TextColor" Value="{AppThemeBinding Light=White, Dark=White}" />
                 <Setter Property="Shadow">
                     <Shadow Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
@@ -36,7 +38,7 @@
                             Opacity="0.2" />
                 </Setter>
             </Style>
-            
+
             <!-- Game Label Style -->
             <Style x:Key="GameLabelStyle" TargetType="Label">
                 <Setter Property="VerticalOptions" Value="Center" />
@@ -44,13 +46,15 @@
                 <Setter Property="FontSize" Value="16" />
                 <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource MidnightBlue}, Dark=White}" />
             </Style>
-            
+
             <!-- Game Info Panel Style -->
             <Style x:Key="GameInfoPanelStyle" TargetType="Border">
-                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}" />
+                <Setter Property="Stroke"
+                        Value="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}" />
                 <Setter Property="StrokeThickness" Value="1" />
                 <Setter Property="StrokeShape" Value="RoundRectangle 8" />
-                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}" />
+                <Setter Property="BackgroundColor"
+                        Value="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}" />
                 <Setter Property="Padding" Value="10,8" />
                 <Setter Property="Shadow">
                     <Shadow Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
@@ -62,31 +66,33 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}" Padding="16">
+    <Grid
+        BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}"
+        Padding="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <!-- Loading Overlay - Semi-transparent to allow interaction during progressive loading -->
         <Grid IsVisible="{Binding IsLoading, Converter={StaticResource BoolConverter}}"
               BackgroundColor="{AppThemeBinding Light=#80FFFFFF, Dark=#80000000}"
               ZIndex="999"
               Grid.RowSpan="4">
             <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="16">
-                <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                                  Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
-                                  HeightRequest="50" 
-                                  WidthRequest="50" />
-                <Label Text="Loading game..." 
-                       FontSize="18" 
+                <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                   Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                                   HeightRequest="50"
+                                   WidthRequest="50" />
+                <Label Text="Loading game..."
+                       FontSize="18"
                        TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
-        
+
         <!-- Progressive Loading Indicator -->
         <Grid IsVisible="{Binding IsGridFullyLoaded, Converter={StaticResource InverseBoolConverter}}"
               BackgroundColor="Transparent"
@@ -94,28 +100,28 @@
               IsEnabled="False"
               InputTransparent="True"
               Grid.RowSpan="4">
-            <VerticalStackLayout HorizontalOptions="Center" 
-                                VerticalOptions="End" 
-                                Spacing="8"
-                                Margin="0,0,0,20">
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 VerticalOptions="End"
+                                 Spacing="8"
+                                 Margin="0,0,0,20">
                 <ProgressBar Progress="{Binding LoadingProgress, Converter={StaticResource ProgressConverter}}"
-                            ProgressColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
-                            HeightRequest="10"
-                            WidthRequest="200" />
-                <Label Text="{Binding LoadingProgress, StringFormat='{0}% Complete'}" 
-                       FontSize="14" 
+                             ProgressColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
+                             HeightRequest="10"
+                             WidthRequest="200" />
+                <Label Text="{Binding LoadingProgress, StringFormat='{0}% Complete'}"
+                       FontSize="14"
                        TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
         </Grid>
-        
+
         <!-- Game Title -->
-        <Label Grid.Row="0" Text="MineSweeper" 
-               FontSize="28" FontAttributes="Bold" 
+        <Label Grid.Row="0" Text="MineSweeper"
+               FontSize="28" FontAttributes="Bold"
                HorizontalOptions="Center"
                TextColor="{AppThemeBinding Light={StaticResource MidnightBlue}, Dark=White}"
                Margin="0,0,0,16" />
-        
+
         <!-- Game Info Panel -->
         <Grid Grid.Row="1" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
@@ -123,41 +129,41 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            
+
             <!-- Mines Counter -->
             <Border Grid.Column="0" Style="{StaticResource GameInfoPanelStyle}" Margin="0,0,8,0">
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
                     <Label Text="💣" FontSize="20" VerticalOptions="Center" />
-                    <Label Text="{Binding RemainingMines}" 
-                           FontSize="20" 
-                           FontAttributes="Bold" 
+                    <Label Text="{Binding RemainingMines}"
+                           FontSize="20"
+                           FontAttributes="Bold"
                            VerticalOptions="Center"
                            TextColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Secondary}}" />
                 </HorizontalStackLayout>
             </Border>
-            
+
             <!-- Game Status -->
             <Border Grid.Column="1" Style="{StaticResource GameInfoPanelStyle}" Margin="4,0,4,0">
-                <Label Text="{Binding GameStatus}" 
-                       FontSize="16" 
+                <Label Text="{Binding GameStatus}"
+                       FontSize="16"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
                        Style="{StaticResource GameLabelStyle}" />
             </Border>
-            
+
             <!-- Timer -->
             <Border Grid.Column="2" Style="{StaticResource GameInfoPanelStyle}" Margin="8,0,0,0">
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
                     <Label Text="⏱️" FontSize="20" VerticalOptions="Center" />
-                    <Label Text="{Binding GameTime}" 
-                           FontSize="20" 
-                           FontAttributes="Bold" 
+                    <Label Text="{Binding GameTime}"
+                           FontSize="20"
+                           FontAttributes="Bold"
                            VerticalOptions="Center"
                            TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
                 </HorizontalStackLayout>
             </Border>
         </Grid>
-        
+
         <!-- Game Grid -->
         <Border Grid.Row="2"
                 StrokeShape="RoundRectangle 12"
@@ -171,7 +177,7 @@
                 Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,4', Radius='8', Opacity='0.2'}">
             <!-- Use DirectUniformGameGrid for optimized performance -->
             <controls:DirectUniformGameGrid
-                PlayCommand="{Binding PlayCommand}" 
+                PlayCommand="{Binding PlayCommand}"
                 FlagCommand="{Binding FlagCommand}"
                 ItemsSource="{Binding Items}"
                 Rows="{Binding Rows}"
@@ -182,57 +188,63 @@
                 <controls:DirectUniformGameGrid.ItemTemplate>
                     <DataTemplate x:DataType="models:SweeperItem">
                         <!-- Inline SweeperItemTemplate for better performance -->
-                        <Border BackgroundColor="{Binding IsRevealed, Converter={StaticResource SimpleRevealedConverter}}"
-                               Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
-                               StrokeThickness="1"
-                               StrokeShape="RoundRectangle 2"
-                               Padding="0"
-                               Margin="0"
-                               HorizontalOptions="Fill"
-                               VerticalOptions="Fill">
+                        <Border
+                            BackgroundColor="{Binding IsRevealed, Converter={StaticResource SimpleRevealedConverter}}"
+                            Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 2"
+                            Padding="0"
+                            Margin="0"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill">
                             <Grid>
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnCellTapped" />
+                                </Grid.GestureRecognizers>
                                 <!-- Flag emoji (when flagged and not revealed) -->
-                                <Label Text="🚩" 
-                                       HorizontalOptions="Center" 
-                                       VerticalOptions="Center" 
+                                <Label Text="🚩"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
                                        FontSize="16"
                                        TextColor="{StaticResource FlagColor}"
                                        IsVisible="{Binding IsFlagged}"
                                        Opacity="{Binding IsRevealed, Converter={StaticResource InverseBoolToOpacityConverter}}" />
-                                
+
                                 <!-- Mine emoji (when revealed and is mine) -->
-                                <Label Text="💣" 
-                                       HorizontalOptions="Center" 
-                                       VerticalOptions="Center" 
+                                <Label Text="💣"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
                                        FontSize="16"
                                        TextColor="{StaticResource MineColor}"
                                        IsVisible="{Binding IsMine}"
                                        Opacity="{Binding IsRevealed, Converter={StaticResource BoolToOpacityConverter}}" />
-                                
+
                                 <!-- Mine count (when revealed, not a mine, and count > 0) -->
-                                <Label Text="{Binding MineCount}" 
+                                <Label Text="{Binding MineCount}"
                                        TextColor="{Binding MineCount, Converter={StaticResource MineCountToColorConverter}}"
-                                       HorizontalOptions="Center" 
-                                       VerticalOptions="Center" 
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"
                                        FontSize="14"
                                        FontAttributes="Bold"
                                        IsVisible="{Binding MineCount, Converter={StaticResource NonZeroConverter}}"
                                        Opacity="{Binding IsRevealed, Converter={StaticResource BoolToOpacityConverter}}" />
+
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </controls:DirectUniformGameGrid.ItemTemplate>
             </controls:DirectUniformGameGrid>
+
         </Border>
-        
+
         <!-- Instructions -->
         <VerticalStackLayout Grid.Row="3" Margin="0,16,0,0" Spacing="4"
-                           IsVisible="{Binding IsGridFullyLoaded, Converter={StaticResource BoolConverter}}">
-            <Label Text="Tap to reveal a cell" 
-                   HorizontalOptions="Center" 
+                             IsVisible="{Binding IsGridFullyLoaded, Converter={StaticResource BoolConverter}}">
+            <Label Text="Tap to reveal a cell"
+                   HorizontalOptions="Center"
                    Style="{StaticResource GameLabelStyle}" />
-            <Label Text="Double-tap to flag a mine" 
-                   HorizontalOptions="Center" 
+            <Label Text="Double-tap to flag a mine"
+                   HorizontalOptions="Center"
                    Style="{StaticResource GameLabelStyle}" />
         </VerticalStackLayout>
     </Grid>

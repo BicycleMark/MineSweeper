@@ -347,6 +347,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     [RelayCommand]
     private void Play(Point point)
     {
+        _logger.Log($"Play called with point: {point}");
         if (_disposed)
         {
             _logger?.LogWarning("Attempted to play after disposal");
