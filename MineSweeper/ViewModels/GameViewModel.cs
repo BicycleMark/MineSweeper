@@ -247,19 +247,20 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             GameStatus = _gameModel.GameStatus;
             GameTime = 0;
             
-            // Create a new ObservableCollection for items
-            Items = new ObservableCollection<SweeperItem>();
+            // Set the Items directly from the model
+            Items = _gameModel.Items;
+            
             phaseStopwatch.Stop();
             _logger?.Log($"Phase 3 - Update Basic UI Properties: {phaseStopwatch.ElapsedMilliseconds}ms");
             
-            // Phase 4: Progressive loading of items
+            // Phase 4: Simulate progressive loading for UI feedback
             phaseStopwatch.Restart();
             
             // Keep loading indicator visible during progressive loading
             // but make it semi-transparent to allow interaction
             
-            // Load items in batches
-            await LoadItemsProgressively(_gameModel.Items);
+            // Simulate loading progress
+            await SimulateProgressiveLoading(Items.Count);
             
             phaseStopwatch.Stop();
             _logger?.Log($"Phase 4 - Progressive Item Loading: {phaseStopwatch.ElapsedMilliseconds}ms");
@@ -281,46 +282,29 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     }
     
     /// <summary>
-    /// Loads items progressively in batches
+    /// Simulates progressive loading for UI feedback
     /// </summary>
-    /// <param name="sourceItems">The source items to load</param>
-    private async Task LoadItemsProgressively(ObservableCollection<SweeperItem>? sourceItems)
+    /// <param name="totalItems">The total number of items</param>
+    private async Task SimulateProgressiveLoading(int totalItems)
     {
-        if (sourceItems == null || sourceItems.Count == 0)
+        if (totalItems == 0)
         {
-            _logger?.LogWarning("No items to load progressively");
+            _logger?.LogWarning("No items to simulate loading for");
             return;
         }
         
-        int totalItems = sourceItems.Count;
-        int processedItems = 0;
+        _logger?.Log($"Starting simulated progressive loading of {totalItems} items");
         
-        _logger?.Log($"Starting progressive loading of {totalItems} items with batch size {BatchSize}");
-        
-        // Process items in batches
-        for (int i = 0; i < totalItems; i += BatchSize)
+        // Simulate loading progress in steps
+        for (int progress = 0; progress <= 100; progress += 10)
         {
-            // Determine batch size (last batch may be smaller)
-            int currentBatchSize = Math.Min(BatchSize, totalItems - i);
-            
-            // Add items from this batch
-            for (int j = 0; j < currentBatchSize; j++)
-            {
-                if (i + j < totalItems)
-                {
-                    Items.Add(sourceItems[i + j]);
-                    processedItems++;
-                }
-            }
-            
-            // Update progress
-            LoadingProgress = (int)((double)processedItems / totalItems * 100);
+            LoadingProgress = progress;
             
             // Allow UI to update by yielding to the UI thread
             await Task.Delay(1); // Minimal delay to allow UI updates
         }
         
-        _logger?.Log($"Completed progressive loading of {processedItems} items");
+        _logger?.Log($"Completed simulated progressive loading");
     }
     
     /// <summary>
