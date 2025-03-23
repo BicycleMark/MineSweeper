@@ -67,7 +67,7 @@ public partial class GameModel : ObservableObject, IGameModel
     }
 
     /// <summary>
-    /// Default Constructor - this was added to allow for serialization
+    /// default Constructor - this was added to allow for serialization
     /// </summary>
     public GameModel()
     {

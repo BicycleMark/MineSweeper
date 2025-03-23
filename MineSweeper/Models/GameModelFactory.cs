@@ -1,7 +1,7 @@
 namespace MineSweeper.Models;
 
 /// <summary>
-/// Default implementation of IGameModelFactory
+/// default implementation of IGameModelFactory
 /// </summary>
 public class GameModelFactory : IGameModelFactory
 {

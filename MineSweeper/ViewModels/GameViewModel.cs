@@ -320,7 +320,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             string stringValue when int.TryParse(stringValue, out var intValue) 
                 && Enum.IsDefined(typeof(GameEnums.GameDifficulty), intValue) 
                 => (GameEnums.GameDifficulty)intValue,
-            _ => GameEnums.GameDifficulty.Easy // Default to Easy if parameter is invalid
+            _ => GameEnums.GameDifficulty.Easy // default to Easy if parameter is invalid
         };
     }
 

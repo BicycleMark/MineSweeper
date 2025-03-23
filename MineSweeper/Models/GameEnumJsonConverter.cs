@@ -22,7 +22,7 @@ public class GameStatusJsonConverter : JsonConverter<GameEnums.GameStatus>
             string? enumString = reader.GetString();
             if (enumString == null)
             {
-                return GameEnums.GameStatus.NotStarted; // Default value if string is null
+                return GameEnums.GameStatus.NotStarted; // default value if string is null
             }
             if (Enum.TryParse<GameEnums.GameStatus>(enumString, out var result))
             {
@@ -38,7 +38,7 @@ public class GameStatusJsonConverter : JsonConverter<GameEnums.GameStatus>
             }
         }
         
-        return GameEnums.GameStatus.NotStarted; // Default value
+        return GameEnums.GameStatus.NotStarted; // default value
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public class GameDifficultyJsonConverter : JsonConverter<GameEnums.GameDifficult
             string? enumString = reader.GetString();
             if (enumString == null)
             {
-                return GameEnums.GameDifficulty.Easy; // Default value if string is null
+                return GameEnums.GameDifficulty.Easy; // default value if string is null
             }
             if (Enum.TryParse<GameEnums.GameDifficulty>(enumString, out var result))
             {
@@ -88,7 +88,7 @@ public class GameDifficultyJsonConverter : JsonConverter<GameEnums.GameDifficult
             }
         }
         
-        return GameEnums.GameDifficulty.Easy; // Default value
+        return GameEnums.GameDifficulty.Easy; // default value
     }
 
     /// <summary>
