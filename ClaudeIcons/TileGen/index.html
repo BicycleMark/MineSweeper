@@ -1,0 +1,516 @@
+pre {
+background-color: #f5f5f5;
+padding: 10px;
+border-radius: 5px;
+overflow-x: auto;
+width: 100%;
+}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper Button</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .button-preview {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button-actions {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .action-btn {
+            flex: 1;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+        }
+        .copy-btn {
+            background-color: #0066cc;
+        }
+        .save-btn {
+            background-color: #009933;
+        }
+        .action-btn:hover {
+            filter: brightness(90%);
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="color"] {
+            width: 50px;
+            height: 30px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .mode-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Minesweeper Button Generator</h1>
+
+    <div class="controls">
+        <h2>Button Controls</h2>
+
+        <div class="control-group">
+            <label for="bgColor">Background Color:</label>
+            <input type="color" id="bgColor" value="#4a90e2" onchange="updateButton()">
+            <span id="bgColorValue">#4a90e2</span>
+        </div>
+
+        <div class="control-group">
+            <label for="hlColor">Highlight Color:</label>
+            <input type="color" id="hlColor" value="#ffffff" onchange="updateButton()">
+            <span id="hlColorValue">#ffffff</span>
+        </div>
+
+        <div class="control-group">
+            <label for="shColor">Shadow Color:</label>
+            <input type="color" id="shColor" value="#2c3e50" onchange="updateButton()">
+            <span id="shColorValue">#2c3e50</span>
+        </div>
+
+        <div class="control-group">
+            <label for="frColor">Frame Color:</label>
+            <input type="color" id="frColor" value="#000000" onchange="updateButton()">
+            <span id="frColorValue">#000000</span>
+        </div>
+
+        <div class="control-group">
+            <label for="size">Button Size: <span id="sizeValue">150px</span></label>
+            <input type="range" id="size" min="50" max="300" value="150" onchange="updateButton()">
+        </div>
+
+        <div class="control-group">
+            <label>Mode:</label>
+            <div class="mode-options">
+                <div>
+                    <input type="checkbox" id="showHighlights" onchange="updateButton()">
+                    <label for="showHighlights">Show Highlights</label>
+                </div>
+
+                <div>
+                    <input type="checkbox" id="pressed" onchange="updateButton()">
+                    <label for="pressed">Pressed State</label>
+                </div>
+
+                <div>
+                    <input type="checkbox" id="showDigit" checked onchange="updateButton()">
+                    <label for="showDigit">Show Digit</label>
+                </div>
+
+                <div>
+                    <input type="checkbox" id="framed" onchange="updateButton()">
+                    <label for="framed">Framed Mode</label>
+                </div>
+
+                <div>
+                    <input type="checkbox" id="mine" onchange="updateButton()">
+                    <label for="mine">Mine Mode</label>
+                </div>
+
+                <div>
+                    <input type="checkbox" id="wrongGuess" onchange="updateButton()">
+                    <label for="wrongGuess">Wrong Guess</label>
+                </div>
+
+                <div>
+                    <input type="checkbox" id="flagged" onchange="updateButton()">
+                    <label for="flagged">Flagged Mode</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="digitSelector" class="control-group">
+            <label for="digit">Select Digit (1-8): <span id="digitValue">1</span></label>
+            <input type="range" id="digit" min="1" max="8" value="1" onchange="updateButton()">
+        </div>
+    </div>
+
+    <div class="button-preview">
+        <div id="svgContainer"></div>
+        <div class="button-actions">
+            <button id="copyButton" class="action-btn copy-btn" onclick="copySvgToClipboard()">COPY SVG TO CLIPBOARD</button>
+            <button id="saveButton" class="action-btn save-btn" onclick="saveSvgToFile()">SAVE SVG TO FILE</button>
+        </div>
+    </div>
+
+    <h2>SVG Code</h2>
+    <pre id="svgCode"></pre>
+</div>
+
+<script>
+    // Minesweeper digit colors
+    const digitColors = [
+        '#0000FF', // 1: Blue
+        '#008000', // 2: Green
+        '#FF0000', // 3: Red
+        '#000080', // 4: Dark Blue
+        '#800000', // 5: Maroon
+        '#008080', // 6: Teal
+        '#000000', // 7: Black
+        '#808080'  // 8: Gray
+    ];
+
+    // Get all the control elements
+    const bgColorInput = document.getElementById('bgColor');
+    const hlColorInput = document.getElementById('hlColor');
+    const shColorInput = document.getElementById('shColor');
+    const frColorInput = document.getElementById('frColor');
+    const sizeInput = document.getElementById('size');
+    const showHighlightsCheckbox = document.getElementById('showHighlights');
+    const pressedCheckbox = document.getElementById('pressed');
+    const showDigitCheckbox = document.getElementById('showDigit');
+    const framedCheckbox = document.getElementById('framed');
+    const mineCheckbox = document.getElementById('mine');
+    const wrongGuessCheckbox = document.getElementById('wrongGuess');
+    const flaggedCheckbox = document.getElementById('flagged');
+    const digitInput = document.getElementById('digit');
+
+    // Update display values
+    function updateDisplayValues() {
+        document.getElementById('bgColorValue').textContent = bgColorInput.value;
+        document.getElementById('hlColorValue').textContent = hlColorInput.value;
+        document.getElementById('shColorValue').textContent = shColorInput.value;
+        document.getElementById('frColorValue').textContent = frColorInput.value;
+        document.getElementById('sizeValue').textContent = sizeInput.value + 'px';
+        document.getElementById('digitValue').textContent = digitInput.value;
+    }
+
+    // Check for conflicting modes
+    function checkModes() {
+        // Handle digit selector visibility
+        const digitSelector = document.getElementById('digitSelector');
+        digitSelector.style.display = (showDigitCheckbox.checked && !flaggedCheckbox.checked && !mineCheckbox.checked && !wrongGuessCheckbox.checked) ? 'block' : 'none';
+
+        // Mine mode forces framed mode, disables others
+        if (mineCheckbox.checked) {
+            framedCheckbox.checked = true;
+            showDigitCheckbox.checked = false;
+            flaggedCheckbox.checked = false;
+            showHighlightsCheckbox.checked = false;
+            pressedCheckbox.checked = false;
+            wrongGuessCheckbox.checked = false;
+        }
+
+        // Wrong guess mode forces framed mode, disables others
+        if (wrongGuessCheckbox.checked) {
+            framedCheckbox.checked = true;
+            showDigitCheckbox.checked = false;
+            flaggedCheckbox.checked = false;
+            showHighlightsCheckbox.checked = false;
+            pressedCheckbox.checked = false;
+            mineCheckbox.checked = false;
+        }
+
+        // Flagged mode forces highlights, disables others
+        if (flaggedCheckbox.checked) {
+            showHighlightsCheckbox.checked = true;
+            showDigitCheckbox.checked = false;
+            framedCheckbox.checked = false;
+            pressedCheckbox.checked = false;
+            mineCheckbox.checked = false;
+            wrongGuessCheckbox.checked = false;
+        }
+
+        // Framed mode disables highlights and pressed
+        if (framedCheckbox.checked && !mineCheckbox.checked && !wrongGuessCheckbox.checked) {
+            showHighlightsCheckbox.checked = false;
+            pressedCheckbox.checked = false;
+        }
+
+        // Update disabled states
+        showHighlightsCheckbox.disabled = framedCheckbox.checked || mineCheckbox.checked || wrongGuessCheckbox.checked || (flaggedCheckbox.checked && showHighlightsCheckbox.checked);
+        pressedCheckbox.disabled = framedCheckbox.checked || flaggedCheckbox.checked || mineCheckbox.checked || wrongGuessCheckbox.checked;
+        showDigitCheckbox.disabled = flaggedCheckbox.checked || mineCheckbox.checked || wrongGuessCheckbox.checked;
+        framedCheckbox.disabled = flaggedCheckbox.checked || mineCheckbox.checked || wrongGuessCheckbox.checked;
+        mineCheckbox.disabled = flaggedCheckbox.checked || wrongGuessCheckbox.checked;
+        wrongGuessCheckbox.disabled = flaggedCheckbox.checked || mineCheckbox.checked;
+        flaggedCheckbox.disabled = framedCheckbox.checked || mineCheckbox.checked || wrongGuessCheckbox.checked;
+    }
+
+    // Generate SVG code based on current settings
+    function generateSvgCode() {
+        const backgroundColor = bgColorInput.value;
+        const highlightColor = hlColorInput.value;
+        const shadowColor = shColorInput.value;
+        const frameColor = frColorInput.value;
+        const buttonSize = sizeInput.value;
+        const showHighlights = showHighlightsCheckbox.checked;
+        const isPressed = pressedCheckbox.checked;
+        const showDigit = showDigitCheckbox.checked;
+        const isFramed = framedCheckbox.checked;
+        const isMine = mineCheckbox.checked;
+        const isWrongGuess = wrongGuessCheckbox.checked;
+        const selectedDigit = parseInt(digitInput.value);
+
+        let svgCode = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="${buttonSize}" height="${buttonSize}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+  <defs>
+    <linearGradient id="buttonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${backgroundColor}" />
+      <stop offset="100%" stop-color="${backgroundColor}CC" />
+    </linearGradient>
+    <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
+      <feOffset dx="2" dy="2" />
+      <feComposite in="SourceAlpha" in2="offsetblur" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" result="shadowDiff" />
+      <feFlood flood-color="${shadowColor}" result="shadowColor" />
+      <feComposite in="shadowColor" in2="shadowDiff" operator="in" result="shadow" />
+      <feComposite in="shadow" in2="SourceGraphic" operator="over" />
+    </filter>
+  </defs>
+  
+  ${isFramed || isMine || isWrongGuess ? `<!-- Framed, Mine or Wrong Guess Mode Button -->
+  <rect
+    x="5"
+    y="5"
+    width="90"
+    height="90"
+    rx="0"
+    ry="0"
+    fill="#C0C0C0"
+    stroke="${frameColor}"
+    stroke-width="1"
+  />` : `<!-- Regular Button -->
+  <rect
+    x="5"
+    y="5"
+    width="90"
+    height="90"
+    rx="0"
+    ry="0"
+    fill="url(#buttonGradient)"
+    filter="url(#innerShadow)"
+    stroke="${shadowColor}"
+    stroke-width="1"
+  />`}
+  
+  ${showHighlights && !isFramed && !isMine && !isWrongGuess ? `<!-- Top Highlight -->
+  <line
+    x1="7"
+    y1="7"
+    x2="93"
+    y2="7"
+    stroke="${isPressed ? shadowColor : highlightColor}"
+    stroke-width="2"
+    stroke-opacity="0.7"
+  />
+  <line
+    x1="7"
+    y1="7"
+    x2="7"
+    y2="93"
+    stroke="${isPressed ? shadowColor : highlightColor}"
+    stroke-width="2"
+    stroke-opacity="0.7"
+  />
+  
+  <!-- Bottom Shadow -->
+  <line
+    x1="7"
+    y1="93"
+    x2="93"
+    y2="93"
+    stroke="${isPressed ? highlightColor : shadowColor}"
+    stroke-width="2"
+    stroke-opacity="0.8"
+  />
+  <line
+    x1="93"
+    y1="7"
+    x2="93"
+    y2="93"
+    stroke="${isPressed ? highlightColor : shadowColor}"
+    stroke-width="2"
+    stroke-opacity="0.8"
+  />` : ''}
+  
+  ${isWrongGuess ? `<!-- Wrong Guess (Mine with red X) -->
+  <circle
+    cx="50"
+    cy="50"
+    r="18"
+    fill="#000000"
+  />
+  
+  <!-- Spikes (some broken/shorter) -->
+  <line x1="32" y1="50" x2="70" y2="50" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  <line x1="50" y1="30" x2="50" y2="65" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  <line x1="38" y1="38" x2="62" y2="62" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  <line x1="67" y1="33" x2="45" y2="55" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  
+  <!-- Highlight -->
+  <circle
+    cx="42"
+    cy="42"
+    r="6"
+    fill="#FFFFFF"
+  />
+  
+  <!-- Red X -->
+  <line x1="20" y1="20" x2="80" y2="80" stroke="#FF0000" stroke-width="6" stroke-linecap="round" />
+  <line x1="80" y1="20" x2="20" y2="80" stroke="#FF0000" stroke-width="6" stroke-linecap="round" />` : ''}
+  
+  ${isMine ? `<!-- Minesweeper Mine -->
+  <circle
+    cx="50"
+    cy="50"
+    r="18"
+    fill="#000000"
+  />
+  
+  <!-- Spikes -->
+  <line x1="25" y1="50" x2="75" y2="50" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  <line x1="50" y1="25" x2="50" y2="75" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  <line x1="33" y1="33" x2="67" y2="67" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  <line x1="67" y1="33" x2="33" y2="67" stroke="#000000" stroke-width="4" stroke-linecap="round" />
+  
+  <!-- Highlight -->
+  <circle
+    cx="42"
+    cy="42"
+    r="6"
+    fill="#FFFFFF"
+  />` : ''}
+  
+  ${flaggedCheckbox.checked ? `<!-- Minesweeper Flag -->
+  <rect
+    x="45"
+    y="25"
+    width="4"
+    height="45"
+    fill="#000000"
+  />
+  <polygon
+    points="49,25 49,40 65,32.5"
+    fill="#FF0000"
+  />
+  <rect
+    x="37"
+    y="70"
+    width="20"
+    height="5"
+    fill="#000000"
+  />` : ''}
+  
+  ${showDigit && !flaggedCheckbox.checked && !isMine && !isWrongGuess ? `<!-- Minesweeper Digit -->
+  <text
+    x="50"
+    y="53"
+    font-family="'Courier New', monospace"
+    font-size="55"
+    font-weight="bold"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill="${digitColors[selectedDigit-1]}"
+  >
+    ${selectedDigit}
+  </text>` : ''}
+</svg>`;
+
+        return svgCode;
+    }
+
+    // Update the button preview and code display
+    function updateButton() {
+        updateDisplayValues();
+        checkModes();
+
+        const svgCode = generateSvgCode();
+        document.getElementById('svgCode').textContent = svgCode;
+        document.getElementById('svgContainer').innerHTML = svgCode;
+    }
+
+    // Copy SVG code to clipboard
+    function copySvgToClipboard() {
+        const svgCode = document.getElementById('svgCode').textContent;
+
+        // Create a temporary textarea element to copy from
+        const textarea = document.createElement('textarea');
+        textarea.value = svgCode;
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            // Execute copy command
+            const successful = document.execCommand('copy');
+            if (successful) {
+                alert('SVG code copied to clipboard!');
+            } else {
+                alert('Unable to copy. Please try manually selecting and copying the code.');
+            }
+        } catch (err) {
+            console.error('Error copying text: ', err);
+            alert('Failed to copy: ' + err);
+        }
+
+        // Clean up
+        document.body.removeChild(textarea);
+    }
+
+    // Save SVG to a file
+    function saveSvgToFile() {
+        const svgCode = document.getElementById('svgCode').textContent;
+        const blob = new Blob([svgCode], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(blob);
+
+        // Create a temporary link and trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `minesweeper-button-${getModeName()}.svg`;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+    }
+
+    // Get current mode name for file naming
+    function getModeName() {
+        if (wrongGuessCheckbox.checked) return 'wrong-guess';
+        if (mineCheckbox.checked) return 'mine';
+        if (flaggedCheckbox.checked) return 'flag';
+        if (framedCheckbox.checked) return 'framed';
+        if (showDigitCheckbox.checked) return `digit-${digitInput.value}`;
+        return 'standard';
+    }
+
+    // Initialize button on page load
+    updateButton();
+</script>
+</body>
+</html>
