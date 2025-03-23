@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seven-Segment Display Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .display-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        .segment-toggles {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button.segment-btn {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        button.segment-btn.active {
+            background-color: #ff5722;
+            color: white;
+        }
+
+        input[type="range"], input[type="color"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .color-pick {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-pick label {
+            flex: 1;
+        }
+
+        :root {
+            --segment-color: #ff0000;
+            --background-color: transparent;
+            --off-segment-opacity: 0.15;
+        }
+
+        /* Base segment styling */
+        .segment {
+            fill: var(--segment-color, #ff0000);
+            opacity: var(--off-segment-opacity, 0.15);
+            transition: opacity 0.2s, fill 0.2s;
+        }
+
+        .segment.active {
+            opacity: 1;
+        }
+
+        /* SVG container */
+        .display-svg {
+            width: 120px;
+            height: 200px;
+        }
+
+        /* CSS for digit number buttons */
+        .digit-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .digit-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .digit-btn.active {
+            background-color: #2196F3;
+        }
+
+        /* Info section */
+        .info-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .copy-btn {
+            margin-left: 15px;
+            padding: 8px 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
+        }
+
+        .copy-btn:hover {
+            background-color: #0d8bf2;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .copy-btn.success {
+            background-color: #4CAF50;
+        }
+
+        /* Tooltip for copy button */
+        .copy-btn span {
+            position: relative;
+        }
+
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .css-vars {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-left: 4px solid #2196F3;
+            margin: 10px 0;
+        }
+
+        /* Download button */
+        .download-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .download-btn {
+            padding: 12px 24px;
+            background-color: #673AB7;
+            color: white;
+            font-weight: bold;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: #5E35B1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Seven-Segment Display Interactive Demo</h1>
+
+    <div class="display-container">
+        <!-- SVG Seven-Segment Display -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 200" class="display-svg" id="seven-segment">
+            <!-- Background rectangle -->
+            <rect width="100%" height="100%" fill="var(--background-color, transparent)" />
+
+            <!-- Segment groups -->
+            <g class="segments">
+                <!-- Segment A (top horizontal) -->
+                <polygon class="segment segment-a" points="30,10 90,10 100,20 90,30 30,30 20,20" />
+
+                <!-- Segment B (top-right vertical) -->
+                <polygon class="segment segment-b" points="90,30 100,20 110,30 110,85 100,95 90,85" />
+
+                <!-- Segment C (bottom-right vertical) -->
+                <polygon class="segment segment-c" points="90,115 100,105 110,115 110,170 100,180 90,170" />
+
+                <!-- Segment D (bottom horizontal) -->
+                <polygon class="segment segment-d" points="30,170 90,170 100,180 90,190 30,190 20,180" />
+
+                <!-- Segment E (bottom-left vertical) -->
+                <polygon class="segment segment-e" points="30,115 40,105 30,95 20,105 20,170 30,170" />
+
+                <!-- Segment F (top-left vertical) -->
+                <polygon class="segment segment-f" points="30,30 40,20 30,10 20,20 20,85 30,85" />
+
+                <!-- Segment G (middle horizontal) -->
+                <polygon class="segment segment-g" points="30,85 90,85 100,95 90,105 30,105 20,95" />
+            </g>
+        </svg>
+
+        <button id="copy-svg-btn" class="copy-btn">
+            <span>Copy SVG</span>
+        </button>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <h2>Digit Selection</h2>
+            <p>Click a digit to display:</p>
+            <div class="digit-buttons">
+                <button class="digit-btn active" data-digit="0">0</button>
+                <button class="digit-btn" data-digit="1">1</button>
+                <button class="digit-btn" data-digit="2">2</button>
+                <button class="digit-btn" data-digit="3">3</button>
+                <button class="digit-btn" data-digit="4">4</button>
+                <button class="digit-btn" data-digit="5">5</button>
+                <button class="digit-btn" data-digit="6">6</button>
+                <button class="digit-btn" data-digit="7">7</button>
+                <button class="digit-btn" data-digit="8">8</button>
+                <button class="digit-btn" data-digit="9">9</button>
+            </div>
+
+            <h3>Manual Segment Control</h3>
+            <p>Click to toggle individual segments:</p>
+            <div class="segment-toggles">
+                <button class="segment-btn" data-segment="a">A</button>
+                <button class="segment-btn" data-segment="b">B</button>
+                <button class="segment-btn" data-segment="c">C</button>
+                <button class="segment-btn" data-segment="d">D</button>
+                <button class="segment-btn" data-segment="e">E</button>
+                <button class="segment-btn" data-segment="f">F</button>
+                <button class="segment-btn" data-segment="g">G</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h2>Style Controls</h2>
+            <h3>CSS Variables</h3>
+
+            <div class="color-pick">
+                <label for="segment-color">Segment Color:</label>
+                <input type="color" id="segment-color" value="#ff0000">
+            </div>
+
+            <div class="color-pick">
+                <label for="background-color">Background Color:</label>
+                <input type="color" id="background-color" value="#333333">
+            </div>
+
+            <label for="off-opacity">Off Segment Opacity:</label>
+            <input type="range" id="off-opacity" min="0" max="0.5" step="0.01" value="0.15">
+            <span id="off-opacity-value">0.15</span>
+
+            <!-- Glow effect controls removed -->
+        </div>
+    </div>
+
+    <div class="info-section">
+        <h2>Special Tags & CSS Variables</h2>
+        <p>This demo uses the following special elements in the seven-segment display:</p>
+
+        <h3>Segment Tags</h3>
+        <p>Each segment is represented by a <code>&lt;polygon&gt;</code> tag with a specific class:</p>
+        <ul>
+            <li><code>.segment-a</code>: Top horizontal segment</li>
+            <li><code>.segment-b</code>: Top-right vertical segment</li>
+            <li><code>.segment-c</code>: Bottom-right vertical segment</li>
+            <li><code>.segment-d</code>: Bottom horizontal segment</li>
+            <li><code>.segment-e</code>: Bottom-left vertical segment</li>
+            <li><code>.segment-f</code>: Top-left vertical segment</li>
+            <li><code>.segment-g</code>: Middle horizontal segment</li>
+        </ul>
+
+        <h3>Digit Attribute</h3>
+        <p>In the original CSS, the <code>digit</code> attribute is used to determine which segments should be active:</p>
+        <pre><code>.seven-segment[digit="0"] .segment-a { opacity: 1; }</code></pre>
+        <p>In this demo, we're managing it with JavaScript instead.</p>
+
+        <h3>CSS Variables</h3>
+        <p>The display uses these CSS variables:</p>
+        <div class="css-vars">
+            --segment-color: #ff0000;<br>
+            --background-color: transparent;<br>
+            --off-segment-opacity: 0.15;<br>
+            <!-- Glow effect CSS variables removed -->
+        </div>
+
+        <h3>Copied SVG Preview</h3>
+        <p>When you click "Copy SVG", the following content will be copied to your clipboard:</p>
+        <pre id="svg-preview" style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 200px; overflow: auto; font-size: 12px;"></pre>
+    </div>
+
+    <div class="download-container">
+        <button id="download-svg-btn" class="download-btn">Download Current SVG</button>
+    </div>
+</div>
+
+<script>
+    // Define the segments that should be active for each digit
+    const digitSegments = {
+        '0': ['a', 'b', 'c', 'd', 'e', 'f'],
+        '1': ['b', 'c'],
+        '2': ['a', 'b', 'g', 'e', 'd'],
+        '3': ['a', 'b', 'g', 'c', 'd'],
+        '4': ['f', 'g', 'b', 'c'],
+        '5': ['a', 'f', 'g', 'c', 'd'],
+        '6': ['a', 'f', 'g', 'e', 'c', 'd'],
+        '7': ['a', 'b', 'c'],
+        '8': ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+        '9': ['a', 'f', 'b', 'g', 'c', 'd']
+    };
+
+    // Get all the elements we need
+    const svg = document.getElementById('seven-segment');
+    const segments = svg.querySelectorAll('.segment');
+    const digitButtons = document.querySelectorAll('.digit-btn');
+    const segmentButtons = document.querySelectorAll('.segment-btn');
+    const copyButton = document.getElementById('copy-svg-btn');
+    const svgPreview = document.getElementById('svg-preview');
+    const downloadButton = document.getElementById('download-svg-btn');
+
+    // Style control elements
+    const segmentColor = document.getElementById('segment-color');
+    const backgroundColor = document.getElementById('background-color');
+    const offOpacity = document.getElementById('off-opacity');
+    const offOpacityValue = document.getElementById('off-opacity-value');
+
+    // Function to set active segments for a digit
+    function setDigit(digit) {
+        // Clear all active segments
+        segments.forEach(segment => {
+            segment.classList.remove('active');
+        });
+
+        // Set the digit attribute
+        svg.setAttribute('digit', digit);
+
+        // Activate the needed segments
+        const activeSegments = digitSegments[digit];
+        activeSegments.forEach(segId => {
+            const segment = svg.querySelector(`.segment-${segId}`);
+            if (segment) {
+                segment.classList.add('active');
+            }
+        });
+
+        // Update segment buttons
+        segmentButtons.forEach(btn => {
+            const segId = btn.dataset.segment;
+            if (activeSegments.includes(segId)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    // Add event listeners to digit buttons
+    digitButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Update button states
+            digitButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // Set the digit
+            setDigit(button.dataset.digit);
+        });
+    });
+
+    // Add event listeners to segment buttons
+    segmentButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const segId = button.dataset.segment;
+            const segment = svg.querySelector(`.segment-${segId}`);
+
+            if (segment.classList.contains('active')) {
+                segment.classList.remove('active');
+                button.classList.remove('active');
+            } else {
+                segment.classList.add('active');
+                button.classList.add('active');
+            }
+
+            // Clear digit selection since we're manually controlling segments
+            digitButtons.forEach(btn => btn.classList.remove('active'));
+            svg.removeAttribute('digit');
+        });
+    });
+
+    // Add event listeners for style controls
+    segmentColor.addEventListener('input', () => {
+        document.documentElement.style.setProperty('--segment-color', segmentColor.value);
+    });
+
+    backgroundColor.addEventListener('input', () => {
+        document.documentElement.style.setProperty('--background-color', backgroundColor.value);
+    });
+
+    offOpacity.addEventListener('input', () => {
+        const value = offOpacity.value;
+        document.documentElement.style.setProperty('--off-segment-opacity', value);
+        offOpacityValue.textContent = value;
+    });
+
+    // Glow effect event listeners removed
+
+    // Function to generate SVG text for the current state
+    function generateSvgText() {
+        // Clone the SVG to avoid modifying the original
+        const svgClone = svg.cloneNode(true);
+
+        // Get the current active segments
+        const activeSegments = [];
+        segments.forEach(segment => {
+            if (segment.classList.contains('active')) {
+                // Extract segment letter from class name
+                const classes = segment.getAttribute('class').split(' ');
+                for (const cls of classes) {
+                    if (cls.startsWith('segment-')) {
+                        activeSegments.push(cls.replace('segment-', ''));
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Add digit attribute if it matches a standard digit
+        let currentDigit = null;
+        for (const [digit, segs] of Object.entries(digitSegments)) {
+            if (segs.length === activeSegments.length &&
+                segs.every(seg => activeSegments.includes(seg))) {
+                currentDigit = digit;
+                break;
+            }
+        }
+
+        if (currentDigit !== null) {
+            svgClone.setAttribute('digit', currentDigit);
+        }
+
+        // Add style element with current CSS variables
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `
+                :root {
+                    --segment-color: ${segmentColor.value};
+                    --background-color: ${backgroundColor.value};
+                    --off-segment-opacity: ${offOpacity.value};
+                }
+                
+                .segment {
+                    fill: var(--segment-color);
+                    opacity: var(--off-segment-opacity);
+                }
+                
+                .segment.active, .seven-segment[digit="0"] .segment-a, .seven-segment[digit="0"] .segment-b,
+                .seven-segment[digit="0"] .segment-c, .seven-segment[digit="0"] .segment-d,
+                .seven-segment[digit="0"] .segment-e, .seven-segment[digit="0"] .segment-f,
+                .seven-segment[digit="1"] .segment-b, .seven-segment[digit="1"] .segment-c,
+                .seven-segment[digit="2"] .segment-a, .seven-segment[digit="2"] .segment-b,
+                .seven-segment[digit="2"] .segment-d, .seven-segment[digit="2"] .segment-e,
+                .seven-segment[digit="2"] .segment-g, .seven-segment[digit="3"] .segment-a,
+                .seven-segment[digit="3"] .segment-b, .seven-segment[digit="3"] .segment-c,
+                .seven-segment[digit="3"] .segment-d, .seven-segment[digit="3"] .segment-g,
+                .seven-segment[digit="4"] .segment-b, .seven-segment[digit="4"] .segment-c,
+                .seven-segment[digit="4"] .segment-f, .seven-segment[digit="4"] .segment-g,
+                .seven-segment[digit="5"] .segment-a, .seven-segment[digit="5"] .segment-c,
+                .seven-segment[digit="5"] .segment-d, .seven-segment[digit="5"] .segment-f,
+                .seven-segment[digit="5"] .segment-g, .seven-segment[digit="6"] .segment-a,
+                .seven-segment[digit="6"] .segment-c, .seven-segment[digit="6"] .segment-d,
+                .seven-segment[digit="6"] .segment-e, .seven-segment[digit="6"] .segment-f,
+                .seven-segment[digit="6"] .segment-g, .seven-segment[digit="7"] .segment-a,
+                .seven-segment[digit="7"] .segment-b, .seven-segment[digit="7"] .segment-c,
+                .seven-segment[digit="8"] .segment-a, .seven-segment[digit="8"] .segment-b,
+                .seven-segment[digit="8"] .segment-c, .seven-segment[digit="8"] .segment-d,
+                .seven-segment[digit="8"] .segment-e, .seven-segment[digit="8"] .segment-f,
+                .seven-segment[digit="8"] .segment-g, .seven-segment[digit="9"] .segment-a,
+                .seven-segment[digit="9"] .segment-b, .seven-segment[digit="9"] .segment-c,
+                .seven-segment[digit="9"] .segment-d, .seven-segment[digit="9"] .segment-f,
+                .seven-segment[digit="9"] .segment-g {
+                    opacity: 1;
+                }
+            `;
+        svgClone.appendChild(styleEl);
+
+        // Update active segments in the cloned SVG
+        const clonedSegments = svgClone.querySelectorAll('.segment');
+        clonedSegments.forEach((segment, index) => {
+            if (segments[index].classList.contains('active')) {
+                segment.classList.add('active');
+            } else {
+                segment.classList.remove('active');
+            }
+        });
+
+        // Convert to string
+        const serializer = new XMLSerializer();
+        return serializer.serializeToString(svgClone);
+    }
+
+    // Function to update SVG preview
+    function updateSvgPreview() {
+        const svgText = generateSvgText();
+        svgPreview.textContent = svgText;
+        return svgText;
+    }
+
+    // Function to copy text to clipboard with fallback
+    function copyToClipboard(text) {
+        // Method 1: Modern clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text)
+                .then(() => {
+                    return true;
+                })
+                .catch(error => {
+                    console.error("Clipboard API error:", error);
+                    return tryFallbackCopy(text);
+                });
+        } else {
+            // Fallback for browsers without clipboard API
+            return Promise.resolve(tryFallbackCopy(text));
+        }
+    }
+
+    // Fallback copy method using execCommand
+    function tryFallbackCopy(text) {
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';  // Prevent scrolling
+            textarea.style.opacity = '0';      // Make invisible
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            return successful;
+        } catch (err) {
+            console.error("Fallback copy failed:", err);
+            return false;
+        }
+    }
+
+    // Handle copy button click
+    copyButton.addEventListener('click', () => {
+        const svgText = updateSvgPreview();
+
+        // Copy to clipboard with robust implementation
+        copyToClipboard(svgText).then(success => {
+            if (success) {
+                // Visual feedback
+                copyButton.classList.add('success');
+                copyButton.querySelector('span').textContent = 'Copied!';
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    copyButton.classList.remove('success');
+                    copyButton.querySelector('span').textContent = 'Copy SVG';
+                }, 2000);
+            } else {
+                // Show error
+                alert('Failed to copy to clipboard. Your browser may not support this feature.');
+            }
+        });
+    });
+
+    // Download SVG button functionality
+    downloadButton.addEventListener('click', () => {
+        const svgText = generateSvgText();
+        const blob = new Blob([svgText], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(blob);
+
+        // Create download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'seven-segment-display.svg';
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 100);
+    });
+
+    // Update SVG preview when settings change
+    function updatePreviewOnChange() {
+        updateSvgPreview();
+    }
+
+    // Add event listeners to update preview
+    digitButtons.forEach(btn => btn.addEventListener('click', updatePreviewOnChange));
+    segmentButtons.forEach(btn => btn.addEventListener('click', updatePreviewOnChange));
+    segmentColor.addEventListener('input', updatePreviewOnChange);
+    backgroundColor.addEventListener('input', updatePreviewOnChange);
+    offOpacity.addEventListener('input', updatePreviewOnChange);
+
+    // Initialize with digit 0
+    setDigit('0');
+    updateSvgPreview();
+</script>
+</body>
+</html>
