@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
@@ -169,122 +168,19 @@
                 StrokeShape="RoundRectangle 12"
                 Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
                 StrokeThickness="2"
-                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
-                Padding="8"
+                BackgroundColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource MidnightBlue}}"
+                Padding="4"
                 Margin="0,0,0,16"
                 HorizontalOptions="Fill"
                 VerticalOptions="Fill"
                 Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,4', Radius='8', Opacity='0.2'}">
-            <!-- Comment out DirectUniformGameGrid
-            <controls:DirectUniformGameGrid
-                PlayCommand="{Binding PlayCommand}"
-                FlagCommand="{Binding FlagCommand}"
-                ItemsSource="{Binding Items}"
-                Rows="{Binding Rows}"
-                Columns="{Binding Columns}"
-                IsGridFullyLoaded="{Binding IsGridFullyLoaded}"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill">
-                <controls:DirectUniformGameGrid.ItemTemplate>
-                    <DataTemplate x:DataType="models:SweeperItem">
-                        <Border
-                            BackgroundColor="{Binding IsRevealed, Converter={StaticResource SimpleRevealedConverter}}"
-                            Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 2"
-                            Padding="0"
-                            Margin="0"
-                            HorizontalOptions="Fill"
-                            VerticalOptions="Fill">
-                            <Grid>
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnCellTapped" />
-                                </Grid.GestureRecognizers>
-                                <Label Text="🚩"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="16"
-                                       TextColor="{StaticResource FlagColor}"
-                                       IsVisible="{Binding IsFlagged}"
-                                       Opacity="{Binding IsRevealed, Converter={StaticResource InverseBoolToOpacityConverter}}" />
-                                <Label Text="💣"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="16"
-                                       TextColor="{StaticResource MineColor}"
-                                       IsVisible="{Binding IsMine}"
-                                       Opacity="{Binding IsRevealed, Converter={StaticResource BoolToOpacityConverter}}" />
-                                <Label Text="{Binding MineCount}"
-                                       TextColor="{Binding MineCount, Converter={StaticResource MineCountToColorConverter}}"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="14"
-                                       FontAttributes="Bold"
-                                       IsVisible="{Binding MineCount, Converter={StaticResource NonZeroConverter}}"
-                                       Opacity="{Binding IsRevealed, Converter={StaticResource BoolToOpacityConverter}}" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </controls:DirectUniformGameGrid.ItemTemplate>
-            </controls:DirectUniformGameGrid>
-            -->
             
-            <!-- Use SquareGameGrid instead -->
-            <controls:SquareGameGrid
-                x:Name="gameGrid"
-                ItemsSource="{Binding Items, Mode=OneWay}"
-                Rows="{Binding Rows, Mode=OneWay}"
-                Columns="{Binding Columns, Mode=OneWay}"
-                HorizontalOptions="Fill"
-                VerticalOptions="Fill">
-                <controls:SquareGameGrid.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnGridTapped" />
-                </controls:SquareGameGrid.GestureRecognizers>
-                <controls:SquareGameGrid.ItemTemplate>
-                    <DataTemplate x:DataType="models:SweeperItem">
-                        <!-- Inline SweeperItemTemplate for better performance -->
-                        <Border
-                            BackgroundColor="{Binding IsRevealed, Converter={StaticResource SimpleRevealedConverter}}"
-                            Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 2"
-                            Padding="0"
-                            Margin="0"
-                            HorizontalOptions="Fill"
-                            VerticalOptions="Fill">
-                            <Grid>
-                                <!-- Flag emoji (when flagged and not revealed) -->
-                                <Label Text="🚩"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="16"
-                                       TextColor="{StaticResource FlagColor}"
-                                       IsVisible="{Binding IsFlagged}"
-                                       Opacity="{Binding IsRevealed, Converter={StaticResource InverseBoolToOpacityConverter}}" />
-
-                                <!-- Mine emoji (when revealed and is mine) -->
-                                <Label Text="💣"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="16"
-                                       TextColor="{StaticResource MineColor}"
-                                       IsVisible="{Binding IsMine}"
-                                       Opacity="{Binding IsRevealed, Converter={StaticResource BoolToOpacityConverter}}" />
-
-                                <!-- Mine count (when revealed, not a mine, and count > 0) -->
-                                <Label Text="{Binding MineCount}"
-                                       TextColor="{Binding MineCount, Converter={StaticResource MineCountToColorConverter}}"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       FontSize="14"
-                                       FontAttributes="Bold"
-                                       IsVisible="{Binding MineCount, Converter={StaticResource NonZeroConverter}}"
-                                       Opacity="{Binding IsRevealed, Converter={StaticResource BoolToOpacityConverter}}" />
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </controls:SquareGameGrid.ItemTemplate>
-            </controls:SquareGameGrid>
+            <Grid x:Name="GameGrid"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill"
+                  RowSpacing="0" 
+                  ColumnSpacing="0">
+            </Grid>
 
         </Border>
 
