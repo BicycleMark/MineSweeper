@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="mine-tile">
+    <style>
+        .mine-tile {
+        --background-color: #d8d8d8;
+        }
+        .tile-face {
+        fill: var(--background-color);
+        }
+
+        /* Mine explosion animation */
+        @keyframes pulse {
+        0% { opacity: 0.3; }
+        50% { opacity: 1; }
+        100% { opacity: 0.3; }
+        }
+        .mine-glow {
+        animation: pulse 2s infinite;
+        }
+    </style>
+
+    <!-- Tile base with 3D chiseled look -->
+    <!-- Outer frame -->
+    <path d="M1,1 L99,1 L99,99 L1,99 Z" fill="#888888" />
+
+    <!-- Main tile face (customizable background color) -->
+    <path d="M2,2 L98,2 L98,98 L2,98 Z" class="tile-face" />
+
+    <!-- Highlight edges (top-left) -->
+    <path d="M1,1 L99,1 L98,2 L2,2 Z" fill="#ffffff" />
+    <path d="M1,1 L2,2 L2,98 L1,99 Z" fill="#f0f0f0" />
+
+    <!-- Shadow edges (bottom-right) -->
+    <path d="M2,98 L98,98 L99,99 L1,99 Z" fill="#555555" />
+    <path d="M98,2 L99,1 L99,99 L98,98 Z" fill="#777777" />
+
+    <!-- Mine components (initially hidden, would be shown when revealed) -->
+    <g class="mine" opacity="0">
+        <!-- Glow effect -->
+        <circle cx="50" cy="50" r="30" fill="#ff0000" opacity="0.2" class="mine-glow" />
+
+        <!-- Mine body -->
+        <circle cx="50" cy="50" r="15" fill="#333333" />
+
+        <!-- Mine spikes -->
+        <path d="M50,20 L50,80" stroke="#333333" stroke-width="4" />
+        <path d="M20,50 L80,50" stroke="#333333" stroke-width="4" />
+        <path d="M29.3,29.3 L70.7,70.7" stroke="#333333" stroke-width="4" />
+        <path d="M29.3,70.7 L70.7,29.3" stroke="#333333" stroke-width="4" />
+
+        <!-- Mine highlights -->
+        <circle cx="45" cy="45" r="4" fill="#ffffff" />
+    </g>
+
+    <!-- Flag components (initially hidden, would be shown when flagged) -->
+    <g class="flag" opacity="0">
+        <rect x="45" y="25" width="5" height="50" fill="#333333" />
+        <path d="M50,25 L75,35 L50,45 Z" fill="#ff0000" />
+    </g>
+</svg>
