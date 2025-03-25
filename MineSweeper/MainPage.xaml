@@ -165,6 +165,8 @@
 
         <!-- Game Grid -->
         <Border Grid.Row="2"
+                x:Name="gameBorder"
+                SizeChanged="GameBorder_OnSizeChanged"
                 StrokeShape="RoundRectangle 12"
                 Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
                 StrokeThickness="2"
@@ -175,12 +177,11 @@
                 VerticalOptions="Fill"
                 Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,4', Radius='8', Opacity='0.2'}">
             
-            <Grid x:Name="GameGrid"
+            <VerticalStackLayout x:Name="GameGrid"
                   HorizontalOptions="Fill"
-                  VerticalOptions="Fill"
-                  RowSpacing="0" 
-                  ColumnSpacing="0">
-            </Grid>
+                  VerticalOptions="Fill">
+              
+            </VerticalStackLayout>
 
         </Border>
 
