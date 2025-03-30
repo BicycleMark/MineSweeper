@@ -45,6 +45,7 @@
     <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4"/>
+       
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128"/>
@@ -69,10 +70,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="ViewModels\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <MauiXaml Remove="Views\Controls\UniformGrid.xaml"/>
         <MauiXaml Remove="Views\Controls\StandardGameGrid.xaml"/>
         <MauiXaml Remove="Views\Controls\GameGrid.xaml"/>
@@ -84,6 +81,11 @@
         <Compile Remove="Views\Controls\StandardGameGrid.xaml.cs"/>
         <Compile Remove="Views\Controls\GameGrid.xaml.cs"/>
         <Compile Remove="Views\Controls\SweeperItemTemplate.xaml.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Resources\Raw\Themes\default\png\" />
+      <Folder Include="Resources\Raw\Themes\tropical\png\" />
     </ItemGroup>
 
 </Project>

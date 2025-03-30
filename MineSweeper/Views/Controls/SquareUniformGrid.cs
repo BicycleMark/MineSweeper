@@ -3,6 +3,8 @@ using Microsoft.Maui.Layouts;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
 using MineSweeper.Models;
 using Size = Microsoft.Maui.Graphics.Size;
 

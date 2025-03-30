@@ -3,6 +3,7 @@ using System.Windows.Input;
 using MineSweeper.Models;
 using Microsoft.Maui.Dispatching;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 
 namespace MineSweeper.ViewModels;

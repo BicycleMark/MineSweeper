@@ -1,5 +1,8 @@
 ﻿﻿﻿﻿using CommunityToolkit.Maui;
-using Microsoft.Extensions.Logging;
+   using Microsoft.Extensions.DependencyInjection;
+   using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Maui.Hosting;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
 

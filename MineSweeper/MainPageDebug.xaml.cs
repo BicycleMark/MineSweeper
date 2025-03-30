@@ -1,3 +1,4 @@
+using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
 using MineSweeper.ViewModels;
 using MineSweeper.Views.Controls;

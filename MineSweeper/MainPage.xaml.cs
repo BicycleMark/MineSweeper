@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
 using MineSweeper.Views.Controls;

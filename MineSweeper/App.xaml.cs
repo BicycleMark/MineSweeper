@@ -1,4 +1,7 @@
-﻿﻿#if IOS || MACCATALYST
+﻿﻿
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+#if IOS || MACCATALYST
 using Foundation;  // Add this for NSNumber and NSString
 using UIKit;      // Add this for UIInterfaceOrientation
 #endif

@@ -3,12 +3,14 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using MineSweeper.Views.Controls;
+using Path = System.IO.Path;
 
 namespace MineSweeper;
 
 public partial class MainPage
 {
     
+
     private void GameBorder_OnSizeChanged(object sender, EventArgs e)
     {
         // Update the grid size when the game border size changes
