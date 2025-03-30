@@ -1,6 +1,4 @@
 using CommunityToolkit.Maui.Layouts;
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using MineSweeper.Models;
 using Size = Microsoft.Maui.Graphics.Size;

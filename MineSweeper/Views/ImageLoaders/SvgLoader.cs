@@ -1,67 +1,72 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MineSweeper.ViewModels;
 
 namespace MineSweeper.Views.ImageLoaders;
 
+/// <summary>
+/// Loads SVG files and provides them as string content for game pieces
+/// </summary>
 public class SvgLoader : ImageLoader
 {
-    public SvgLoader()
-    {
-        _themeDictionary = new Dictionary<GamePieceEnum.ThemedGamPieces, string>();
-    }
-    private string[] imageFiles =
-    {
-        "digit_0_image.svg",
-        "digit_1_image.svg",
-        "digit_2_image.svg",
-        "digit_3_image.svg",
-        "digit_4_image.svg",
-        "digit_5_image.svg",
-        "digit_6_image.svg",
-        "digit_7_image.svg",
-        "digit_8_image.svg",
-        "digit_9_image.svg",
-        "digit_none_image.svg",
-        "flagged.svg",
-        "neighbor_0_image.svg",
-        "neighbor_1_image.svg",
-        "neighbor_2_image.svg",
-        "neighbor_3_image.svg",
-        "neighbor_4_image.svg",
-        "neighbor_5_image.svg",
-        "neighbor_6_image.svg",
-        "neighbor_7_image.svg",
-        "neighbor_8_image.svg",
-        "pressed.svg",
-        "revealed_mine.svg",
-        "unplayed.svg",
-        "wrong_guess.svg"
-    };
+    private readonly Dictionary<GamePieceEnum.ThemedGamPieces, string> _themeDictionary = new();
+    private readonly Dictionary<string, string> _svgContentCache = new();
     
-    private readonly Dictionary<string, string> svgDictionary = new();
-    public async Task InitializeAsync(string prefix = "Themes/default")
+    public override object GetImageResource(GamePieceEnum.ThemedGamPieces piece)
     {
+        if (_themeDictionary.TryGetValue(piece, out string svgContent))
+        {
+            return svgContent;
+        }
+        
+        throw new KeyNotFoundException($"No SVG content found for game piece: {piece}");
+    }
+    
+    // Helper method to get SVG content directly as string (type-safe wrapper)
+    public string GetSvg(GamePieceEnum.ThemedGamPieces piece)
+    {
+        return (string)GetImageResource(piece);
+    }
+    
+    protected override async Task LoadAllImagesAsync(string themePrefix)
+    {
+        // Clear existing data
         _themeDictionary.Clear();
-        await LoadAllImages(prefix);
-        return ;
-    }
-    
-    private  async Task LoadAllImages(string prefix)
-    {
+        _svgContentCache.Clear();
+        
+        // Use a semaphore to limit concurrent file operations
         SemaphoreSlim semaphoreSlim = new(5, 5);
-        await semaphoreSlim.WaitAsync();
+        
         try
         {
-            foreach (var image in imageFiles)
+            await semaphoreSlim.WaitAsync();
+            
+            // First load all SVG content into the content cache
+            foreach (var fileName in imageFiles)
             {
-                var svg = await LoadMauiAsset(prefix, image);
-                if (svg == null)
+                string svgContent = await LoadMauiAsset(themePrefix, fileName);
+                if (string.IsNullOrEmpty(svgContent))
                 {
-                    throw new Exception($"Failed to load SVG: {image}");
+                    throw new Exception($"Failed to load SVG: {fileName}");
                 }
-
-                svgDictionary.Add(image, svg);
+                
+                _svgContentCache[fileName] = svgContent;
+            }
+            
+            // Then map all enum values to their corresponding SVG content
+            foreach (GamePieceEnum.ThemedGamPieces piece in Enum.GetValues(typeof(GamePieceEnum.ThemedGamPieces)))
+            {
+                string fileName = MapEnumToFileName(piece);
+                if (_svgContentCache.TryGetValue(fileName, out string? svgContent) && svgContent != null)
+                {
+                    _themeDictionary[piece] = svgContent;
+                }
+                else
+                {
+                    throw new Exception($"SVG file not loaded for game piece: {piece} (file: {fileName})");
+                }
             }
         }
         finally
@@ -69,12 +74,4 @@ public class SvgLoader : ImageLoader
             semaphoreSlim.Release();
         }
     }
-    
-    Dictionary<GamePieceEnum.ThemedGamPieces, string> _themeDictionary = new();
-    public string this[GamePieceEnum.ThemedGamPieces index]
-    {
-        get => _themeDictionary[index];
-        
-    }
-    
-} // SvgLoader
+}
