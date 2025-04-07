@@ -1,0 +1,28 @@
+{
+  "content": {
+    "digit": "8",
+    "displayType": "7-segment"
+  },
+  "appearance": {
+    "foregroundColor": "#ff0000",
+    "backgroundColor": "#000000",
+    "opacityOffSegment": 0.15,
+    "glowEnabled": true,
+    "edgeRadius": 0
+  },
+  "generator": {
+    "name": "7-Segment LED Display Generator",
+    "version": "1.0.0",
+    "versionDetails": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0,
+      "string": "1.0.0"
+    },
+    "buildDate": "2025-04-07T13:11:49.975Z"
+  },
+  "meta": {
+    "type": "defaults",
+    "description": "Factory default settings for the 7-Segment LED Display Generator"
+  }
+}
