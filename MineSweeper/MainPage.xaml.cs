@@ -3,6 +3,7 @@ using Microsoft.Maui.Controls;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
 using MineSweeper.Views.Controls;
+using MineSweeper.Views.ImageLoaders;
 
 namespace MineSweeper;
 
@@ -12,11 +13,12 @@ public partial class MainPage : ContentPage
 
     private readonly ILogger _logger;
     
-    public MainPage(GameViewModel viewModel)
+    public MainPage(GameViewModel viewModel, SvgLoader svgLoader)
     {
         InitializeComponent();
         _logger = new CustomDebugLogger();
         _viewModel = viewModel;
+        _svgLoader = svgLoader;
         BindingContext = _viewModel;
         
         // Start a new game when the page is loaded
@@ -84,6 +86,7 @@ public partial class MainPage : ContentPage
     // Dictionary to track which cells have been tapped for double-tap detection
     private readonly Dictionary<int, bool> _tappedCells = new();
     private DateTime _lastTapTime = DateTime.MinValue;
+    private readonly SvgLoader _svgLoader;
     private const int DoubleTapThresholdMs = 300; // Double tap threshold in milliseconds
     
     // This method is kept for reference but is no longer used since we're using SquareGameGrid

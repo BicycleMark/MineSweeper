@@ -14,6 +14,7 @@ public class SvgLoader : ImageLoader
     private readonly Dictionary<GamePieceEnum.ThemedGamPieces, string> _themeDictionary = new();
     private readonly Dictionary<string, string> _svgContentCache = new();
     
+    
     public override object GetImageResource(GamePieceEnum.ThemedGamPieces piece)
     {
         if (_themeDictionary.TryGetValue(piece, out string svgContent))

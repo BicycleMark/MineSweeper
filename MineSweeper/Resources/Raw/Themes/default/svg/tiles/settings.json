@@ -1,0 +1,47 @@
+{
+  "content": {
+    "tileState": "unplayed",
+    "displayType": "minesweeper-tile"
+  },
+  "appearance": {
+    "unplayedColor": "#4a90e2",
+    "revealedColor": "#C0C0C0",
+    "borderColor": "#2c3e50",
+    "highlightColor": "#ffffff",
+    "shadowColor": "#2c3e50",
+    "numberOutlineColor": "#ffffff",
+    "number1Color": "#0000FF",
+    "number2Color": "#008000",
+    "number3Color": "#FF0000",
+    "number4Color": "#000080",
+    "number5Color": "#800000",
+    "number6Color": "#008080",
+    "number7Color": "#000000",
+    "number8Color": "#808080",
+    "mineColor": "#000000",
+    "flagColor": "#FF0000",
+    "wrongGuessColor": "#FF0000",
+    "shadowOpacity": 0.8,
+    "highlightOpacity": 0.7,
+    "innerShadowEnabled": true,
+    "innerShadowBlur": 1,
+    "innerShadowOffset": 2,
+    "tileSize": 150
+  },
+  "generator": {
+    "name": "Minesweeper Tile Generator",
+    "version": "1.0.0",
+    "versionDetails": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0,
+      "string": "1.0.0"
+    },
+    "buildDate": "2025-04-06T23:11:43.872Z"
+  },
+  "meta": {
+    "type": "user-settings",
+    "lastModified": "2025-04-06T23:12:57.085Z",
+    "description": "Settings used to generate these images"
+  }
+}

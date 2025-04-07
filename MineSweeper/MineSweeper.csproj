@@ -84,7 +84,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\Raw\Themes\default\png\" />
+      <Folder Include="Resources\Raw\Themes\default\png\digits\" />
+      <Folder Include="Resources\Raw\Themes\default\png\tiles\" />
+      <Folder Include="Resources\Raw\Themes\default\svg\">
+        <Link>Themes\default\svg</Link>
+      </Folder>
       <Folder Include="Resources\Raw\Themes\tropical\png\" />
     </ItemGroup>
 
