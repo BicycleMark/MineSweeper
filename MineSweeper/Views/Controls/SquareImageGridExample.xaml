@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
+             x:Class="MineSweeper.Views.Controls.SquareImageGridExample"
+             Shell.NavBarIsVisible="True"
+             Title="Square Image Grid Example">
+    
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Label Grid.Row="0" 
+               Text="Square Image Grid Example" 
+               FontSize="24" 
+               HorizontalOptions="Center" 
+               Margin="0,0,0,10" />
+        
+        <!-- Grid Size Controls -->
+        <Grid Grid.Row="1" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Label Grid.Column="0" 
+                   Text="Grid Size:" 
+                   VerticalOptions="Center" />
+            
+            <Slider Grid.Column="1"
+                    x:Name="gridSizeSlider"
+                    Minimum="3"
+                    Maximum="10"
+                    Value="5"
+                    ValueChanged="OnGridSizeChanged"
+                    Margin="10,0"
+                    VerticalOptions="Center" />
+            
+            <Label Grid.Column="2" 
+                   x:Name="gridSizeLabel"
+                   Text="5x5"
+                   VerticalOptions="Center" />
+        </Grid>
+        
+        <!-- Image Grid -->
+        <Grid Grid.Row="2">
+            <Border Stroke="Blue"
+                    StrokeThickness="3"
+                    StrokeDashArray="2,2"
+                    BackgroundColor="#EEEEEE"
+                    Padding="10"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill">
+                <controls:SquareImageGrid x:Name="imageGrid"
+                                         HorizontalOptions="Fill"
+                                         VerticalOptions="Fill" />
+            </Border>
+            
+            <!-- Debug overlay to show the available space -->
+            <Rectangle Stroke="Red" 
+                       StrokeThickness="1" 
+                       StrokeDashArray="5,5"
+                       Fill="Transparent"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill" />
+        </Grid>
+        
+        <!-- Size Buttons -->
+        <HorizontalStackLayout Grid.Row="3" 
+                              Spacing="10" 
+                              HorizontalOptions="Center"
+                              Margin="0,20,0,10">
+            <Button Text="3x3" Clicked="OnSize3Clicked" />
+            <Button Text="5x5" Clicked="OnSize5Clicked" />
+            <Button Text="8x8" Clicked="OnSize8Clicked" />
+            <Button Text="10x10" Clicked="OnSize10Clicked" />
+            <Button Text="Update Random Cell" Clicked="OnUpdateRandomCellClicked" />
+        </HorizontalStackLayout>
+        
+        <!-- Footer with status -->
+        <Label Grid.Row="4" 
+               x:Name="statusLabel"
+               Text="Adjust the grid size using the slider or buttons" 
+               HorizontalOptions="Center" 
+               Margin="0,10,0,0" />
+    </Grid>
+    
+</ContentPage>
