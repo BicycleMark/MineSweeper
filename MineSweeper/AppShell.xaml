@@ -6,6 +6,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MineSweeper"
     xmlns:controls="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
+    xmlns:viewControls="clr-namespace:MineSweeper.Views.Controls"
     x:DataType="local:AppShell"
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
@@ -76,4 +77,11 @@
         Title="Debug Page"
         ContentTemplate="{DataTemplate local:MainPageDebug}"
         Route="MainPageDebug" />
+        
+    <!-- Grid Examples Menu Items -->
+    
+    <ShellContent
+        Title="Square Image Grid Example"
+        ContentTemplate="{DataTemplate viewControls:SquareImageGridExample}"
+        Route="SquareImageGridExample" />
 </Shell>

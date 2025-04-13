@@ -59,6 +59,10 @@
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <MauiImage Remove="Resources\Images\Themes\tropical\svg\**" />
+        <MauiImage Remove="Resources\Images\Themes\default\svg\**" />
+        <MauiImage Remove="Resources\Images\Themes\**" />
+        
         
     </ItemGroup>
 
@@ -74,6 +78,10 @@
         <MauiXaml Remove="Views\Controls\StandardGameGrid.xaml"/>
         <MauiXaml Remove="Views\Controls\GameGrid.xaml"/>
         <MauiXaml Remove="Views\Controls\SweeperItemTemplate.xaml"/>
+        <MauiXaml Remove="Resources\Images\Themes\**" />
+        <MauiXaml Remove="Resources\Images\Themes\tropical\**" />
+        <MauiXaml Remove="Resources\Images\Themes\default\svg\**" />
+        <MauiXaml Remove="Views\Controls\CanvasImageGridExample.xaml" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,13 +89,29 @@
         <Compile Remove="Views\Controls\StandardGameGrid.xaml.cs"/>
         <Compile Remove="Views\Controls\GameGrid.xaml.cs"/>
         <Compile Remove="Views\Controls\SweeperItemTemplate.xaml.cs"/>
+        <Compile Remove="Resources\Images\Themes\**" />
+        <Compile Remove="Resources\Images\Themes\tropical\**" />
+        <Compile Remove="Resources\Images\Themes\default\svg\**" />
+        <Compile Remove="Views\Controls\CanvasImageGrid.cs" />
+        <Compile Remove="Views\Controls\CanvasImageGridExample.xaml.cs" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\Raw\Themes\default\svg\">
-        <Link>Themes\default\svg</Link>
-      </Folder>
-      <Folder Include="Resources\Raw\Themes\tropical\png\" />
+      <MauiCss Remove="Resources\Images\Themes\**" />
+      <MauiCss Remove="Resources\Images\Themes\tropical\**" />
+      <MauiCss Remove="Resources\Images\Themes\default\svg\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Resources\Images\Themes\**" />
+      <EmbeddedResource Remove="Resources\Images\Themes\tropical\**" />
+      <EmbeddedResource Remove="Resources\Images\Themes\default\svg\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\Images\Themes\**" />
+      <None Remove="Resources\Images\Themes\tropical\**" />
+      <None Remove="Resources\Images\Themes\default\svg\**" />
     </ItemGroup>
 
 </Project>

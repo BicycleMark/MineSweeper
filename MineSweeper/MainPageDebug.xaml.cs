@@ -1,7 +1,8 @@
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
 using MineSweeper.ViewModels;
-using MineSweeper.Views.Controls;
+// Commenting out one of the conflicting namespaces
+// using MineSweeper.Views.Controls;
 using MineSweeper.Models;
 
 namespace MineSweeper;
