@@ -252,14 +252,14 @@
                 </Grid.ColumnDefinitions>
                 
                 <Button Grid.Column="0"
-                        Text="Image Grid Example"
-                        Clicked="OnImageGridExampleClicked"
+                        Text="Square Image Grid Example"
+                        Clicked="OnSquareImageGridExampleClicked"
                         Style="{StaticResource GameButtonStyle}"
                         HorizontalOptions="Center" />
-                
+                        
                 <Button Grid.Column="1"
-                        Text="Canvas Image Grid"
-                        Clicked="OnCanvasImageGridExampleClicked"
+                        Text="LED Control Example"
+                        Clicked="OnLedControlExampleClicked"
                         Style="{StaticResource GameButtonStyle}"
                         HorizontalOptions="Center" />
             </Grid>

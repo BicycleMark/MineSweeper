@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿using Microsoft.Maui.Controls;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using Microsoft.Maui.Controls;
    using MineSweeper.Models;
 using MineSweeper.ViewModels;
 
@@ -19,6 +19,7 @@ public partial class AppShell : Shell
         
        
         Routing.RegisterRoute("SquareImageGridExample", typeof(Views.Controls.SquareImageGridExample));
+        Routing.RegisterRoute("LedControlExample", typeof(Views.Controls.LedControlExample));
         
         // Subscribe to route selection events
         Navigating += OnShellNavigating;

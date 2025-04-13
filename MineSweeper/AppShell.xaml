@@ -84,4 +84,9 @@
         Title="Square Image Grid Example"
         ContentTemplate="{DataTemplate viewControls:SquareImageGridExample}"
         Route="SquareImageGridExample" />
+        
+    <ShellContent
+        Title="LED Control Example"
+        ContentTemplate="{DataTemplate viewControls:LedControlExample}"
+        Route="LedControlExample" />
 </Shell>

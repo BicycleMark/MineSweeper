@@ -198,34 +198,34 @@ public partial class MainPage : ContentPage
     }
     
     /// <summary>
-    /// Handles the click event for the Image Grid Example button
+    /// Handles the click event for the Square Image Grid Example button
     /// </summary>
-    private async void OnImageGridExampleClicked(object sender, EventArgs e)
+    private async void OnSquareImageGridExampleClicked(object sender, EventArgs e)
     {
         try
         {
-            // Navigate to the ImageGridExample page
-            await Shell.Current.GoToAsync("ImageGridExample");
+            // Navigate to the SquareImageGridExample page
+            await Shell.Current.GoToAsync("SquareImageGridExample");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error navigating to ImageGridExample: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error navigating to SquareImageGridExample: {ex}");
         }
     }
     
     /// <summary>
-    /// Handles the click event for the Canvas Image Grid Example button
+    /// Handles the click event for the LED Control Example button
     /// </summary>
-    private async void OnCanvasImageGridExampleClicked(object sender, EventArgs e)
+    private async void OnLedControlExampleClicked(object sender, EventArgs e)
     {
         try
         {
-            // Navigate to the CanvasImageGridExample page
-            await Shell.Current.GoToAsync("CanvasImageGridExample");
+            // Navigate to the LedControlExample page
+            await Shell.Current.GoToAsync("LedControlExample");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error navigating to CanvasImageGridExample: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Error navigating to LedControlExample: {ex}");
         }
     }
     

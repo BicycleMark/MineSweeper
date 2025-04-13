@@ -44,21 +44,21 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4"/>
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
        
 
         <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128"/>
+        <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
 
         <!-- Images -->
-        <MauiImage Include="Resources\Images\**\*.svg"/>
-        <MauiImage Include="Resources\Images\**\*.png"/>
-        <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185"/>
+        <MauiImage Include="Resources\Images\**\*.svg" />
+        <MauiImage Include="Resources\Images\**\*.png" />
+        <MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
         <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*"/>
+        <MauiFont Include="Resources\Fonts\*" />
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
         <MauiImage Remove="Resources\Images\Themes\tropical\svg\**" />
         <MauiImage Remove="Resources\Images\Themes\default\svg\**" />
         <MauiImage Remove="Resources\Images\Themes\**" />
@@ -67,17 +67,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1"/>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0"/>
+        <PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
+        <PackageReference Include="CommunityToolkit.Maui.Core" Version="11.2.0" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <MauiXaml Remove="Views\Controls\UniformGrid.xaml"/>
-        <MauiXaml Remove="Views\Controls\StandardGameGrid.xaml"/>
-        <MauiXaml Remove="Views\Controls\GameGrid.xaml"/>
-        <MauiXaml Remove="Views\Controls\SweeperItemTemplate.xaml"/>
+        <MauiXaml Remove="Views\Controls\UniformGrid.xaml" />
+        <MauiXaml Remove="Views\Controls\StandardGameGrid.xaml" />
+        <MauiXaml Remove="Views\Controls\GameGrid.xaml" />
+        <MauiXaml Remove="Views\Controls\SweeperItemTemplate.xaml" />
         <MauiXaml Remove="Resources\Images\Themes\**" />
         <MauiXaml Remove="Resources\Images\Themes\tropical\**" />
         <MauiXaml Remove="Resources\Images\Themes\default\svg\**" />
@@ -85,10 +86,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Views\Controls\UniformGrid.xaml.cs"/>
-        <Compile Remove="Views\Controls\StandardGameGrid.xaml.cs"/>
-        <Compile Remove="Views\Controls\GameGrid.xaml.cs"/>
-        <Compile Remove="Views\Controls\SweeperItemTemplate.xaml.cs"/>
+        <Compile Remove="Views\Controls\UniformGrid.xaml.cs" />
+        <Compile Remove="Views\Controls\StandardGameGrid.xaml.cs" />
+        <Compile Remove="Views\Controls\GameGrid.xaml.cs" />
+        <Compile Remove="Views\Controls\SweeperItemTemplate.xaml.cs" />
         <Compile Remove="Resources\Images\Themes\**" />
         <Compile Remove="Resources\Images\Themes\tropical\**" />
         <Compile Remove="Resources\Images\Themes\default\svg\**" />
