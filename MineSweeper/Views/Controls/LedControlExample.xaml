@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
+             x:Class="MineSweeper.Views.Controls.LedControlExample"
+             Shell.NavBarIsVisible="True"
+             Title="LED Control Example">
+    
+    <Grid Padding="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Label Grid.Row="0" 
+               Text="LED Control Example" 
+               FontSize="24" 
+               HorizontalOptions="Center" 
+               Margin="0,0,0,20" />
+        
+        <!-- LED Display -->
+        <Border Grid.Row="1"
+                Stroke="Gray"
+                StrokeThickness="2"
+                BackgroundColor="#222222"
+                Padding="0"
+                Margin="0,0,0,20"
+                HorizontalOptions="Center">
+            <controls:LedControl x:Name="ledDisplay"
+                                Value="123"
+                                MaxDigitsToDisplay="5"
+                                PadWithZeros="True"
+                                ShowBorder="True"
+                                HighlightColor="#CCCCCC"
+                                ShadowColor="#444444"
+                                DisplayBackgroundColor="#222222"
+                                SizeScale="1.0"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center" />
+        </Border>
+        
+        <!-- Value Controls -->
+        <Grid Grid.Row="2" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Label Grid.Column="0" 
+                   Text="Value:" 
+                   VerticalOptions="Center" />
+            
+            <Slider Grid.Column="1"
+                    x:Name="valueSlider"
+                    Minimum="0"
+                    Maximum="99999"
+                    Value="123"
+                    ValueChanged="OnValueChanged"
+                    Margin="10,0"
+                    VerticalOptions="Center" />
+            
+            <Label Grid.Column="2" 
+                   x:Name="valueLabel"
+                   Text="123"
+                   VerticalOptions="Center" />
+        </Grid>
+        
+        <!-- Max Digits Controls -->
+        <Grid Grid.Row="3" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Label Grid.Column="0" 
+                   Text="Max Digits:" 
+                   VerticalOptions="Center" />
+            
+            <Slider Grid.Column="1"
+                    x:Name="maxDigitsSlider"
+                    Minimum="1"
+                    Maximum="10"
+                    Value="5"
+                    ValueChanged="OnMaxDigitsChanged"
+                    Margin="10,0"
+                    VerticalOptions="Center" />
+            
+            <Label Grid.Column="2" 
+                   x:Name="maxDigitsLabel"
+                   Text="5"
+                   VerticalOptions="Center" />
+        </Grid>
+        
+        <!-- Size Scale Controls -->
+        <Grid Grid.Row="4" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Label Grid.Column="0" 
+                   Text="Size Scale:" 
+                   VerticalOptions="Center" />
+            
+            <Slider Grid.Column="1"
+                    x:Name="sizeScaleSlider"
+                    Minimum="0.5"
+                    Maximum="3.0"
+                    Value="1.0"
+                    ValueChanged="OnSizeScaleChanged"
+                    Margin="10,0"
+                    VerticalOptions="Center" />
+            
+            <Label Grid.Column="2" 
+                   x:Name="sizeScaleLabel"
+                   Text="1.0"
+                   VerticalOptions="Center" />
+        </Grid>
+        
+        <!-- Border Thickness Controls -->
+        <Grid Grid.Row="5" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+            <Label Grid.Column="0" 
+                   Text="Border Thickness:" 
+                   VerticalOptions="Center" />
+            
+            <Slider Grid.Column="1"
+                    x:Name="borderThicknessSlider"
+                    Minimum="1"
+                    Maximum="8"
+                    Value="3"
+                    ValueChanged="OnBorderThicknessChanged"
+                    Margin="10,0"
+                    VerticalOptions="Center" />
+            
+            <Label Grid.Column="2" 
+                   x:Name="borderThicknessLabel"
+                   Text="3"
+                   VerticalOptions="Center" />
+        </Grid>
+        
+        <!-- Pad With Zeros Toggle -->
+        <Grid Grid.Row="6" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            
+            <HorizontalStackLayout Grid.Column="0" 
+                                  Spacing="10" 
+                                  HorizontalOptions="Center">
+                <Label Text="Pad With Zeros:" 
+                       VerticalOptions="Center" />
+                <Switch x:Name="padWithZerosSwitch"
+                        IsToggled="True"
+                        Toggled="OnPadWithZerosToggled"
+                        VerticalOptions="Center" />
+            </HorizontalStackLayout>
+            
+            <HorizontalStackLayout Grid.Column="1" 
+                                  Spacing="10" 
+                                  HorizontalOptions="Center">
+                <Label Text="Show Border:" 
+                       VerticalOptions="Center" />
+                <Switch x:Name="showBorderSwitch"
+                        IsToggled="True"
+                        Toggled="OnShowBorderToggled"
+                        VerticalOptions="Center" />
+            </HorizontalStackLayout>
+        </Grid>
+        
+        <!-- Color Controls -->
+        <Grid Grid.Row="7" Margin="0,0,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <!-- Background Color -->
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Column="0" 
+                       Text="Background Color:" 
+                       VerticalOptions="Center" />
+                
+                <HorizontalStackLayout Grid.Column="1" Spacing="5">
+                    <Button x:Name="backgroundColorButton"
+                            WidthRequest="60"
+                            HeightRequest="30"
+                            Text="#222222"
+                            BackgroundColor="#222222"
+                            TextColor="White"
+                            Clicked="OnBackgroundColorClicked" />
+                    
+                    <!-- Color Picker for Background -->
+                    <HorizontalStackLayout x:Name="backgroundColorPicker" Spacing="0">
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#000000" Clicked="OnBackgroundColorPickerClicked" CommandParameter="#000000" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#222222" Clicked="OnBackgroundColorPickerClicked" CommandParameter="#222222" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#333333" Clicked="OnBackgroundColorPickerClicked" CommandParameter="#333333" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#444444" Clicked="OnBackgroundColorPickerClicked" CommandParameter="#444444" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#0A0A0A" Clicked="OnBackgroundColorPickerClicked" CommandParameter="#0A0A0A" Margin="2" />
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </Grid>
+            
+            <!-- Highlight Color -->
+            <Grid Grid.Row="1" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Column="0" 
+                       Text="Highlight Color:" 
+                       VerticalOptions="Center" />
+                
+                <HorizontalStackLayout Grid.Column="1" Spacing="5">
+                    <Button x:Name="highlightColorButton"
+                            WidthRequest="60"
+                            HeightRequest="30"
+                            Text="#CCCCCC"
+                            BackgroundColor="#CCCCCC"
+                            TextColor="Black"
+                            Clicked="OnHighlightColorClicked" />
+                    
+                    <!-- Color Picker for Highlight -->
+                    <HorizontalStackLayout x:Name="highlightColorPicker" Spacing="0">
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#FFFFFF" Clicked="OnHighlightColorPickerClicked" CommandParameter="#FFFFFF" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#CCCCCC" Clicked="OnHighlightColorPickerClicked" CommandParameter="#CCCCCC" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#ADD8E6" Clicked="OnHighlightColorPickerClicked" CommandParameter="#ADD8E6" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#90EE90" Clicked="OnHighlightColorPickerClicked" CommandParameter="#90EE90" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#FFFFE0" Clicked="OnHighlightColorPickerClicked" CommandParameter="#FFFFE0" Margin="2" />
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </Grid>
+            
+            <!-- Shadow Color -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Column="0" 
+                       Text="Shadow Color:" 
+                       VerticalOptions="Center" />
+                
+                <HorizontalStackLayout Grid.Column="1" Spacing="5">
+                    <Button x:Name="shadowColorButton"
+                            WidthRequest="60"
+                            HeightRequest="30"
+                            Text="#444444"
+                            BackgroundColor="#444444"
+                            TextColor="White"
+                            Clicked="OnShadowColorClicked" />
+                    
+                    <!-- Color Picker for Shadow -->
+                    <HorizontalStackLayout x:Name="shadowColorPicker" Spacing="0">
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#000000" Clicked="OnShadowColorPickerClicked" CommandParameter="#000000" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#444444" Clicked="OnShadowColorPickerClicked" CommandParameter="#444444" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#00008B" Clicked="OnShadowColorPickerClicked" CommandParameter="#00008B" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#006400" Clicked="OnShadowColorPickerClicked" CommandParameter="#006400" Margin="2" />
+                        <Button WidthRequest="30" HeightRequest="30" BackgroundColor="#8B0000" Clicked="OnShadowColorPickerClicked" CommandParameter="#8B0000" Margin="2" />
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </Grid>
+        </Grid>
+        
+        <!-- Preset Value Buttons -->
+        <HorizontalStackLayout Grid.Row="8" 
+                              Spacing="10" 
+                              HorizontalOptions="Center"
+                              Margin="0,0,0,20">
+            <Button Text="0" Clicked="OnValue0Clicked" />
+            <Button Text="123" Clicked="OnValue123Clicked" />
+            <Button Text="9999" Clicked="OnValue9999Clicked" />
+            <Button Text="12345" Clicked="OnValue12345Clicked" />
+            <Button Text="Random" Clicked="OnRandomValueClicked" />
+        </HorizontalStackLayout>
+        
+        <!-- Status Label -->
+        <Label Grid.Row="9" 
+               x:Name="statusLabel"
+               Text="Adjust the controls to see how the LED display changes" 
+               HorizontalOptions="Center" 
+               VerticalOptions="Start"
+               Margin="0,20,0,0" />
+    </Grid>
+    
+</ContentPage>
