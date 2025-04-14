@@ -28,25 +28,19 @@
                Margin="0,0,0,20" />
         
         <!-- LED Display -->
-        <Border Grid.Row="1"
-                Stroke="Gray"
-                StrokeThickness="2"
-                BackgroundColor="#222222"
-                Padding="0"
-                Margin="0,0,0,20"
-                HorizontalOptions="Center">
-            <controls:LedControl x:Name="ledDisplay"
-                                Value="123"
-                                MaxDigitsToDisplay="5"
-                                PadWithZeros="True"
-                                ShowBorder="True"
-                                HighlightColor="#CCCCCC"
-                                ShadowColor="#444444"
-                                DisplayBackgroundColor="#222222"
-                                SizeScale="1.0"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center" />
-        </Border>
+        <controls:LedControl Grid.Row="1"
+                            x:Name="ledDisplay"
+                            Value="123"
+                            MaxDigitsToDisplay="5"
+                            PadWithZeros="True"
+                            ShowBorder="True"
+                            HighlightColor="#CCCCCC"
+                            ShadowColor="#444444"
+                            DisplayBackgroundColor="#222222"
+                            SizeScale="1.0"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            Margin="0,0,0,20" />
         
         <!-- Value Controls -->
         <Grid Grid.Row="2" Margin="0,0,0,20">

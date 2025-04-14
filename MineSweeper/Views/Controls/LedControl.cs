@@ -1,5 +1,4 @@
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Graphics;
 
 namespace MineSweeper.Views.Controls;
@@ -182,20 +181,7 @@ public class LedControl : ContentView
     }
 
     private readonly HorizontalStackLayout _digitContainer;
-    private readonly Grid _container;
-    private readonly BoxView _recessedArea;
-    
-    // Outer border lines
-    private readonly List<Line> _topOuterLines = new();
-    private readonly List<Line> _leftOuterLines = new();
-    private readonly List<Line> _bottomOuterLines = new();
-    private readonly List<Line> _rightOuterLines = new();
-    
-    // Inner border lines
-    private readonly List<Line> _topInnerLines = new();
-    private readonly List<Line> _leftInnerLines = new();
-    private readonly List<Line> _bottomInnerLines = new();
-    private readonly List<Line> _rightInnerLines = new();
+    private readonly ChiseledBorder _border;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LedControl"/> class.
@@ -211,32 +197,22 @@ public class LedControl : ContentView
             Padding = 5
         };
         
-        // Recessed area (background for the digits)
-        // This is the main background area where the digits will be displayed
-        _recessedArea = new BoxView
+        // Create the chiseled border with the digit container as content
+        _border = new ChiseledBorder
         {
-            HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.Fill,
-            BackgroundColor = DisplayBackgroundColor
-        };
-        
-        // Create the main container grid
-        _container = new Grid
-        {
+            ShadowColor = ShadowColor,
+            HighlightColor = HighlightColor,
+            BorderThickness = BorderThickness,
+            ContentBackgroundColor = DisplayBackgroundColor,
+            IsRecessed = true,
+            Content = _digitContainer,
+            IsVisible = ShowBorder,
             HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            Padding = 0
+            VerticalOptions = LayoutOptions.Center
         };
         
-        // Add the recessed area and digit container to the grid
-        _container.Add(_recessedArea);         // Base layer (background)
-        _container.Add(_digitContainer);       // Top layer (content)
-        
-        // Create the border lines
-        CreateBorderLines();
-        
-        // Set the content to the container
-        Content = _container;
+        // Set the content to the border
+        Content = _border;
 
         // Set default properties
         BackgroundColor = Colors.Transparent;
@@ -252,108 +228,6 @@ public class LedControl : ContentView
 
         // Update the display
         UpdateDisplay();
-    }
-    
-    /// <summary>
-    /// Creates the border lines for the 3D chiseled effect.
-    /// </summary>
-    private void CreateBorderLines()
-    {
-        // Create the outer border lines - create 8 lines (maximum possible thickness)
-        for (int i = 0; i < 8; i++)
-        {
-            // Top outer line (shadow) - thin line with 1px thickness
-            var topLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(ShadowColor),
-                HorizontalOptions = LayoutOptions.Fill,
-                VerticalOptions = LayoutOptions.Start
-            };
-            _topOuterLines.Add(topLine);
-            _container.Add(topLine);
-            
-            // Left outer line (shadow) - thin line with 1px thickness
-            var leftLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(ShadowColor),
-                HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Fill
-            };
-            _leftOuterLines.Add(leftLine);
-            _container.Add(leftLine);
-            
-            // Bottom outer line (highlight) - thin line with 1px thickness
-            var bottomLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(HighlightColor),
-                HorizontalOptions = LayoutOptions.Fill,
-                VerticalOptions = LayoutOptions.End
-            };
-            _bottomOuterLines.Add(bottomLine);
-            _container.Add(bottomLine);
-            
-            // Right outer line (highlight) - thin line with 1px thickness
-            var rightLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(HighlightColor),
-                HorizontalOptions = LayoutOptions.End,
-                VerticalOptions = LayoutOptions.Fill
-            };
-            _rightOuterLines.Add(rightLine);
-            _container.Add(rightLine);
-        }
-        
-        // Create the inner border lines - create 8 lines (maximum possible thickness)
-        for (int i = 0; i < 8; i++)
-        {
-            // Top inner line (shadow) - thin line with 1px thickness
-            var topLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(ShadowColor),
-                HorizontalOptions = LayoutOptions.Fill,
-                VerticalOptions = LayoutOptions.Start
-            };
-            _topInnerLines.Add(topLine);
-            _container.Add(topLine);
-            
-            // Left inner line (shadow) - thin line with 1px thickness
-            var leftLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(ShadowColor),
-                HorizontalOptions = LayoutOptions.Start,
-                VerticalOptions = LayoutOptions.Fill
-            };
-            _leftInnerLines.Add(leftLine);
-            _container.Add(leftLine);
-            
-            // Bottom inner line (highlight) - thin line with 1px thickness
-            var bottomLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(HighlightColor),
-                HorizontalOptions = LayoutOptions.Fill,
-                VerticalOptions = LayoutOptions.End
-            };
-            _bottomInnerLines.Add(bottomLine);
-            _container.Add(bottomLine);
-            
-            // Right inner line (highlight) - thin line with 1px thickness
-            var rightLine = new Line
-            {
-                StrokeThickness = 1,
-                Stroke = new SolidColorBrush(HighlightColor),
-                HorizontalOptions = LayoutOptions.End,
-                VerticalOptions = LayoutOptions.Fill
-            };
-            _rightInnerLines.Add(rightLine);
-            _container.Add(rightLine);
-        }
     }
 
     /// <summary>
@@ -450,17 +324,12 @@ public class LedControl : ContentView
         double totalWidth = digitWidth * MaxDigitsToDisplay + (BorderThickness * 2) + 10; // Add padding and border thickness
         double totalHeight = digitHeight + (BorderThickness * 2) + 10; // Add padding and border thickness
         
-        // Explicitly set the size of the control and container to ensure it shrinks when scale decreases
+        // Explicitly set the size of the control and border to ensure it shrinks when scale decreases
         WidthRequest = totalWidth;
         HeightRequest = totalHeight;
         
-        // Set the size of the container grid
-        _container.WidthRequest = totalWidth;
-        _container.HeightRequest = totalHeight;
-        
-        // Set the size of the recessed area
-        _recessedArea.WidthRequest = totalWidth - (BorderThickness * 2);
-        _recessedArea.HeightRequest = totalHeight - (BorderThickness * 2);
+        _border.WidthRequest = totalWidth;
+        _border.HeightRequest = totalHeight;
         
         // Set the size of the individual digit images
         foreach (var child in _digitContainer.Children)
@@ -487,207 +356,15 @@ public class LedControl : ContentView
     /// </summary>
     private void UpdateBorderAppearance()
     {
-        if (_container == null)
+        if (_border == null)
             return;
             
-        // Update the recessed area background color
-        _recessedArea.BackgroundColor = DisplayBackgroundColor;
-        
-        if (ShowBorder)
-        {
-            // Set up the container with no padding to eliminate any extra space
-            _container.Padding = new Thickness(0);
-            
-            // Calculate the inner border offset (where the recessed area begins)
-            // Use BorderThickness directly without additional padding to eliminate empty space
-            int innerBorderOffset = BorderThickness;
-            
-            // Configure the recessed area - make it exactly match the inner border
-            // to eliminate empty space around the chiseled frame
-            _recessedArea.Margin = new Thickness(innerBorderOffset);
-            
-            // Configure the digit container - position it with minimal margin
-            // Just enough space to not overlap with the inner border lines
-            _digitContainer.Margin = new Thickness(innerBorderOffset + 1);
-            _digitContainer.Padding = new Thickness(0);
-            
-            // Update the outer border lines
-            for (int i = 0; i < _topOuterLines.Count; i++)
-            {
-                // Make all lines visible
-                _topOuterLines[i].IsVisible = i < BorderThickness;
-                _leftOuterLines[i].IsVisible = i < BorderThickness;
-                _bottomOuterLines[i].IsVisible = i < BorderThickness;
-                _rightOuterLines[i].IsVisible = i < BorderThickness;
-                
-                if (i < BorderThickness)
-                {
-                    // Position the lines with appropriate offsets to create the mitered corners
-                    
-                    // Top line - starts at (i,i) and ends at (width-i-1,i)
-                    _topOuterLines[i].X1 = i;
-                    _topOuterLines[i].Y1 = i;
-                    _topOuterLines[i].X2 = -1; // Will be set in SizeChanged event
-                    _topOuterLines[i].Y2 = i;
-                    
-                    // Left line - starts at (i,i) and ends at (i,height-i-1)
-                    _leftOuterLines[i].X1 = i;
-                    _leftOuterLines[i].Y1 = i;
-                    _leftOuterLines[i].X2 = i;
-                    _leftOuterLines[i].Y2 = -1; // Will be set in SizeChanged event
-                    
-                    // Bottom line - starts at (i,height-i-1) and ends at (width-i-1,height-i-1)
-                    _bottomOuterLines[i].X1 = i;
-                    _bottomOuterLines[i].Y1 = -1; // Will be set in SizeChanged event
-                    _bottomOuterLines[i].X2 = -1; // Will be set in SizeChanged event
-                    _bottomOuterLines[i].Y2 = -1; // Will be set in SizeChanged event
-                    
-                    // Right line - starts at (width-i-1,i) and ends at (width-i-1,height-i-1)
-                    _rightOuterLines[i].X1 = -1; // Will be set in SizeChanged event
-                    _rightOuterLines[i].Y1 = i;
-                    _rightOuterLines[i].X2 = -1; // Will be set in SizeChanged event
-                    _rightOuterLines[i].Y2 = -1; // Will be set in SizeChanged event
-                    
-                    // Update the colors - for recessed look, shadow on top/left, highlight on bottom/right
-                    (_topOuterLines[i].Stroke as SolidColorBrush).Color = ShadowColor;
-                    (_leftOuterLines[i].Stroke as SolidColorBrush).Color = ShadowColor;
-                    (_bottomOuterLines[i].Stroke as SolidColorBrush).Color = HighlightColor;
-                    (_rightOuterLines[i].Stroke as SolidColorBrush).Color = HighlightColor;
-                }
-            }
-            
-            // Update the inner border lines
-            for (int i = 0; i < _topInnerLines.Count; i++)
-            {
-                // Make all lines visible
-                _topInnerLines[i].IsVisible = i < BorderThickness;
-                _leftInnerLines[i].IsVisible = i < BorderThickness;
-                _bottomInnerLines[i].IsVisible = i < BorderThickness;
-                _rightInnerLines[i].IsVisible = i < BorderThickness;
-                
-                if (i < BorderThickness)
-                {
-                    // Position the lines with appropriate offsets to create the mitered corners
-                    int offset = innerBorderOffset + i;
-                    
-                    // Top inner line - starts at (offset,offset) and ends at (width-offset-1,offset)
-                    _topInnerLines[i].X1 = offset;
-                    _topInnerLines[i].Y1 = offset;
-                    _topInnerLines[i].X2 = -1; // Will be set in SizeChanged event
-                    _topInnerLines[i].Y2 = offset;
-                    
-                    // Left inner line - starts at (offset,offset) and ends at (offset,height-offset-1)
-                    _leftInnerLines[i].X1 = offset;
-                    _leftInnerLines[i].Y1 = offset;
-                    _leftInnerLines[i].X2 = offset;
-                    _leftInnerLines[i].Y2 = -1; // Will be set in SizeChanged event
-                    
-                    // Bottom inner line - starts at (offset,height-offset-1) and ends at (width-offset-1,height-offset-1)
-                    _bottomInnerLines[i].X1 = offset;
-                    _bottomInnerLines[i].Y1 = -1; // Will be set in SizeChanged event
-                    _bottomInnerLines[i].X2 = -1; // Will be set in SizeChanged event
-                    _bottomInnerLines[i].Y2 = -1; // Will be set in SizeChanged event
-                    
-                    // Right inner line - starts at (width-offset-1,offset) and ends at (width-offset-1,height-offset-1)
-                    _rightInnerLines[i].X1 = -1; // Will be set in SizeChanged event
-                    _rightInnerLines[i].Y1 = offset;
-                    _rightInnerLines[i].X2 = -1; // Will be set in SizeChanged event
-                    _rightInnerLines[i].Y2 = -1; // Will be set in SizeChanged event
-                    
-                    // Update the colors - use full opacity for better visibility
-                    (_topInnerLines[i].Stroke as SolidColorBrush).Color = ShadowColor;
-                    (_leftInnerLines[i].Stroke as SolidColorBrush).Color = ShadowColor;
-                    (_bottomInnerLines[i].Stroke as SolidColorBrush).Color = HighlightColor;
-                    (_rightInnerLines[i].Stroke as SolidColorBrush).Color = HighlightColor;
-                }
-            }
-            
-            // Subscribe to the SizeChanged event to update the line coordinates
-            SizeChanged += OnSizeChanged;
-        }
-        else
-        {
-            // Hide all the border lines
-            foreach (var line in _topOuterLines.Concat(_leftOuterLines).Concat(_bottomOuterLines).Concat(_rightOuterLines)
-                                .Concat(_topInnerLines).Concat(_leftInnerLines).Concat(_bottomInnerLines).Concat(_rightInnerLines))
-            {
-                line.IsVisible = false;
-            }
-            
-            // Keep the recessed area and digit container visible
-            _recessedArea.Margin = new Thickness(0);
-            _digitContainer.Margin = new Thickness(6);
-            _digitContainer.Padding = new Thickness(4);
-            
-            // Unsubscribe from the SizeChanged event
-            SizeChanged -= OnSizeChanged;
-        }
-    }
-    
-    /// <summary>
-    /// Called when the control's size changes.
-    /// </summary>
-    private void OnSizeChanged(object sender, EventArgs e)
-    {
-        if (!ShowBorder)
-            return;
-            
-        double width = Width;
-        double height = Height;
-        
-        if (width <= 0 || height <= 0)
-            return;
-            
-        // Calculate the inner border offset (where the recessed area begins)
-        int innerBorderOffset = BorderThickness;
-        
-        // Update the outer border lines
-        for (int i = 0; i < _topOuterLines.Count && i < BorderThickness; i++)
-        {
-            if (i < _topOuterLines.Count)
-            {
-                // Top line - ends at (width-i-1,i)
-                _topOuterLines[i].X2 = width - i - 1;
-                
-                // Left line - ends at (i,height-i-1)
-                _leftOuterLines[i].Y2 = height - i - 1;
-                
-                // Bottom line - starts at (i,height-i-1) and ends at (width-i-1,height-i-1)
-                _bottomOuterLines[i].Y1 = height - i - 1;
-                _bottomOuterLines[i].X2 = width - i - 1;
-                _bottomOuterLines[i].Y2 = height - i - 1;
-                
-                // Right line - starts at (width-i-1,i) and ends at (width-i-1,height-i-1)
-                _rightOuterLines[i].X1 = width - i - 1;
-                _rightOuterLines[i].X2 = width - i - 1;
-                _rightOuterLines[i].Y2 = height - i - 1;
-            }
-        }
-        
-        // Update the inner border lines
-        for (int i = 0; i < _topInnerLines.Count && i < BorderThickness; i++)
-        {
-            if (i < _topInnerLines.Count)
-            {
-                int offset = innerBorderOffset + i;
-                
-                // Top inner line - ends at (width-offset-1,offset)
-                _topInnerLines[i].X2 = width - offset - 1;
-                
-                // Left inner line - ends at (offset,height-offset-1)
-                _leftInnerLines[i].Y2 = height - offset - 1;
-                
-                // Bottom inner line - starts at (offset,height-offset-1) and ends at (width-offset-1,height-offset-1)
-                _bottomInnerLines[i].Y1 = height - offset - 1;
-                _bottomInnerLines[i].X2 = width - offset - 1;
-                _bottomInnerLines[i].Y2 = height - offset - 1;
-                
-                // Right inner line - starts at (width-offset-1,offset) and ends at (width-offset-1,height-offset-1)
-                _rightInnerLines[i].X1 = width - offset - 1;
-                _rightInnerLines[i].X2 = width - offset - 1;
-                _rightInnerLines[i].Y2 = height - offset - 1;
-            }
-        }
+        // Update the border properties
+        _border.ShadowColor = ShadowColor;
+        _border.HighlightColor = HighlightColor;
+        _border.BorderThickness = BorderThickness;
+        _border.ContentBackgroundColor = DisplayBackgroundColor;
+        _border.IsVisible = ShowBorder;
     }
 
     /// <summary>

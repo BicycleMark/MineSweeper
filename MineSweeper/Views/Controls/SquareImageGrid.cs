@@ -1,6 +1,7 @@
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
+using Microsoft.Maui.Graphics;
 
 namespace MineSweeper.Views.Controls;
 
@@ -20,6 +21,56 @@ public class SquareImageGrid : ContentView
         typeof(SquareImageGrid),
         defaultValue: 5,
         propertyChanged: OnGridSizeChanged);
+        
+    /// <summary>
+    /// Bindable property for the highlight color of the 3D border (bottom and right edges for recessed look).
+    /// </summary>
+    public static readonly BindableProperty HighlightColorProperty = BindableProperty.Create(
+        nameof(HighlightColor),
+        typeof(Color),
+        typeof(SquareImageGrid),
+        defaultValue: Colors.LightGray,
+        propertyChanged: OnBorderPropertyChanged);
+        
+    /// <summary>
+    /// Bindable property for the shadow color of the 3D border (top and left edges for recessed look).
+    /// </summary>
+    public static readonly BindableProperty ShadowColorProperty = BindableProperty.Create(
+        nameof(ShadowColor),
+        typeof(Color),
+        typeof(SquareImageGrid),
+        defaultValue: Colors.DimGray,
+        propertyChanged: OnBorderPropertyChanged);
+        
+    /// <summary>
+    /// Bindable property for whether to show the 3D border effect.
+    /// </summary>
+    public static readonly BindableProperty ShowBorderProperty = BindableProperty.Create(
+        nameof(ShowBorder),
+        typeof(bool),
+        typeof(SquareImageGrid),
+        defaultValue: true,
+        propertyChanged: OnBorderPropertyChanged);
+        
+    /// <summary>
+    /// Bindable property for the thickness of the border.
+    /// </summary>
+    public static readonly BindableProperty BorderThicknessProperty = BindableProperty.Create(
+        nameof(BorderThickness),
+        typeof(int),
+        typeof(SquareImageGrid),
+        defaultValue: 6,
+        propertyChanged: OnBorderPropertyChanged);
+        
+    /// <summary>
+    /// Bindable property for whether the border appears recessed (true) or raised (false).
+    /// </summary>
+    public static readonly BindableProperty IsRecessedProperty = BindableProperty.Create(
+        nameof(IsRecessed),
+        typeof(bool),
+        typeof(SquareImageGrid),
+        defaultValue: true,
+        propertyChanged: OnBorderPropertyChanged);
     
     /// <summary>
     /// Gets or sets the size of the grid (number of rows and columns).
@@ -28,6 +79,51 @@ public class SquareImageGrid : ContentView
     {
         get => (int)GetValue(GridSizeProperty);
         set => SetValue(GridSizeProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets the highlight color of the 3D border (bottom and right edges for recessed look).
+    /// </summary>
+    public Color HighlightColor
+    {
+        get => (Color)GetValue(HighlightColorProperty);
+        set => SetValue(HighlightColorProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets the shadow color of the 3D border (top and left edges for recessed look).
+    /// </summary>
+    public Color ShadowColor
+    {
+        get => (Color)GetValue(ShadowColorProperty);
+        set => SetValue(ShadowColorProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets whether to show the 3D border effect.
+    /// </summary>
+    public bool ShowBorder
+    {
+        get => (bool)GetValue(ShowBorderProperty);
+        set => SetValue(ShowBorderProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets the thickness of the border.
+    /// </summary>
+    public int BorderThickness
+    {
+        get => (int)GetValue(BorderThicknessProperty);
+        set => SetValue(BorderThicknessProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets whether the border appears recessed (true) or raised (false).
+    /// </summary>
+    public bool IsRecessed
+    {
+        get => (bool)GetValue(IsRecessedProperty);
+        set => SetValue(IsRecessedProperty, value);
     }
     
     /// <summary>
@@ -42,8 +138,21 @@ public class SquareImageGrid : ContentView
         }
     }
     
+    /// <summary>
+    /// Called when any of the border properties change.
+    /// </summary>
+    private static void OnBorderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is SquareImageGrid grid)
+        {
+            // Update the border appearance
+            grid.UpdateBorderAppearance();
+        }
+    }
+    
     private readonly Grid _grid;
-    private AbsoluteLayout _container = new();
+    private readonly AbsoluteLayout _container;
+    private readonly ChiseledBorder _border;
     private View[,]? _images;
     
     /// <summary>
@@ -118,8 +227,22 @@ public class SquareImageGrid : ContentView
         AbsoluteLayout.SetLayoutFlags(_grid, AbsoluteLayoutFlags.All);
         _container.Children.Add(_grid);
         
-        // Set the content to the container
-        Content = _container;
+        // Create the chiseled border with the container as content
+        _border = new ChiseledBorder
+        {
+            ShadowColor = ShadowColor,
+            HighlightColor = HighlightColor,
+            BorderThickness = BorderThickness,
+            ContentBackgroundColor = Colors.Transparent,
+            IsRecessed = IsRecessed,
+            Content = _container,
+            IsVisible = ShowBorder,
+            HorizontalOptions = LayoutOptions.Fill,
+            VerticalOptions = LayoutOptions.Fill
+        };
+        
+        // Set the content to the border
+        Content = _border;
         
         // Set default properties
         BackgroundColor = Colors.Transparent;
@@ -133,6 +256,22 @@ public class SquareImageGrid : ContentView
         // Add event handlers
         SizeChanged += OnSizeChanged;
         Loaded += OnLoaded;
+    }
+    
+    /// <summary>
+    /// Updates the border appearance based on the current property values.
+    /// </summary>
+    private void UpdateBorderAppearance()
+    {
+        if (_border == null)
+            return;
+            
+        // Update the border properties
+        _border.ShadowColor = ShadowColor;
+        _border.HighlightColor = HighlightColor;
+        _border.BorderThickness = BorderThickness;
+        _border.IsRecessed = IsRecessed;
+        _border.IsVisible = ShowBorder;
     }
     
     /// <summary>
@@ -241,7 +380,7 @@ public class SquareImageGrid : ContentView
     }
     
     /// <summary>
-    /// Updates the layout to ensure the grid is square and centered.
+    /// Updates the layout to ensure the grid is square and centered, with tighter spacing to the border.
     /// </summary>
     private void UpdateLayout()
     {
@@ -255,16 +394,20 @@ public class SquareImageGrid : ContentView
             // Use the minimum dimension to ensure the grid is square
             double size = Math.Min(availableWidth, availableHeight);
             
+            // Adjust the size to be closer to the border (90% of available space)
+            // This makes the grid take up more space, bringing it closer to the border
+            double adjustedSize = size * 0.9;
+            
             // Calculate the position to center the grid
-            double x = (availableWidth - size) / 2;
-            double y = (availableHeight - size) / 2;
+            double x = (availableWidth - adjustedSize) / 2;
+            double y = (availableHeight - adjustedSize) / 2;
             
             // Update the grid's position and size
-            AbsoluteLayout.SetLayoutBounds(_grid, new Rect(x, y, size, size));
+            AbsoluteLayout.SetLayoutBounds(_grid, new Rect(x, y, adjustedSize, adjustedSize));
             AbsoluteLayout.SetLayoutFlags(_grid, AbsoluteLayoutFlags.None);
             
             // Log the size for debugging
-            System.Diagnostics.Debug.WriteLine($"SquareImageGrid: Setting size to {size}x{size} at position ({x},{y})");
+            System.Diagnostics.Debug.WriteLine($"SquareImageGrid: Setting size to {adjustedSize}x{adjustedSize} at position ({x},{y})");
         }
         else
         {

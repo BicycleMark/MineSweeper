@@ -51,32 +51,130 @@
         
         <!-- Image Grid -->
         <Grid Grid.Row="2">
-            <Border Stroke="Blue"
-                    StrokeThickness="3"
-                    StrokeDashArray="2,2"
-                    BackgroundColor="#EEEEEE"
-                    Padding="10"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill">
-                <controls:SquareImageGrid x:Name="imageGrid"
-                                         HorizontalOptions="Fill"
-                                         VerticalOptions="Fill" />
-            </Border>
+            <controls:SquareImageGrid x:Name="imageGrid"
+                                     HorizontalOptions="Fill"
+                                     VerticalOptions="Fill"
+                                     ShowBorder="True"
+                                     BorderThickness="6"
+                                     ShadowColor="DimGray"
+                                     HighlightColor="LightGray"
+                                     IsRecessed="True" />
             
-            <!-- Debug overlay to show the available space -->
-            <Rectangle Stroke="Red" 
-                       StrokeThickness="1" 
-                       StrokeDashArray="5,5"
-                       Fill="Transparent"
-                       HorizontalOptions="Fill"
-                       VerticalOptions="Fill" />
+            <!-- Debug overlay removed -->
+        </Grid>
+        
+        <!-- Border Controls -->
+        <Grid Grid.Row="3" Margin="0,20,0,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <!-- Border Thickness and Show Border -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <!-- Border Thickness -->
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Column="0" 
+                           Text="Border Thickness:" 
+                           VerticalOptions="Center" />
+                    
+                    <Slider Grid.Column="1"
+                            x:Name="borderThicknessSlider"
+                            Minimum="1"
+                            Maximum="8"
+                            Value="6"
+                            ValueChanged="OnBorderThicknessChanged"
+                            Margin="10,0"
+                            VerticalOptions="Center" />
+                    
+                    <Label Grid.Column="2" 
+                           x:Name="borderThicknessLabel"
+                           Text="6"
+                           VerticalOptions="Center" />
+                </Grid>
+                
+                <!-- Show Border and Is Recessed -->
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <HorizontalStackLayout Grid.Column="0" 
+                                          Spacing="10" 
+                                          HorizontalOptions="Center">
+                        <Label Text="Show Border:" 
+                               VerticalOptions="Center" />
+                        <Switch x:Name="showBorderSwitch"
+                                IsToggled="True"
+                                Toggled="OnShowBorderToggled"
+                                VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    
+                    <HorizontalStackLayout Grid.Column="1" 
+                                          Spacing="10" 
+                                          HorizontalOptions="Center">
+                        <Label Text="Is Recessed:" 
+                               VerticalOptions="Center" />
+                        <Switch x:Name="isRecessedSwitch"
+                                IsToggled="True"
+                                Toggled="OnIsRecessedToggled"
+                                VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Grid>
+            
+            <!-- Border Colors -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <!-- Shadow Color -->
+                <HorizontalStackLayout Grid.Column="0" 
+                                      Spacing="10" 
+                                      HorizontalOptions="Center">
+                    <Label Text="Shadow Color:" 
+                           VerticalOptions="Center" />
+                    <Button x:Name="shadowColorButton"
+                            WidthRequest="30"
+                            HeightRequest="30"
+                            BackgroundColor="DimGray"
+                            Clicked="OnShadowColorClicked" />
+                </HorizontalStackLayout>
+                
+                <!-- Highlight Color -->
+                <HorizontalStackLayout Grid.Column="1" 
+                                      Spacing="10" 
+                                      HorizontalOptions="Center">
+                    <Label Text="Highlight Color:" 
+                           VerticalOptions="Center" />
+                    <Button x:Name="highlightColorButton"
+                            WidthRequest="30"
+                            HeightRequest="30"
+                            BackgroundColor="LightGray"
+                            Clicked="OnHighlightColorClicked" />
+                </HorizontalStackLayout>
+            </Grid>
         </Grid>
         
         <!-- Size Buttons -->
-        <HorizontalStackLayout Grid.Row="3" 
+        <HorizontalStackLayout Grid.Row="4" 
                               Spacing="10" 
                               HorizontalOptions="Center"
-                              Margin="0,20,0,10">
+                              Margin="0,10,0,10">
             <Button Text="3x3" Clicked="OnSize3Clicked" />
             <Button Text="5x5" Clicked="OnSize5Clicked" />
             <Button Text="8x8" Clicked="OnSize8Clicked" />
@@ -85,7 +183,7 @@
         </HorizontalStackLayout>
         
         <!-- Footer with status -->
-        <Label Grid.Row="4" 
+        <Label Grid.Row="5" 
                x:Name="statusLabel"
                Text="Adjust the grid size using the slider or buttons" 
                HorizontalOptions="Center" 

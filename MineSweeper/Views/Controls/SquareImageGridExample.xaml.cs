@@ -1,5 +1,6 @@
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Xaml;
+using Microsoft.Maui.Graphics;
 
 namespace MineSweeper.Views.Controls;
 
@@ -28,6 +29,14 @@ public partial class SquareImageGridExample : ContentPage
         var tapGestureRecognizer = new TapGestureRecognizer();
         tapGestureRecognizer.Tapped += OnGridTapped;
         imageGrid.GestureRecognizers.Add(tapGestureRecognizer);
+        
+        // Initialize the border controls
+        borderThicknessSlider.Value = imageGrid.BorderThickness;
+        borderThicknessLabel.Text = imageGrid.BorderThickness.ToString();
+        showBorderSwitch.IsToggled = imageGrid.ShowBorder;
+        isRecessedSwitch.IsToggled = imageGrid.IsRecessed;
+        shadowColorButton.BackgroundColor = imageGrid.ShadowColor;
+        highlightColorButton.BackgroundColor = imageGrid.HighlightColor;
     }
     
     /// <summary>
@@ -158,5 +167,129 @@ public partial class SquareImageGridExample : ContentPage
         
         // Update the status label
         statusLabel.Text = $"Updated cell at [{row}, {col}] using indexer";
+    }
+    
+    /// <summary>
+    /// Handles the border thickness slider value changed event.
+    /// </summary>
+    private void OnBorderThicknessChanged(object sender, ValueChangedEventArgs e)
+    {
+        // Get the new border thickness
+        int borderThickness = (int)Math.Round(e.NewValue);
+        
+        // Update the grid
+        imageGrid.BorderThickness = borderThickness;
+        
+        // Update the label
+        borderThicknessLabel.Text = borderThickness.ToString();
+        
+        // Update the status label
+        statusLabel.Text = $"Border thickness changed to {borderThickness}";
+    }
+    
+    /// <summary>
+    /// Handles the show border switch toggled event.
+    /// </summary>
+    private void OnShowBorderToggled(object sender, ToggledEventArgs e)
+    {
+        // Update the grid
+        imageGrid.ShowBorder = e.Value;
+        
+        // Update the status label
+        statusLabel.Text = $"Show border set to {e.Value}";
+    }
+    
+    /// <summary>
+    /// Handles the is recessed switch toggled event.
+    /// </summary>
+    private void OnIsRecessedToggled(object sender, ToggledEventArgs e)
+    {
+        // Update the grid
+        imageGrid.IsRecessed = e.Value;
+        
+        // Update the status label
+        statusLabel.Text = $"Is recessed set to {e.Value}";
+    }
+    
+    /// <summary>
+    /// Handles the shadow color button click event.
+    /// </summary>
+    private void OnShadowColorClicked(object sender, EventArgs e)
+    {
+        // Rotate through some common shadow colors
+        Color[] colors = new Color[]
+        {
+            Colors.DimGray, // Default
+            Colors.Black,
+            Colors.DarkGray,
+            Colors.DarkBlue,
+            Colors.DarkGreen,
+            Colors.DarkRed
+        };
+        
+        // Find the current color in the array
+        int currentIndex = -1;
+        for (int i = 0; i < colors.Length; i++)
+        {
+            if (imageGrid.ShadowColor.ToHex() == colors[i].ToHex())
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // Move to the next color
+        int nextIndex = (currentIndex + 1) % colors.Length;
+        Color newColor = colors[nextIndex];
+        
+        // Update the grid
+        imageGrid.ShadowColor = newColor;
+        
+        // Update the button
+        shadowColorButton.BackgroundColor = newColor;
+        
+        // Update the status label
+        statusLabel.Text = $"Shadow color changed to {newColor.ToHex()}";
+    }
+    
+    /// <summary>
+    /// Handles the highlight color button click event.
+    /// </summary>
+    private void OnHighlightColorClicked(object sender, EventArgs e)
+    {
+        // Rotate through some common highlight colors
+        Color[] colors = new Color[]
+        {
+            Colors.LightGray, // Default
+            Colors.White,
+            Colors.Silver,
+            Colors.LightBlue,
+            Colors.LightGreen,
+            Colors.LightYellow
+        };
+        
+        // Find the current color in the array
+        int currentIndex = -1;
+        for (int i = 0; i < colors.Length; i++)
+        {
+            if (imageGrid.HighlightColor.ToHex() == colors[i].ToHex())
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        // Move to the next color
+        int nextIndex = (currentIndex + 1) % colors.Length;
+        Color newColor = colors[nextIndex];
+        
+        // Update the grid
+        imageGrid.HighlightColor = newColor;
+        
+        // Update the button
+        highlightColorButton.BackgroundColor = newColor;
+        
+        // Update the status label
+        statusLabel.Text = $"Highlight color changed to {newColor.ToHex()}";
     }
 }
