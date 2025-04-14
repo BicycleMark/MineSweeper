@@ -49,7 +49,7 @@
     
     <!-- Main Page (Default) - This is the initial page shown but not in flyout menu -->
     <ShellContent
-        Title="Main"
+        Title="Mine Sweeper"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage"
         FlyoutItemIsVisible="False" />

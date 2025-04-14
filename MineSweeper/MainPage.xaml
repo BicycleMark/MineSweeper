@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
@@ -115,40 +116,6 @@
             </VerticalStackLayout>
         </Grid>
 
-        <!-- Game Title and Button Row -->
-        <HorizontalStackLayout Grid.Row="0" 
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"
-                               Spacing="10"
-                               Margin="0,0,0,16">
-            <Label Text="MineSweeper"
-                   FontSize="28" 
-                   FontAttributes="Bold"
-                   VerticalOptions="Center"
-                   TextColor="{AppThemeBinding Light={StaticResource MidnightBlue}, Dark=White}" />
-           <!--
-            <Button WidthRequest="40" 
-                    HeightRequest="40"
-                    Padding="0"
-                    VerticalOptions="Center"
-                    Text ="H">
-               
-            </Button>
-            -->
-            <Button x:Name="HelpButton"
-                    WidthRequest="40" 
-                    HeightRequest="40"
-                    Padding="0"
-                    VerticalOptions="Center"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                    BorderColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
-                    BorderWidth="1"
-                    TextColor="White"
-                    ImageSource="unplayed.png"
-                    Clicked="OnHelpButtonClicked">
-            </Button>
-        </HorizontalStackLayout>
-
         <!-- Game Info Panel -->
         <Grid Grid.Row="1" Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
@@ -180,9 +147,6 @@
                 </HorizontalStackLayout>
             </Border>
         </Grid>
-
-
-        
         <!-- Game Grid -->
         <Grid Grid.Row="2">
             <Border Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
@@ -192,9 +156,9 @@
                     HorizontalOptions="Fill"
                     VerticalOptions="Fill">
                 <controls:SquareImageGrid x:Name="GameGrid"
-                                         HorizontalOptions="Fill"
-                                         VerticalOptions="Fill"
-                                         GridSize="{Binding Rows}" />
+                                          HorizontalOptions="Fill"
+                                          VerticalOptions="Fill"
+                                          GridSize="{Binding Rows}" />
             </Border>
         </Grid>
 
@@ -204,37 +168,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
-            <!-- Instructions -->
-            <VerticalStackLayout Grid.Row="0" Spacing="4" Margin="0,0,0,16"
-                                 IsVisible="{Binding IsGridFullyLoaded, Converter={StaticResource BoolConverter}}">
-                <Label Text="Tap to reveal a cell"
-                       HorizontalOptions="Center"
-                       Style="{StaticResource GameLabelStyle}" />
-                <Label Text="Double-tap to flag a mine"
-                       HorizontalOptions="Center"
-                       Style="{StaticResource GameLabelStyle}" />
-            </VerticalStackLayout>
-            
-            <!-- Controls -->
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                
-                <Button Grid.Column="0"
-                        Text="Square Image Grid Example"
-                        Clicked="OnSquareImageGridExampleClicked"
-                        Style="{StaticResource GameButtonStyle}"
-                        HorizontalOptions="Center" />
-                        
-                <Button Grid.Column="1"
-                        Text="LED Control Example"
-                        Clicked="OnLedControlExampleClicked"
-                        Style="{StaticResource GameButtonStyle}"
-                        HorizontalOptions="Center" />
-            </Grid>
+
+
         </Grid>
     </Grid>
 </ContentPage>
