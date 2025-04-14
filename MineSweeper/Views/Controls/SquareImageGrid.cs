@@ -394,20 +394,16 @@ public class SquareImageGrid : ContentView
             // Use the minimum dimension to ensure the grid is square
             double size = Math.Min(availableWidth, availableHeight);
             
-            // Adjust the size to be closer to the border (90% of available space)
+            // Adjust the size to be closer to the border (95% of available space)
             // This makes the grid take up more space, bringing it closer to the border
-            double adjustedSize = size * 0.9;
+            double adjustedSize = size * 0.95;
             
-            // Calculate the position to center the grid
-            double x = (availableWidth - adjustedSize) / 2;
-            double y = (availableHeight - adjustedSize) / 2;
-            
-            // Update the grid's position and size
-            AbsoluteLayout.SetLayoutBounds(_grid, new Rect(x, y, adjustedSize, adjustedSize));
-            AbsoluteLayout.SetLayoutFlags(_grid, AbsoluteLayoutFlags.None);
+            // Center the grid using proportional positioning
+            AbsoluteLayout.SetLayoutBounds(_grid, new Rect(0.5, 0.5, adjustedSize, adjustedSize));
+            AbsoluteLayout.SetLayoutFlags(_grid, AbsoluteLayoutFlags.PositionProportional);
             
             // Log the size for debugging
-            System.Diagnostics.Debug.WriteLine($"SquareImageGrid: Setting size to {adjustedSize}x{adjustedSize} at position ({x},{y})");
+            System.Diagnostics.Debug.WriteLine($"SquareImageGrid: Setting size to {adjustedSize}x{adjustedSize} centered proportionally");
         }
         else
         {
