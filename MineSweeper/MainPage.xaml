@@ -160,12 +160,7 @@
             <!-- Mines Counter -->
             <Border Grid.Column="0" Style="{StaticResource GameInfoPanelStyle}" Margin="0,0,8,0">
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
-                    <Label Text="💣" FontSize="20" VerticalOptions="Center" />
-                    <Label Text="{Binding RemainingMines}"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           VerticalOptions="Center"
-                           TextColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Secondary}}" />
+                    <controls:LedControl Value="{Binding Mines}"></controls:LedControl>
                 </HorizontalStackLayout>
             </Border>
 
@@ -181,35 +176,12 @@
             <!-- Timer -->
             <Border Grid.Column="2" Style="{StaticResource GameInfoPanelStyle}" Margin="8,0,0,0">
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
-                    <Label Text="⏱️" FontSize="20" VerticalOptions="Center" />
-                    <Label Text="{Binding GameTime}"
-                           FontSize="20"
-                           FontAttributes="Bold"
-                           VerticalOptions="Center"
-                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}" />
+                    <controls:LedControl Value="{Binding Time}"></controls:LedControl>
                 </HorizontalStackLayout>
             </Border>
         </Grid>
 
-        <!-- 
-        <Grid Grid.Row="2" HorizontalOptions="Center" VerticalOptions="Center">
-            <Border Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
-                    StrokeThickness="2"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource MidnightBlue}}"
-                    Padding="4"
-                    WidthRequest="400"
-                    HeightRequest="400"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    Margin="0,0,0,16"
-                    Shadow="{Shadow Brush={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Offset='0,4', Radius='8', Opacity='0.2'}">
-            
-                <controls:BasicImageGrid x:Name="GameGrid" 
-                                        HorizontalOptions="Fill" 
-                                        VerticalOptions="Fill" />
-            </Border>
-        </Grid>
-        -->
+
         
         <!-- Game Grid -->
         <Grid Grid.Row="2">
