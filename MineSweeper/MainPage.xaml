@@ -68,8 +68,9 @@
     </ContentPage.Resources>
 
     <Grid
-        BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, Dark={StaticResource GameBackgroundDark}}"
-        Padding="16">
+        BackgroundColor="{AppThemeBinding Light={StaticResource GameBackground}, 
+        Dark={StaticResource GameBackgroundDark}}"
+        Padding="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -116,50 +117,81 @@
             </VerticalStackLayout>
         </Grid>
 
-        <!-- Game Info Panel -->
-        <Grid Grid.Row="1" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- Mines Counter -->
-            <Border Grid.Column="0" Style="{StaticResource GameInfoPanelStyle}" Margin="0,0,8,0">
-                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
-                    <controls:LedControl Value="{Binding Mines}"></controls:LedControl>
-                </HorizontalStackLayout>
-            </Border>
-
-            <!-- Game Status -->
-            <Border Grid.Column="1" Style="{StaticResource GameInfoPanelStyle}" Margin="4,0,4,0">
-                <Label Text="{Binding GameStatus}"
-                       FontSize="16"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       Style="{StaticResource GameLabelStyle}" />
-            </Border>
-
-            <!-- Timer -->
-            <Border Grid.Column="2" Style="{StaticResource GameInfoPanelStyle}" Margin="8,0,0,0">
-                <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
-                    <controls:LedControl Value="{Binding Time}"></controls:LedControl>
-                </HorizontalStackLayout>
-            </Border>
-        </Grid>
-        <!-- Game Grid -->
-        <Grid Grid.Row="2">
-            <Border Stroke="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}"
-                    StrokeThickness="2"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource MidnightBlue}}"
-                    Padding="4"
+        <!-- Game Info Panel with ChiseledBorder -->
+        <Grid Grid.Row="1" Margin="4,4,4,16">
+            <!-- Chiseled Border using GraphicsView -->
+            <GraphicsView x:Name="TopPanelBorder"
+                         HorizontalOptions="Fill"
+                         VerticalOptions="Fill"
+                         BackgroundColor="Transparent" />
+            
+            <!-- Background -->
+            <BoxView BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
+                    Margin="8"
                     HorizontalOptions="Fill"
-                    VerticalOptions="Fill">
-                <controls:SquareImageGrid x:Name="GameGrid"
-                                          HorizontalOptions="Fill"
-                                          VerticalOptions="Fill"
-                                          GridSize="{Binding Rows}" />
-            </Border>
+                    VerticalOptions="Fill" />
+            
+            <!-- Content -->
+            <Grid Margin="18" Padding="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Mines Counter -->
+                <controls:LedControl Grid.Column="0" 
+                                    BorderThickness="2" 
+                                    Value="{Binding Mines}"
+                                    ShowBorder="True"
+                                    SizeScale="1.2"
+                                    DisplayBackgroundColor="#222222"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+
+                <!-- Game Status -->
+                <Label Text="{Binding GameStatus}"
+                       Grid.Column="1"
+                       FontSize="16"
+                       FontAttributes="Bold"                                                                                                      
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Style="{StaticResource GameLabelStyle}" />
+                
+                <!-- Timer -->
+                <controls:LedControl Grid.Column="2" 
+                                    BorderThickness="2" 
+                                    Value="{Binding Time}"
+                                    ShowBorder="True"
+                                    SizeScale="1.2"
+                                    DisplayBackgroundColor="#222222"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+            </Grid>
+        </Grid>
+        
+        <!-- Game Grid with ChiseledBorder -->
+        <Grid Grid.Row="2">
+            <controls:ChiseledBorder ShadowColor="{AppThemeBinding Light=DimGray, Dark=Black}"
+                                    HighlightColor="{AppThemeBinding Light=LightGray, Dark=#444444}"
+                                    BorderThickness="6"
+                                    ContentBackgroundColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource MidnightBlue}}"
+                                    IsRecessed="True"
+                                    Margin="4,0,4,0"
+                                    Padding="4"
+                                    HorizontalOptions="Fill"
+                                    VerticalOptions="Fill">
+                <!-- Keep the original Border inside for compatibility -->
+                <Border BackgroundColor="Transparent"
+                        Padding="0"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill">
+                    <controls:SquareImageGrid x:Name="GameGrid"
+                                              HorizontalOptions="Fill"
+                                              VerticalOptions="Fill"
+                                              GridSize="{Binding Rows}" />
+                </Border>
+            </controls:ChiseledBorder>
         </Grid>
 
         <!-- Instructions and Controls -->

@@ -40,10 +40,15 @@ public class ChiseledBorderDrawable : IDrawable
         Color topLeftColor = IsRecessed ? ShadowColor : HighlightColor;
         Color bottomRightColor = IsRecessed ? HighlightColor : ShadowColor;
         
+        // Clear the canvas with a transparent color to ensure we're drawing on a clean surface
+        canvas.FillColor = Colors.Transparent;
+        canvas.FillRectangle(0, 0, width, height);
+        
         // Draw the beveled edge (3D chiseled effect)
         for (int i = 0; i < BorderThickness; i++)
         {
-            canvas.StrokeSize = 1;
+            // Use a thicker stroke for better visibility
+            canvas.StrokeSize = 2;
             
             // Top shadow/highlight line
             canvas.StrokeColor = topLeftColor;
@@ -55,11 +60,31 @@ public class ChiseledBorderDrawable : IDrawable
             
             // Bottom highlight/shadow line
             canvas.StrokeColor = bottomRightColor;
-            canvas.DrawLine(i, height - i - 1, width - i - 1, height - i - 1);
+            canvas.DrawLine(i, height - i - 1, width - i, height - i - 1);
             
             // Right highlight/shadow line
             canvas.StrokeColor = bottomRightColor;
-            canvas.DrawLine(width - i - 1, i, width - i - 1, height - i - 1);
+            canvas.DrawLine(width - i - 1, i, width - i - 1, height - i);
+        }
+        
+        // Draw corner pixels to ensure clean corners
+        for (int i = 0; i < BorderThickness; i++)
+        {
+            // Top-left corner
+            canvas.StrokeColor = topLeftColor;
+            canvas.DrawLine(i, i, i, i);
+            
+            // Top-right corner
+            canvas.StrokeColor = IsRecessed ? topLeftColor : bottomRightColor;
+            canvas.DrawLine(width - i - 1, i, width - i - 1, i);
+            
+            // Bottom-left corner
+            canvas.StrokeColor = IsRecessed ? bottomRightColor : topLeftColor;
+            canvas.DrawLine(i, height - i - 1, i, height - i - 1);
+            
+            // Bottom-right corner
+            canvas.StrokeColor = bottomRightColor;
+            canvas.DrawLine(width - i - 1, height - i - 1, width - i - 1, height - i - 1);
         }
     }
 }

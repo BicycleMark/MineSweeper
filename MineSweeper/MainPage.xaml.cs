@@ -33,8 +33,38 @@ public partial class MainPage : ContentPage
         // Set the help button image programmatically
        // SetHelpButtonImage();
         
+        // Set up the chiseled border for the top panel
+        SetupTopPanelBorder();
+        
         // Start a new game when the page is loaded
         Loaded += OnPageLoaded;
+    }
+    
+    /// <summary>
+    /// Sets up the chiseled border for the top panel.
+    /// </summary>
+    private void SetupTopPanelBorder()
+    {
+        try
+        {
+            // Create a new ChiseledBorderDrawable for the top panel
+            var borderDrawable = new ChiseledBorderDrawable
+            {
+                BorderThickness = 8,
+                ShadowColor = Colors.Black,
+                HighlightColor = Colors.White,
+                IsRecessed = true
+            };
+            
+            // Set the drawable for the top panel border
+            TopPanelBorder.Drawable = borderDrawable;
+            
+            System.Diagnostics.Debug.WriteLine("Top panel border set up successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error setting up top panel border: {ex}");
+        }
     }
     
     private void SetHelpButtonImage()

@@ -128,7 +128,8 @@ public class ChiseledBorder : ContentView
         {
             Drawable = _borderDrawable,
             HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.Fill
+            VerticalOptions = LayoutOptions.Fill,
+            BackgroundColor = Colors.Transparent
         };
         
         // Create the background
@@ -144,7 +145,9 @@ public class ChiseledBorder : ContentView
         {
             HorizontalOptions = LayoutOptions.Fill,
             VerticalOptions = LayoutOptions.Fill,
-            Padding = 0
+            Padding = 0,
+            RowSpacing = 0,
+            ColumnSpacing = 0
         };
         
         // Add elements to the grid
@@ -162,6 +165,18 @@ public class ChiseledBorder : ContentView
         
         // Update appearance
         UpdateBorderAppearance();
+        
+        // Add a handler for the SizeChanged event to ensure the border is redrawn when the size changes
+        SizeChanged += OnSizeChanged;
+    }
+    
+    /// <summary>
+    /// Handles the SizeChanged event.
+    /// </summary>
+    private void OnSizeChanged(object sender, EventArgs e)
+    {
+        // Force a redraw of the border when the size changes
+        _borderGraphics.Invalidate();
     }
     
     /// <summary>
@@ -227,5 +242,9 @@ public class ChiseledBorder : ContentView
         
         // Request redraw
         _borderGraphics.Invalidate();
+        
+        // Force a layout update
+        InvalidateMeasure();
+        InvalidateLayout();
     }
 }
