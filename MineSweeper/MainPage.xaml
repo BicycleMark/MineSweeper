@@ -118,7 +118,7 @@
         </Grid>
 
         <!-- Game Info Panel with ChiseledBorder -->
-        <Grid Grid.Row="1" Margin="4,4,4,16">
+        <Grid Grid.Row="1" Margin="8,4,8,0">
             <!-- Chiseled Border using GraphicsView -->
             <GraphicsView x:Name="TopPanelBorder"
                          HorizontalOptions="Fill"
@@ -127,12 +127,12 @@
             
             <!-- Background -->
             <BoxView BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
-                    Margin="8"
+                    Margin="6"
                     HorizontalOptions="Fill"
                     VerticalOptions="Fill" />
             
             <!-- Content -->
-            <Grid Margin="18" Padding="0">
+            <Grid Margin="10" Padding="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />

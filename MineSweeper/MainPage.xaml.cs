@@ -47,17 +47,24 @@ public partial class MainPage : ContentPage
     {
         try
         {
+            // Get the current app theme
+            var isDarkTheme = Application.Current?.RequestedTheme == AppTheme.Dark;
+            
             // Create a new ChiseledBorderDrawable for the top panel
             var borderDrawable = new ChiseledBorderDrawable
             {
-                BorderThickness = 8,
-                ShadowColor = Colors.Black,
-                HighlightColor = Colors.White,
+                BorderThickness = 6,
+                // Match the colors used in the game grid's ChiseledBorder
+                ShadowColor = isDarkTheme ? Colors.Black : Colors.DimGray,
+                HighlightColor = isDarkTheme ? Color.FromArgb("#444444") : Colors.LightGray,
                 IsRecessed = true
             };
             
             // Set the drawable for the top panel border
             TopPanelBorder.Drawable = borderDrawable;
+            
+            // Force a redraw
+            TopPanelBorder.Invalidate();
             
             System.Diagnostics.Debug.WriteLine("Top panel border set up successfully");
         }
