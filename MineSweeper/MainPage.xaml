@@ -141,10 +141,11 @@
 
                 <!-- Mines Counter -->
                 <controls:LedControl Grid.Column="0" 
+                                     Margin="2"
                                     BorderThickness="2" 
                                     Value="{Binding Mines}"
                                     ShowBorder="True"
-                                    SizeScale="1.2"
+                                    SizeScale="1.0"
                                     DisplayBackgroundColor="#222222"
                                     HorizontalOptions="Center"
                                     VerticalOptions="Center" />
@@ -161,9 +162,10 @@
                 <!-- Timer -->
                 <controls:LedControl Grid.Column="2" 
                                     BorderThickness="2" 
+                                    Margin="2"
                                     Value="{Binding Time}"
                                     ShowBorder="True"
-                                    SizeScale="1.2"
+                                    SizeScale="1.0"
                                     DisplayBackgroundColor="#222222"
                                     HorizontalOptions="Center"
                                     VerticalOptions="Center" />
