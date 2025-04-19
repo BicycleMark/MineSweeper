@@ -178,10 +178,7 @@ public partial class MainPage : ContentPage
                 }
             };
             
-            // Add tap gesture recognizer to handle cell taps
-            var tapGestureRecognizer = new TapGestureRecognizer();
-            tapGestureRecognizer.Tapped += OnGridCellTapped;
-            GameGrid.GestureRecognizers.Add(tapGestureRecognizer);
+            // The grid cell taps are now handled by the PlayCommand binding
             
             stopwatch.Stop();
             System.Diagnostics.Debug.WriteLine($"MainPage: Game creation completed in {stopwatch.ElapsedMilliseconds}ms");
@@ -193,14 +190,6 @@ public partial class MainPage : ContentPage
         }
     }
     
-    /// <summary>
-    /// Handles the tap event on a grid cell
-    /// </summary>
-    private void OnGridCellTapped(object? sender, TappedEventArgs e)
-    {
-        // Handle cell taps here
-        System.Diagnostics.Debug.WriteLine("Grid cell tapped");
-    }
     
     protected override void OnAppearing()
     {

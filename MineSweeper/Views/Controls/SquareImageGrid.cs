@@ -2,6 +2,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Graphics;
+using System.Windows.Input;
 
 namespace MineSweeper.Views.Controls;
 
@@ -71,6 +72,15 @@ public class SquareImageGrid : ContentView
         typeof(SquareImageGrid),
         defaultValue: true,
         propertyChanged: OnBorderPropertyChanged);
+        
+    /// <summary>
+    /// Bindable property for the play command that is executed when a cell is tapped.
+    /// </summary>
+    public static readonly BindableProperty PlayCommandProperty = BindableProperty.Create(
+        nameof(PlayCommand),
+        typeof(ICommand),
+        typeof(SquareImageGrid),
+        defaultValue: null);
     
     /// <summary>
     /// Gets or sets the size of the grid (number of rows and columns).
@@ -124,6 +134,16 @@ public class SquareImageGrid : ContentView
     {
         get => (bool)GetValue(IsRecessedProperty);
         set => SetValue(IsRecessedProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets the command to execute when a cell is tapped.
+    /// The command parameter will be a Point representing the row and column of the tapped cell.
+    /// </summary>
+    public ICommand PlayCommand
+    {
+        get => (ICommand)GetValue(PlayCommandProperty);
+        set => SetValue(PlayCommandProperty, value);
     }
     
     /// <summary>
@@ -359,6 +379,39 @@ public class SquareImageGrid : ContentView
             return _images[row, col];
         }
         return null;
+    }
+    
+    /// <summary>
+    /// Handles the tap event on a grid cell
+    /// </summary>
+    private void OnGridCellTapped(object? sender, TappedEventArgs e)
+    {
+        // Get the tapped position
+        if (e.GetPosition(this) is Point position)
+        {
+            // Calculate the cell size
+            double cellWidth = Width / Columns;
+            double cellHeight = Height / Rows;
+            
+            // Calculate the row and column
+            int row = (int)(position.Y / cellHeight);
+            int col = (int)(position.X / cellWidth);
+            
+            // Ensure the row and column are within bounds
+            if (row >= 0 && row < Rows && col >= 0 && col < Columns)
+            {
+                // Create a Point to represent the row and column
+                var cellPosition = new Point(col, row);
+                
+                // Execute the command if one is set
+                if (PlayCommand != null && PlayCommand.CanExecute(cellPosition))
+                {
+                    PlayCommand.Execute(cellPosition);
+                }
+                
+                System.Diagnostics.Debug.WriteLine($"Grid cell tapped at row {row}, column {col}");
+            }
+        }
     }
     
     /// <summary>

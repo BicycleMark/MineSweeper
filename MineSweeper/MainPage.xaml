@@ -154,6 +154,8 @@
                 <controls:GameStateControl 
                        Grid.Column="1"
                        Status="{Binding GameStatus}"
+                       Command="{Binding NewGameCommand}"
+                       CommandParameter="{Binding GameDifficulty}"
                        SizeScale="1.2"
                        BorderThickness="2"
                        ShowBorder="True"
@@ -193,7 +195,8 @@
                     <controls:SquareImageGrid x:Name="GameGrid"
                                               HorizontalOptions="Fill"
                                               VerticalOptions="Fill"
-                                              GridSize="{Binding Rows}" />
+                                              GridSize="{Binding Rows}"
+                                              PlayCommand="{Binding PlayCommand}" />
                 </Border>
             </controls:ChiseledBorder>
         </Grid>
