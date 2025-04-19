@@ -3,6 +3,7 @@ using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Graphics;
 using System.Windows.Input;
+using System.Linq;
 
 namespace MineSweeper.Views.Controls;
 
@@ -81,6 +82,25 @@ public class SquareImageGrid : ContentView
         typeof(ICommand),
         typeof(SquareImageGrid),
         defaultValue: null);
+        
+    /// <summary>
+    /// Bindable property for the command that is executed when a piece is moved from one cell to another.
+    /// </summary>
+    public static readonly BindableProperty PlayFromToCommandProperty = BindableProperty.Create(
+        nameof(PlayFromToCommand),
+        typeof(ICommand),
+        typeof(SquareImageGrid),
+        defaultValue: null);
+        
+    /// <summary>
+    /// Bindable property for whether drag and drop is enabled.
+    /// </summary>
+    public static readonly BindableProperty IsDragDropEnabledProperty = BindableProperty.Create(
+        nameof(IsDragDropEnabled),
+        typeof(bool),
+        typeof(SquareImageGrid),
+        defaultValue: false,
+        propertyChanged: OnDragDropEnabledChanged);
     
     /// <summary>
     /// Gets or sets the size of the grid (number of rows and columns).
@@ -147,6 +167,25 @@ public class SquareImageGrid : ContentView
     }
     
     /// <summary>
+    /// Gets or sets the command to execute when a piece is moved from one cell to another.
+    /// The command parameter will be a PlayFromToRecord containing the source and destination points.
+    /// </summary>
+    public ICommand PlayFromToCommand
+    {
+        get => (ICommand)GetValue(PlayFromToCommandProperty);
+        set => SetValue(PlayFromToCommandProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets or sets whether drag and drop is enabled.
+    /// </summary>
+    public bool IsDragDropEnabled
+    {
+        get => (bool)GetValue(IsDragDropEnabledProperty);
+        set => SetValue(IsDragDropEnabledProperty, value);
+    }
+    
+    /// <summary>
     /// Called when the GridSize property changes.
     /// </summary>
     private static void OnGridSizeChanged(BindableObject bindable, object oldValue, object newValue)
@@ -170,10 +209,32 @@ public class SquareImageGrid : ContentView
         }
     }
     
+    /// <summary>
+    /// Called when the IsDragDropEnabled property changes.
+    /// </summary>
+    private static void OnDragDropEnabledChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is SquareImageGrid grid)
+        {
+            // Set up or tear down drag and drop based on the new value
+            if ((bool)newValue)
+            {
+                grid.SetupDragAndDrop();
+            }
+            else
+            {
+                grid.TearDownDragAndDrop();
+            }
+        }
+    }
+    
     private readonly Grid _grid;
     private readonly AbsoluteLayout _container;
     private readonly ChiseledBorder _border;
     private View[,]? _images;
+    
+    // Field to track the selected cell (the "from" position)
+    private Point? _selectedCell;
     
     /// <summary>
     /// Gets or sets the number of rows in the grid.
@@ -415,15 +476,43 @@ public class SquareImageGrid : ContentView
                 View tileView = _images[row, col];
                 
                 // Determine if it's a default tile (Rectangle with transparent fill)
-                bool isDefaultTile = tileView is Rectangle rectangle && 
-                                     rectangle.Fill is SolidColorBrush brush && 
-                                     brush.Color == Colors.Transparent;
+                bool isDefaultTile = IsDefaultTile(tileView);
                 
                 // Create a Point to represent the row and column
                 var cellPosition = new Point(col, row);
                 
-                // Execute the command if one is set
-                if (PlayCommand != null && PlayCommand.CanExecute(cellPosition))
+                // Handle drag and drop if enabled
+                if (IsDragDropEnabled && PlayFromToCommand != null)
+                {
+                    // Skip default/blank tiles for drag and drop
+                    if (!isDefaultTile)
+                    {
+                        if (_selectedCell == null)
+                        {
+                            // First tap - select the "from" cell
+                            _selectedCell = cellPosition;
+                            
+                            // Visual feedback could be added here
+                            System.Diagnostics.Debug.WriteLine($"Selected cell at {cellPosition}");
+                        }
+                        else
+                        {
+                            // Second tap - execute the command with from/to points
+                            var fromToRecord = new PlayFromToRecord(_selectedCell.Value, cellPosition);
+                            if (PlayFromToCommand.CanExecute(fromToRecord))
+                            {
+                                PlayFromToCommand.Execute(fromToRecord);
+                            }
+                            
+                            // Reset selection
+                            _selectedCell = null;
+                            
+                            System.Diagnostics.Debug.WriteLine($"Moved from {_selectedCell} to {cellPosition}");
+                        }
+                    }
+                }
+                // Otherwise, use the regular play command
+                else if (PlayCommand != null && PlayCommand.CanExecute(cellPosition))
                 {
                     PlayCommand.Execute(cellPosition);
                 }
@@ -437,6 +526,44 @@ public class SquareImageGrid : ContentView
                 System.Diagnostics.Debug.WriteLine($"Grid cell tapped at row {row}, column {col}, isDefaultTile: {isDefaultTile}");
             }
         }
+    }
+    
+    /// <summary>
+    /// Determines if a view is a default/blank tile.
+    /// </summary>
+    private bool IsDefaultTile(View view)
+    {
+        return view is Rectangle rectangle && 
+               rectangle.Fill is SolidColorBrush brush && 
+               brush.Color == Colors.Transparent;
+    }
+    
+    /// <summary>
+    /// Sets up drag and drop functionality.
+    /// </summary>
+    private void SetupDragAndDrop()
+    {
+        // For the simplified implementation, we'll use the existing tap gesture recognizer
+        // and track the selected cell to implement a "select source, then select destination" pattern
+        _selectedCell = null;
+    }
+    
+    /// <summary>
+    /// Tears down drag and drop functionality.
+    /// </summary>
+    private void TearDownDragAndDrop()
+    {
+        // Clear the selected cell
+        _selectedCell = null;
+    }
+    
+    /// <summary>
+    /// Clears the current cell selection.
+    /// </summary>
+    public void ClearSelection()
+    {
+        _selectedCell = null;
+        // Clear any visual selection indicators
     }
     
     /// <summary>
