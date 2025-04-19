@@ -168,7 +168,7 @@ public class SquareImageGrid : ContentView
     
     /// <summary>
     /// Gets or sets the command to execute when a piece is moved from one cell to another.
-    /// The command parameter will be a PlayFromToRecord containing the source and destination points.
+    /// The command parameter will be a PlayPointsSequence containing the sequence of points in the move.
     /// </summary>
     public ICommand PlayFromToCommand
     {
@@ -497,11 +497,11 @@ public class SquareImageGrid : ContentView
                         }
                         else
                         {
-                            // Second tap - execute the command with from/to points
-                            var fromToRecord = new PlayFromToRecord(_selectedCell.Value, cellPosition);
-                            if (PlayFromToCommand.CanExecute(fromToRecord))
+                            // Second tap - execute the command with the sequence of points
+                            var pointsSequence = new PlayPointsSequence(_selectedCell.Value, cellPosition);
+                            if (PlayFromToCommand.CanExecute(pointsSequence))
                             {
-                                PlayFromToCommand.Execute(fromToRecord);
+                                PlayFromToCommand.Execute(pointsSequence);
                             }
                             
                             // Reset selection

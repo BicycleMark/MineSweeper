@@ -92,8 +92,8 @@ For a more sophisticated drag-and-drop implementation using MAUI's native capabi
            var dropPosition = CalculateDropPosition(e.GetPosition(_grid));
            
            // Execute command
-           var record = new PlayFromToRecord(sourcePosition, dropPosition);
-           PlayFromToCommand?.Execute(record);
+           var pointsSequence = new PlayPointsSequence(sourcePosition, dropPosition);
+           PlayFromToCommand?.Execute(pointsSequence);
        }
    }
    ```
