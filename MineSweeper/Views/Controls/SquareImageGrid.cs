@@ -220,6 +220,12 @@ public class SquareImageGrid : ContentView
     public event EventHandler<GetCellImageEventArgs>? GetCellImage;
     
     /// <summary>
+    /// Event triggered when a tile is tapped.
+    /// Only fires for non-default tiles (tiles that are not blank).
+    /// </summary>
+    public event EventHandler<TileTappedEventArgs>? TileTapped;
+    
+    /// <summary>
     /// Initializes a new instance of the <see cref="SquareImageGrid"/> class.
     /// </summary>
     public SquareImageGrid()
@@ -276,6 +282,11 @@ public class SquareImageGrid : ContentView
         // Add event handlers
         SizeChanged += OnSizeChanged;
         Loaded += OnLoaded;
+        
+        // Add tap gesture recognizer to handle cell taps
+        var tapGestureRecognizer = new TapGestureRecognizer();
+        tapGestureRecognizer.Tapped += OnGridCellTapped;
+        _grid.GestureRecognizers.Add(tapGestureRecognizer);
     }
     
     /// <summary>
@@ -387,19 +398,27 @@ public class SquareImageGrid : ContentView
     private void OnGridCellTapped(object? sender, TappedEventArgs e)
     {
         // Get the tapped position
-        if (e.GetPosition(this) is Point position)
+        if (e.GetPosition(_grid) is Point position)
         {
             // Calculate the cell size
-            double cellWidth = Width / Columns;
-            double cellHeight = Height / Rows;
+            double cellWidth = _grid.Width / Columns;
+            double cellHeight = _grid.Height / Rows;
             
             // Calculate the row and column
             int row = (int)(position.Y / cellHeight);
             int col = (int)(position.X / cellWidth);
             
             // Ensure the row and column are within bounds
-            if (row >= 0 && row < Rows && col >= 0 && col < Columns)
+            if (row >= 0 && row < Rows && col >= 0 && col < Columns && _images != null)
             {
+                // Get the tapped view
+                View tileView = _images[row, col];
+                
+                // Determine if it's a default tile (Rectangle with transparent fill)
+                bool isDefaultTile = tileView is Rectangle rectangle && 
+                                     rectangle.Fill is SolidColorBrush brush && 
+                                     brush.Color == Colors.Transparent;
+                
                 // Create a Point to represent the row and column
                 var cellPosition = new Point(col, row);
                 
@@ -409,7 +428,13 @@ public class SquareImageGrid : ContentView
                     PlayCommand.Execute(cellPosition);
                 }
                 
-                System.Diagnostics.Debug.WriteLine($"Grid cell tapped at row {row}, column {col}");
+                // Raise the TileTapped event if it's not a default tile
+                if (!isDefaultTile && TileTapped != null)
+                {
+                    TileTapped.Invoke(this, new TileTappedEventArgs(row, col, tileView, isDefaultTile));
+                }
+                
+                System.Diagnostics.Debug.WriteLine($"Grid cell tapped at row {row}, column {col}, isDefaultTile: {isDefaultTile}");
             }
         }
     }
