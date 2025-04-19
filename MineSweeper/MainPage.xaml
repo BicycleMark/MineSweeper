@@ -151,13 +151,15 @@
                                     VerticalOptions="Center" />
 
                 <!-- Game Status -->
-                <Label Text="{Binding GameStatus}"
+                <controls:GameStateControl 
                        Grid.Column="1"
-                       FontSize="16"
-                       FontAttributes="Bold"                                                                                                      
+                       Status="{Binding GameStatus}"
+                       SizeScale="1.2"
+                       BorderThickness="2"
+                       ShowBorder="True"
+                       DisplayBackgroundColor="#222222"
                        HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       Style="{StaticResource GameLabelStyle}" />
+                       VerticalOptions="Center" />
                 
                 <!-- Timer -->
                 <controls:LedControl Grid.Column="2" 
