@@ -14,6 +14,8 @@ public partial class MainPage : ContentPage
     private readonly ILogger _logger;
     private readonly SvgLoader _svgLoader;
     
+    partial void InitializeAnimations();
+    
     // Dictionary to track which cells have been tapped for double-tap detection
     private readonly Dictionary<int, bool> _tappedCells = new();
     private DateTime _lastTapTime = DateTime.MinValue;
@@ -26,7 +28,7 @@ public partial class MainPage : ContentPage
         _viewModel = viewModel;
         _svgLoader = svgLoader;
         BindingContext = _viewModel;
-        
+        InitializeAnimations();
         var lst = GetAllEmbeddedImages();
         var cat = GetCategorizedImages();
         
@@ -139,53 +141,13 @@ public partial class MainPage : ContentPage
         {
             // Delay the game initialization to improve navigation performance
             await Task.Delay(200);
-
+            
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
 
-            // FIRST: Set up the GetCellImage event handler
-            GameGrid.GetCellImage += async (s, args) =>
-            {
-                try
-                {
-                    // Get the corresponding SweeperItem from the view model
-                    var row = args.Row;
-                    var col = args.Column;
-
-                    if (row >= 0 && row < _viewModel.Rows && col >= 0 && col < _viewModel.Columns)
-                    {
-                        // Create an image with initial properties for flip animation
-                        var image = new Image
-                        {
-                            Source = "unplayed.png",
-                            Aspect = Aspect.AspectFill,
-                            Opacity = 0.3,
-                            RotationY = 90,  // Start flipped (hidden)
-                            AnchorX = 0.5    // Set rotation anchor to center
-                        };
-
-                        args.Image = image;
-
-                        // Queue the animation to run after the image is added to the visual tree
-                        await Task.Delay(50);
-
-                        // Create a staggered animation based on position
-                        int delay = (row * 5) + (col * 5); // Creates a wave-like reveal pattern
-                        await Task.Delay(delay);
-
-                        // Animate the flip-in effect with a bounce
-                        await Task.WhenAll(
-                            image.RotateYTo(0, 250, Easing.BounceOut), // Add bounce effect to rotation
-                            image.FadeTo(1, 200)
-                        );
-                    }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error in GetCellImage: {ex}");
-                }
-            };
-
+            GameGrid.GetCellImage += HandleGetCellImage;
+            
+          
             // THEN: Create the grid with the handler in place
             GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
         }
