@@ -138,38 +138,46 @@ public partial class MainPage : ContentPage
         try
         {
             // Delay the game initialization to improve navigation performance
-            // This allows the UI to render before starting the potentially heavy game creation
             await Task.Delay(200);
-            
+
             // Start a new game with Easy difficulty
-            // The NewGameCommand will handle running on a background thread
-            System.Diagnostics.Debug.WriteLine("MainPage: Starting game creation");
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
-            
-            // The grid size is now set via the GridSize property in XAML
-            // No need to call CreateGrid here as it's handled by the property change
-            
-            // Set up the GetCellImage event handler
-            GameGrid.GetCellImage += (s, args) =>
+
+            // FIRST: Set up the GetCellImage event handler
+            GameGrid.GetCellImage += async (s, args) =>
             {
                 try
                 {
                     // Get the corresponding SweeperItem from the view model
                     var row = args.Row;
                     var col = args.Column;
-                    
+
                     if (row >= 0 && row < _viewModel.Rows && col >= 0 && col < _viewModel.Columns)
                     {
-                        // Create an image based on the cell position
+                        // Create an image with initial properties for flip animation
                         var image = new Image
                         {
                             Source = "unplayed.png",
-                            Aspect = Aspect.AspectFill
+                            Aspect = Aspect.AspectFill,
+                            Opacity = 0.3,
+                            RotationY = 90,  // Start flipped (hidden)
+                            AnchorX = 0.5    // Set rotation anchor to center
                         };
-                        
+
                         args.Image = image;
+
+                        // Queue the animation to run after the image is added to the visual tree
+                        await Task.Delay(50);
+
+                        // Create a staggered animation based on position
+                        int delay = (row * 5) + (col * 5); // Creates a wave-like reveal pattern
+                        await Task.Delay(delay);
+
+                        // Animate the flip-in effect with a bounce
+                        await Task.WhenAll(
+                            image.RotateYTo(0, 250, Easing.BounceOut), // Add bounce effect to rotation
+                            image.FadeTo(1, 200)
+                        );
                     }
                 }
                 catch (Exception ex)
@@ -178,15 +186,8 @@ public partial class MainPage : ContentPage
                 }
             };
 
-            // This represents a re=create but so be it
-            
+            // THEN: Create the grid with the handler in place
             GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
-            
-            // The grid cell taps are now handled by the PlayCommand binding
-            
-            stopwatch.Stop();
-            System.Diagnostics.Debug.WriteLine($"MainPage: Game creation completed in {stopwatch.ElapsedMilliseconds}ms");
-            
         }
         catch (Exception ex)
         {
