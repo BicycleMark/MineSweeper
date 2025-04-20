@@ -177,6 +177,10 @@ public partial class MainPage : ContentPage
                     System.Diagnostics.Debug.WriteLine($"Error in GetCellImage: {ex}");
                 }
             };
+
+            // This represents a re=create but so be it
+            
+            GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
             
             // The grid cell taps are now handled by the PlayCommand binding
             
