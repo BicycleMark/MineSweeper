@@ -26,7 +26,13 @@ namespace MineSweeper
             SwipeDiagonalTopLeftBottomRight,
             SwipeDiagonalTopRightBottomLeft,
             SwipeDiagonalBottomLeftTopRight,
-            SwipeDiagonalBottomRightTopLeft
+            SwipeDiagonalBottomRightTopLeft,
+            SwirlInnerToOuter,
+            SwirlOuterToInner,
+            LeftToRight,
+            RightToLeft,
+            TopToBottom,
+            BottomToTop
         }
         
         // Animation pattern enum
@@ -61,6 +67,13 @@ namespace MineSweeper
             _animations.Add(AnimationType.SwipeDiagonalTopRightBottomLeft, SwipeDiagonalTopRightBottomLeftAdapter);
             _animations.Add(AnimationType.SwipeDiagonalBottomLeftTopRight, SwipeDiagonalBottomLeftTopRightAdapter);
             _animations.Add(AnimationType.SwipeDiagonalBottomRightTopLeft, SwipeDiagonalBottomRightTopLeftAdapter);
+            _animations.Add(AnimationType.SwirlInnerToOuter, SwirlInnerToOuterAdapter);
+            _animations.Add(AnimationType.SwirlOuterToInner, SwirlOuterToInnerAdapter);
+            _animations.Add(AnimationType.LeftToRight, LeftToRightAdapter);
+            _animations.Add(AnimationType.RightToLeft, RightToLeftAdapter);
+            _animations.Add(AnimationType.TopToBottom, TopToBottomAdapter);
+            _animations.Add(AnimationType.BottomToTop, BottomToTopAdapter);
+
         }
         // Gets a random animation for the cell
         private Func<Image, int, int, Task> GetRandomAnimation()
@@ -312,7 +325,162 @@ namespace MineSweeper
             );
         }
         
+        private async Task SwirlInnerToOuterAnimation(Image image, int row, int col, int totalRows, int totalCols)
+{
+    image.Opacity = 0;
+    image.Scale = 0.7;
+    
+    // Calculate center coordinates
+    int centerRow = totalRows / 2;
+    int centerCol = totalCols / 2;
+    
+    // Calculate layer (distance from center in a spiral pattern)
+    int rowDistance = Math.Abs(row - centerRow);
+    int colDistance = Math.Abs(col - centerCol);
+    int layer = Math.Max(rowDistance, colDistance);
+    
+    // Calculate position within the layer (for proper sequencing)
+    int position = 0;
+    
+    if (row == centerRow - layer) // Top edge of the layer
+        position = col - (centerCol - layer);
+    else if (col == centerCol + layer) // Right edge
+        position = 2 * layer + (row - (centerRow - layer));
+    else if (row == centerRow + layer) // Bottom edge
+        position = 4 * layer - (col - (centerCol - layer));
+    else // Left edge
+        position = 6 * layer - (row - (centerRow - layer));
+    
+    // Base delay per layer plus position in layer
+    int delay = layer * 80 + position * 20;
+    await Task.Delay(delay);
+    
+    await Task.WhenAll(
+        image.ScaleTo(1.0, 350, Easing.CubicOut),
+        image.FadeTo(1, 300)
+    );
+}
+
+private async Task SwirlOuterToInnerAnimation(Image image, int row, int col, int totalRows, int totalCols)
+{
+    image.Opacity = 0;
+    image.Scale = 0.7;
+    
+    // Calculate center coordinates
+    int centerRow = totalRows / 2;
+    int centerCol = totalCols / 2;
+    
+    // Calculate max possible layer
+    int maxLayer = Math.Max(Math.Max(centerRow, totalRows - centerRow - 1),
+                           Math.Max(centerCol, totalCols - centerCol - 1));
+    
+    // Calculate current layer (distance from center in a spiral pattern)
+    int rowDistance = Math.Abs(row - centerRow);
+    int colDistance = Math.Abs(col - centerCol);
+    int layer = Math.Max(rowDistance, colDistance);
+    
+    // Calculate position within the layer (for proper sequencing)
+    int position = 0;
+    
+    if (row == centerRow - layer) // Top edge of the layer
+        position = col - (centerCol - layer);
+    else if (col == centerCol + layer) // Right edge
+        position = 2 * layer + (row - (centerRow - layer));
+    else if (row == centerRow + layer) // Bottom edge
+        position = 4 * layer - (col - (centerCol - layer));
+    else // Left edge
+        position = 6 * layer - (row - (centerRow - layer));
+    
+    // Reverse the delay so outer layers animate first
+    int delay = (maxLayer - layer) * 80 + position * 20;
+    await Task.Delay(delay);
+    
+    await Task.WhenAll(
+        image.ScaleTo(1.0, 350, Easing.CubicOut),
+        image.FadeTo(1, 300)
+    );
+}
+private async Task LeftToRightAnimation(Image image, int row, int col, int totalCols)
+{
+    image.Opacity = 0;
+    image.TranslationX = -40;
+
+    // Calculate delay based on column position
+    int delay = col * 20;
+    await Task.Delay(delay);
+
+    await Task.WhenAll(
+        image.TranslateTo(0, 0, 300, Easing.CubicOut),
+        image.FadeTo(1, 250)
+    );
+}
+
+private async Task RightToLeftAnimation(Image image, int row, int col, int totalCols)
+{
+    image.Opacity = 0;
+    image.TranslationX = 40;
+
+    // Calculate delay based on reverse column position
+    int delay = (totalCols - 1 - col) * 20;
+    await Task.Delay(delay);
+
+    await Task.WhenAll(
+        image.TranslateTo(0, 0, 300, Easing.CubicOut),
+        image.FadeTo(1, 250)
+    );
+}
+
+private async Task TopToBottomAnimation(Image image, int row, int col, int totalRows)
+{
+    image.Opacity = 0;
+    image.TranslationY = -40;
+
+    // Calculate delay based on row position
+    int delay = row * 20;
+    await Task.Delay(delay);
+
+    await Task.WhenAll(
+        image.TranslateTo(0, 0, 300, Easing.CubicOut),
+        image.FadeTo(1, 250)
+    );
+}
+
+private async Task BottomToTopAnimation(Image image, int row, int col, int totalRows)
+{
+    image.Opacity = 0;
+    image.TranslationY = 40;
+
+    // Calculate delay based on reverse row position
+    int delay = (totalRows - 1 - row) * 20;
+    await Task.Delay(delay);
+
+    await Task.WhenAll(
+        image.TranslateTo(0, 0, 300, Easing.CubicOut),
+        image.FadeTo(1, 250)
+    );
+}
+        
         // Adapter methods to match the required signature
+        
+        private Task LeftToRightAdapter(Image image, int row, int col)
+        {
+            return LeftToRightAnimation(image, row, col, _viewModel.Columns);
+        }
+
+        private Task RightToLeftAdapter(Image image, int row, int col)
+        {
+            return RightToLeftAnimation(image, row, col, _viewModel.Columns);
+        }
+
+        private Task TopToBottomAdapter(Image image, int row, int col)
+        {
+            return TopToBottomAnimation(image, row, col, _viewModel.Rows);
+        }
+
+        private Task BottomToTopAdapter(Image image, int row, int col)
+        {
+            return BottomToTopAnimation(image, row, col, _viewModel.Rows);
+        }
         private Task SwipeDiagonalTopLeftBottomRightAdapter(Image image, int row, int col)
         {
             return SwipeDiagonalTopLeftBottomRightAnimation(image, row, col);
@@ -331,6 +499,16 @@ namespace MineSweeper
         private Task SwipeDiagonalBottomRightTopLeftAdapter(Image image, int row, int col)
         {
             return SwipeDiagonalBottomRightTopLeftAnimation(image, row, col, _viewModel.Rows, _viewModel.Columns);
+        }
+        
+        private Task SwirlInnerToOuterAdapter(Image image, int row, int col)
+        {
+            return SwirlInnerToOuterAnimation(image, row, col, _viewModel.Rows, _viewModel.Columns);
+        }
+
+        private Task SwirlOuterToInnerAdapter(Image image, int row, int col)
+        {
+            return SwirlOuterToInnerAnimation(image, row, col, _viewModel.Rows, _viewModel.Columns);
         }
     }
     
