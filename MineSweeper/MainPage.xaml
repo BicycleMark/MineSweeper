@@ -195,8 +195,7 @@
                     <controls:SquareImageGrid x:Name="GameGrid"
                                               HorizontalOptions="Fill"
                                               VerticalOptions="Fill"
-                                              GridSize="{Binding Rows}"
-                                              PlayCommand="{Binding PlayCommand}" />
+                                              GridSize="{Binding Rows}" />
                 </Border>
             </controls:ChiseledBorder>
         </Grid>

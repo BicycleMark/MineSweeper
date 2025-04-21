@@ -75,24 +75,6 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         propertyChanged: OnBorderPropertyChanged);
         
     /// <summary>
-    /// Bindable property for the play command that is executed when a cell is tapped.
-    /// </summary>
-    public static readonly BindableProperty PlayCommandProperty = BindableProperty.Create(
-        nameof(PlayCommand),
-        typeof(ICommand),
-        typeof(SquareImageGrid),
-        defaultValue: null);
-        
-    /// <summary>
-    /// Bindable property for the command that is executed when a piece is moved from one cell to another.
-    /// </summary>
-    public static readonly BindableProperty PlayFromToCommandProperty = BindableProperty.Create(
-        nameof(PlayFromToCommand),
-        typeof(ICommand),
-        typeof(SquareImageGrid),
-        defaultValue: null);
-        
-    /// <summary>
     /// Bindable property for whether drag and drop is enabled.
     /// </summary>
     public static readonly BindableProperty IsDragDropEnabledProperty = BindableProperty.Create(
@@ -154,26 +136,6 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
     {
         get => (bool)GetValue(IsRecessedProperty);
         set => SetValue(IsRecessedProperty, value);
-    }
-    
-    /// <summary>
-    /// Gets or sets the command to execute when a cell is tapped.
-    /// The command parameter will be a Point representing the row and column of the tapped cell.
-    /// </summary>
-    public ICommand PlayCommand
-    {
-        get => (ICommand)GetValue(PlayCommandProperty);
-        set => SetValue(PlayCommandProperty, value);
-    }
-    
-    /// <summary>
-    /// Gets or sets the command to execute when a piece is moved from one cell to another.
-    /// The command parameter will be a PlayPointsSequence containing the sequence of points in the move.
-    /// </summary>
-    public ICommand PlayFromToCommand
-    {
-        get => (ICommand)GetValue(PlayFromToCommandProperty);
-        set => SetValue(PlayFromToCommandProperty, value);
     }
     
     /// <summary>
@@ -481,41 +443,7 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                 // Create a Point to represent the row and column
                 var cellPosition = new Point(col, row);
                 
-                // Handle drag and drop if enabled
-                if (IsDragDropEnabled && PlayFromToCommand != null)
-                {
-                    // Skip default/blank tiles for drag and drop
-                    if (!isDefaultTile)
-                    {
-                        if (_selectedCell == null)
-                        {
-                            // First tap - select the "from" cell
-                            _selectedCell = cellPosition;
-                            
-                            // Visual feedback could be added here
-                            System.Diagnostics.Debug.WriteLine($"Selected cell at {cellPosition}");
-                        }
-                        else
-                        {
-                            // Second tap - execute the command with the sequence of points
-                            var pointsSequence = new PlayPointsSequence(_selectedCell.Value, cellPosition);
-                            if (PlayFromToCommand.CanExecute(pointsSequence))
-                            {
-                                PlayFromToCommand.Execute(pointsSequence);
-                            }
-                            
-                            // Reset selection
-                            _selectedCell = null;
-                            
-                            System.Diagnostics.Debug.WriteLine($"Moved from {_selectedCell} to {cellPosition}");
-                        }
-                    }
-                }
-                // Otherwise, use the regular play command
-                else if (PlayCommand != null && PlayCommand.CanExecute(cellPosition))
-                {
-                    PlayCommand.Execute(cellPosition);
-                }
+                
                 
                 // Raise the TileTapped event if it's not a default tile
                 if (!isDefaultTile && TileTapped != null)
