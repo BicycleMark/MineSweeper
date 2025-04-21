@@ -80,6 +80,7 @@ public partial class AppShell : Shell
                 {
                     System.Diagnostics.Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
                     viewModel.NewGameCommand.Execute(difficulty);
+                    mainPage.SelectRandomGameAnimationStyle();
                 }
             }
         }

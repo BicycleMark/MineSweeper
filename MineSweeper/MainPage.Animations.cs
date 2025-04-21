@@ -22,7 +22,11 @@ namespace MineSweeper
             BounceIn,
             SpinIn,
             SlideIn,
-            RandomPerCell
+            RandomPerCell,
+            SwipeDiagonalTopLeftBottomRight,
+            SwipeDiagonalTopRightBottomLeft,
+            SwipeDiagonalBottomLeftTopRight,
+            SwipeDiagonalBottomRightTopLeft
         }
         
         // Animation pattern enum
@@ -53,6 +57,10 @@ namespace MineSweeper
             _animations.Add(AnimationType.SpinIn, SpinInAnimation);
             _animations.Add(AnimationType.SlideIn, SlideInAnimation);
             _animations.Add(AnimationType.RandomPerCell, RandomPerCellAnimation);
+            _animations.Add(AnimationType.SwipeDiagonalTopLeftBottomRight, SwipeDiagonalTopLeftBottomRightAdapter);
+            _animations.Add(AnimationType.SwipeDiagonalTopRightBottomLeft, SwipeDiagonalTopRightBottomLeftAdapter);
+            _animations.Add(AnimationType.SwipeDiagonalBottomLeftTopRight, SwipeDiagonalBottomLeftTopRightAdapter);
+            _animations.Add(AnimationType.SwipeDiagonalBottomRightTopLeft, SwipeDiagonalBottomRightTopLeftAdapter);
         }
         // Gets a random animation for the cell
         private Func<Image, int, int, Task> GetRandomAnimation()
@@ -62,7 +70,7 @@ namespace MineSweeper
             return _animations[selectedType];
         }
         
-        private void SelectRandomGameAnimationStyle()
+        public void SelectRandomGameAnimationStyle()
         {
             // Choose random animation type for this game
             var animationTypes = Enum.GetValues<AnimationType>();
@@ -239,5 +247,91 @@ namespace MineSweeper
                 image.FadeTo(1, 250)
             );
         }
+        
+        private async Task SwipeDiagonalTopLeftBottomRightAnimation(Image image, int row, int col)
+        {
+            image.Opacity = 0;
+            image.TranslationX = -30;
+            image.TranslationY = -30;
+
+            // Delay based on diagonal distance from top-left
+            int delay = (row + col) * 15;
+            await Task.Delay(delay);
+
+            await Task.WhenAll(
+                image.TranslateTo(0, 0, 300, Easing.CubicOut),
+                image.FadeTo(1, 250)
+            );
+        }
+
+        private async Task SwipeDiagonalTopRightBottomLeftAnimation(Image image, int row, int col, int totalCols)
+        {
+            image.Opacity = 0;
+            image.TranslationX = 30;
+            image.TranslationY = -30;
+
+            // Delay based on diagonal distance from top-right
+            int delay = (row + (totalCols - 1 - col)) * 15;
+            await Task.Delay(delay);
+
+            await Task.WhenAll(
+                image.TranslateTo(0, 0, 300, Easing.CubicOut),
+                image.FadeTo(1, 250)
+            );
+        }
+
+        private async Task SwipeDiagonalBottomLeftTopRightAnimation(Image image, int row, int col, int totalRows)
+        {
+            image.Opacity = 0;
+            image.TranslationX = -30;
+            image.TranslationY = 30;
+
+            // Delay based on diagonal distance from bottom-left
+            int delay = ((totalRows - 1 - row) + col) * 15;
+            await Task.Delay(delay);
+
+            await Task.WhenAll(
+                image.TranslateTo(0, 0, 300, Easing.CubicOut),
+                image.FadeTo(1, 250)
+            );
+        }
+
+        private async Task SwipeDiagonalBottomRightTopLeftAnimation(Image image, int row, int col, int totalRows, int totalCols)
+        {
+            image.Opacity = 0;
+            image.TranslationX = 30;
+            image.TranslationY = 30;
+
+            // Delay based on diagonal distance from bottom-right
+            int delay = ((totalRows - 1 - row) + (totalCols - 1 - col)) * 15;
+            await Task.Delay(delay);
+
+            await Task.WhenAll(
+                image.TranslateTo(0, 0, 300, Easing.CubicOut),
+                image.FadeTo(1, 250)
+            );
+        }
+        
+        // Adapter methods to match the required signature
+        private Task SwipeDiagonalTopLeftBottomRightAdapter(Image image, int row, int col)
+        {
+            return SwipeDiagonalTopLeftBottomRightAnimation(image, row, col);
+        }
+
+        private Task SwipeDiagonalTopRightBottomLeftAdapter(Image image, int row, int col)
+        {
+            return SwipeDiagonalTopRightBottomLeftAnimation(image, row, col, _viewModel.Columns);
+        }
+
+        private Task SwipeDiagonalBottomLeftTopRightAdapter(Image image, int row, int col)
+        {
+            return SwipeDiagonalBottomLeftTopRightAnimation(image, row, col, _viewModel.Rows);
+        }
+
+        private Task SwipeDiagonalBottomRightTopLeftAdapter(Image image, int row, int col)
+        {
+            return SwipeDiagonalBottomRightTopLeftAnimation(image, row, col, _viewModel.Rows, _viewModel.Columns);
+        }
     }
+    
 }
