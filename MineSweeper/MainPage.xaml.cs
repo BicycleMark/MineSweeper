@@ -31,12 +31,6 @@ public partial class MainPage : ContentPage
         // Initialize animation manager
         _animationManager = new GridAnimationManager(GameGrid);
         
-        var lst = GetAllEmbeddedImages();
-        var cat = GetCategorizedImages();
-        
-        // Set the help button image programmatically
-       // SetHelpButtonImage();
-        
         // Set up the chiseled border for the top panel
         SetupTopPanelBorder();
         
@@ -78,64 +72,6 @@ public partial class MainPage : ContentPage
         }
     }
     
-    private void SetHelpButtonImage()
-    {
-        try
-        {
-            // Set the image source to dotnet_bot.png
-            var imageSource = ImageSource.FromFile("dotnet_bot.png");
-          
-            
-            System.Diagnostics.Debug.WriteLine("Help button image set to dotnet_bot.png");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error setting help button image: {ex}");
-            
-            // If image loading fails, fall back to text
-            
-            
-            System.Diagnostics.Debug.WriteLine("Falling back to text '?' for help button");
-        }
-    }
-    
-    
-    private List<string> GetAllEmbeddedImages()
-    {
-        var assembly = GetType().Assembly;
-        var resourceNames = assembly.GetManifestResourceNames();
-    
-        // Filter for common image extensions
-        var imageExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp" };
-        var imageResources = resourceNames
-           // .Where(name => imageExtensions.Any(ext => name.ToLowerInvariant().EndsWith(ext)))
-            .ToList();
-    
-        return imageResources;
-    }
-    
-    private Dictionary<string, List<string>> GetCategorizedImages()
-    {
-        var assembly = GetType().Assembly;
-        var resourceNames = assembly.GetManifestResourceNames();
-        var imageExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp" };
-    
-        var result = new Dictionary<string, List<string>>
-        {
-            ["All"] = resourceNames.Where(name => 
-                imageExtensions.Any(ext => name.ToLowerInvariant().EndsWith(ext))).ToList(),
-            ["AppIcons"] = resourceNames.Where(name => 
-                name.Contains("AppIcon") || name.Contains("Icon")).ToList(),
-            ["MauiAssets"] = resourceNames.Where(name => 
-                name.Contains(".Resources.") && 
-                imageExtensions.Any(ext => name.ToLowerInvariant().EndsWith(ext))).ToList(),
-            ["Raw"] = resourceNames.Where(name => 
-                (name.Contains(".Raw.") || name.Contains(".rawassets.")) && 
-                imageExtensions.Any(ext => name.ToLowerInvariant().EndsWith(ext))).ToList()
-        };
-    
-        return result;
-    }
     
     /// <summary>
     /// Selects a random animation style for the game grid.
@@ -206,54 +142,4 @@ public partial class MainPage : ContentPage
         }
     }
     
-    /// <summary>
-    /// Handles the click event for the Square Image Grid Example button
-    /// </summary>
-    private async void OnSquareImageGridExampleClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            // Navigate to the SquareImageGridExample page
-            await Shell.Current.GoToAsync("SquareImageGridExample");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error navigating to SquareImageGridExample: {ex}");
-        }
-    }
-    
-    /// <summary>
-    /// Handles the click event for the LED Control Example button
-    /// </summary>
-    private async void OnLedControlExampleClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            // Navigate to the LedControlExample page
-            await Shell.Current.GoToAsync("LedControlExample");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error navigating to LedControlExample: {ex}");
-        }
-    }
-    
-    /// <summary>
-    /// Handles the click event for the Help button
-    /// </summary>
-    private async void OnHelpButtonClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            // Display a help message
-            await DisplayAlert("Help", "Welcome to MineSweeper!\n\n" +
-                "- Tap to reveal a cell\n" +
-                "- Double-tap to flag a mine\n" +
-                "- Clear all non-mine cells to win!", "OK");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Error displaying help: {ex}");
-        }
-    }
 }

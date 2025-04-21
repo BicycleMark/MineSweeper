@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using Microsoft.Maui.Controls;
+﻿﻿using Microsoft.Maui.Controls;
    using MineSweeper.Models;
 using MineSweeper.ViewModels;
 
@@ -12,7 +12,6 @@ public partial class AppShell : Shell
         
         // Register routes for navigation
         Routing.RegisterRoute("MainPage", typeof(MainPage));
-        Routing.RegisterRoute("MainPageDebug", typeof(MainPageDebug));
         Routing.RegisterRoute("EasyGame", typeof(MainPage));
         Routing.RegisterRoute("MediumGame", typeof(MainPage));
         Routing.RegisterRoute("HardGame", typeof(MainPage));

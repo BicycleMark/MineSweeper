@@ -72,12 +72,6 @@
     <!-- Separator -->
     <MenuItem Text="-" />
 
-    <!-- Debug Page Menu Item -->
-    <ShellContent
-        Title="Debug Page"
-        ContentTemplate="{DataTemplate local:MainPageDebug}"
-        Route="MainPageDebug" />
-        
     <!-- Grid Examples Menu Items -->
     
     <ShellContent

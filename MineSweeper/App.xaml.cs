@@ -1,6 +1,9 @@
-﻿﻿
+﻿﻿﻿﻿﻿﻿
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using MineSweeper.Models;
+using MineSweeper.ViewModels;
+using MineSweeper.Views.ImageLoaders;
 #if IOS || MACCATALYST
 using Foundation;  // Add this for NSNumber and NSString
 using UIKit;      // Add this for UIInterfaceOrientation
@@ -49,9 +52,31 @@ public partial class App : Application
             // Log any exceptions
             System.Diagnostics.Debug.WriteLine($"App: Error creating AppShell: {ex}");
             
-            // Fall back to MainPageDebug directly if there's an error
-            System.Diagnostics.Debug.WriteLine("App: Falling back to MainPageDebug directly");
-            return new Window(new MainPageDebug());
+            // Create a simple error page instead of trying to instantiate MainPage
+            System.Diagnostics.Debug.WriteLine("App: Creating simple error page");
+            var errorPage = new ContentPage
+            {
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 10,
+                    Padding = new Thickness(20),
+                    Children =
+                    {
+                        new Label
+                        {
+                            Text = "Error Starting Application",
+                            FontSize = 24,
+                            HorizontalOptions = LayoutOptions.Center
+                        },
+                        new Label
+                        {
+                            Text = $"Error details: {ex.Message}",
+                            FontSize = 16
+                        }
+                    }
+                }
+            };
+            return new Window(errorPage);
         }
     }
 }

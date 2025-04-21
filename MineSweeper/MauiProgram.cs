@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using CommunityToolkit.Maui;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using CommunityToolkit.Maui;
    using Microsoft.Extensions.DependencyInjection;
    using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Hosting;
@@ -36,7 +36,6 @@ public static class MauiProgram
         
         // Register Pages as transient to allow multiple instances
         builder.Services.AddTransient<MainPage>();
-        builder.Services.AddTransient<MainPageDebug>();
         
 
 #if DEBUG
