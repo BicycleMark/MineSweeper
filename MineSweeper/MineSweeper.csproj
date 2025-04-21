@@ -95,7 +95,6 @@
         <Compile Remove="Resources\Images\Themes\default\svg\**" />
         <Compile Remove="Views\Controls\CanvasImageGrid.cs" />
         <Compile Remove="Views\Controls\CanvasImageGridExample.xaml.cs" />
-        <Compile Remove="Views\Controls\SquareImageGridAnimationExtensions.cs" />
     </ItemGroup>
 
     <ItemGroup>
