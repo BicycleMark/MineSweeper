@@ -25,4 +25,8 @@
         <ProjectReference Include="..\MineSweeper\MineSweeper.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Views\Controls\Helpers\" />
+    </ItemGroup>
+
 </Project>

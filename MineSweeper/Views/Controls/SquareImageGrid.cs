@@ -12,7 +12,7 @@ namespace MineSweeper.Views.Controls;
 /// The grid will always maintain a square aspect ratio and
 /// will fill the maximum square area possible within its container.
 /// </summary>
-public class SquareImageGrid : ContentView
+public class SquareImageGrid : ContentView, IAnimatableGrid
 {
     /// <summary>
     /// Bindable property for the grid size (number of rows and columns).

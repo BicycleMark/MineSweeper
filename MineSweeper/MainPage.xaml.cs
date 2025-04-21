@@ -13,8 +13,7 @@ public partial class MainPage : ContentPage
     private readonly GameViewModel _viewModel;
     private readonly ILogger _logger;
     private readonly SvgLoader _svgLoader;
-    
-    partial void InitializeAnimations();
+    private GridAnimationManager _animationManager;
     
     // Dictionary to track which cells have been tapped for double-tap detection
     private readonly Dictionary<int, bool> _tappedCells = new();
@@ -28,7 +27,10 @@ public partial class MainPage : ContentPage
         _viewModel = viewModel;
         _svgLoader = svgLoader;
         BindingContext = _viewModel;
-        InitializeAnimations();
+        
+        // Initialize animation manager
+        _animationManager = new GridAnimationManager(GameGrid);
+        
         var lst = GetAllEmbeddedImages();
         var cat = GetCategorizedImages();
         
@@ -135,6 +137,14 @@ public partial class MainPage : ContentPage
         return result;
     }
     
+    /// <summary>
+    /// Selects a random animation style for the game grid.
+    /// </summary>
+    public void SelectRandomGameAnimationStyle()
+    {
+        _animationManager.SelectRandomAnimationStyle();
+    }
+    
     private async void OnPageLoaded(object? sender, EventArgs e)
     {
         try
@@ -143,14 +153,15 @@ public partial class MainPage : ContentPage
             await Task.Delay(200);
             
             // Select a random animation style for this game
-            SelectRandomGameAnimationStyle();
+            _animationManager.SelectRandomAnimationStyle();
+            
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
 
-            GameGrid.GetCellImage += HandleGetCellImage;
+            // Set up animations
+            _animationManager.SetupAnimations();
             
-          
-            // THEN: Create the grid with the handler in place
+            // Create the grid
             GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
         }
         catch (Exception ex)
@@ -181,6 +192,9 @@ public partial class MainPage : ContentPage
         try
         {
             System.Diagnostics.Debug.WriteLine("MainPage: OnDisappearing starting");
+            
+            // Clean up animation manager
+            _animationManager.Cleanup();
             
             base.OnDisappearing();
             
