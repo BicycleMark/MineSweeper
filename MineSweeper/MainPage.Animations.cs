@@ -9,6 +9,10 @@ namespace MineSweeper
 {
     public partial class MainPage
     {
+        // MainPage.Animations.cs - Add these properties
+        private AnimationType _currentGameAnimationType;
+        private AnimationPattern _currentGamePattern;
+        
         // Animation type enum
         private enum AnimationType
         {
@@ -18,8 +22,20 @@ namespace MineSweeper
             BounceIn,
             SpinIn,
             SlideIn,
+            RandomPerCell
         }
-
+        
+        // Animation pattern enum
+        private enum AnimationPattern
+        {
+            Sequential,
+            WaveFromTopLeft,
+            WaveFromCenter,
+            Spiral,
+            Random,
+            Checkerboard
+        }
+        
         // Animation dictionary to store our animation methods
         private readonly Dictionary<AnimationType, Func<Image, int, int, Task>> _animations = new();
 
@@ -29,21 +45,34 @@ namespace MineSweeper
         // Initialize animations in constructor
         partial void InitializeAnimations()
         {
-            _animations.Clear(); // Clear first since we can't reassign the readonly field
+            _animations.Clear();
             _animations.Add(AnimationType.FlipIn, FlipInAnimation);
             _animations.Add(AnimationType.FadeIn, FadeInAnimation);
             _animations.Add(AnimationType.ScaleIn, ScaleInAnimation);
             _animations.Add(AnimationType.BounceIn, BounceInAnimation);
             _animations.Add(AnimationType.SpinIn, SpinInAnimation);
             _animations.Add(AnimationType.SlideIn, SlideInAnimation);
+            _animations.Add(AnimationType.RandomPerCell, RandomPerCellAnimation);
         }
-
         // Gets a random animation for the cell
         private Func<Image, int, int, Task> GetRandomAnimation()
         {
             var animationTypes = Enum.GetValues<AnimationType>();
             var selectedType = animationTypes[_random.Next(animationTypes.Length)];
             return _animations[selectedType];
+        }
+        
+        private void SelectRandomGameAnimationStyle()
+        {
+            // Choose random animation type for this game
+            var animationTypes = Enum.GetValues<AnimationType>();
+            _currentGameAnimationType = animationTypes[_random.Next(animationTypes.Length)];
+    
+            // Choose random pattern for this game
+            var patterns = Enum.GetValues<AnimationPattern>();
+            _currentGamePattern = patterns[_random.Next(patterns.Length)];
+    
+            System.Diagnostics.Debug.WriteLine($"Game animation style: {_currentGameAnimationType}, Pattern: {_currentGamePattern}");
         }
 
         // Handler for GetCellImage event
@@ -55,11 +84,21 @@ namespace MineSweeper
             // Schedule animation to run after layout
             Dispatcher.Dispatch(async () => {
                 await Task.Delay(50);
-                var animation = GetRandomAnimation();
+        
+                // Get the animation function for the current game's style
+                var animation = _animations[_currentGameAnimationType];
+        
+                // Calculate delay based on current pattern
+                int delay = CalculateAnimationDelay(
+                    getCellImageEventArgs.Row, 
+                    getCellImageEventArgs.Column, 
+                    _viewModel.Rows, 
+                    _viewModel.Columns);
+            
+                await Task.Delay(delay);
                 await animation(image, getCellImageEventArgs.Row, getCellImageEventArgs.Column);
             });
         }
-
         // Creates a basic cell image
         private Image CreateCellImage()
         {
@@ -72,6 +111,20 @@ namespace MineSweeper
         }
 
 
+        private async Task RandomPerCellAnimation(Image image, int row, int col)
+        {
+            // Select a random animation type for this specific cell
+            // (excluding RandomPerCell itself to avoid recursion)
+            var animationTypes = Enum.GetValues<AnimationType>()
+                .Where(t => t != AnimationType.RandomPerCell)
+                .ToArray();
+        
+            var randomCellAnimation = animationTypes[_random.Next(animationTypes.Length)];
+    
+            // Execute the randomly chosen animation
+            await _animations[randomCellAnimation](image, row, col);
+        }
+        
         // Animation implementations
         private async Task FlipInAnimation(Image image, int row, int col)
         {
@@ -86,6 +139,39 @@ namespace MineSweeper
                 image.RotateYTo(0, 250, Easing.BounceOut),
                 image.FadeTo(1, 200)
             );
+        }
+        
+        private int CalculateAnimationDelay(int row, int col, int totalRows, int totalCols)
+        {
+            const int baseDelay = 10;
+    
+            switch (_currentGamePattern)
+            {
+                case AnimationPattern.WaveFromTopLeft:
+                    return (row + col) * baseDelay;
+            
+                case AnimationPattern.WaveFromCenter:
+                    int centerRow = totalRows / 2;
+                    int centerCol = totalCols / 2;
+                    int distanceFromCenter = Math.Abs(row - centerRow) + Math.Abs(col - centerCol);
+                    return distanceFromCenter * baseDelay;
+            
+                case AnimationPattern.Spiral:
+                    // Approximation of spiral ordering
+                    int maxDist = Math.Max(Math.Max(row, totalRows - 1 - row), 
+                        Math.Max(col, totalCols - 1 - col));
+                    return maxDist * baseDelay * 2;
+            
+                case AnimationPattern.Random:
+                    return _random.Next(0, baseDelay * 10);
+            
+                case AnimationPattern.Checkerboard:
+                    return ((row + col) % 2 == 0) ? 0 : baseDelay * 5;
+            
+                case AnimationPattern.Sequential:
+                default:
+                    return (row * totalCols + col) * baseDelay / 2;
+            }
         }
         
         private async Task FadeInAnimation(Image image, int row, int col)

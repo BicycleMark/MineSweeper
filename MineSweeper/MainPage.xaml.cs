@@ -142,6 +142,8 @@ public partial class MainPage : ContentPage
             // Delay the game initialization to improve navigation performance
             await Task.Delay(200);
             
+            // Select a random animation style for this game
+            SelectRandomGameAnimationStyle();
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
 
