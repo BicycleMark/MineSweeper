@@ -28,7 +28,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     /// Initializes a new instance of the GameViewModel class
     /// </summary>
     /// <param name="dispatcher">The dispatcher for UI thread operations</param>
-    /// <param name="customDebugLoggercustomDebugLogger for debugging</param>
+    /// <param name="customDebugLogger">Logger for debugging</param>
     /// <param name="modelFactory">The factory for creating game models</param>
     public GameViewModel(
         IDispatcher dispatcher, 

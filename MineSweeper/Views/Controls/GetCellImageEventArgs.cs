@@ -29,8 +29,3 @@ public class GetCellImageEventArgs : EventArgs
         Column = column;
     }
 }
-
-/// <summary>
-/// Event triggered to get the image for a specific cell at [row, column].
-/// </summary>
-//public event EventHandler<GetCellImageEventArgs> GetCellImage;

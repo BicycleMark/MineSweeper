@@ -10,7 +10,7 @@ public class GameModelFactory : IGameModelFactory
     /// <summary>
     /// Constructor with dependency injection for customDebugLogger
     /// </summary>
-    /// <param name="customDebugLoggerr debugging"</param>
+    /// <param name="customDebugLogger">Logger for debugging</param>
     public GameModelFactory(ILogger customDebugLogger)
     {
         _customDebugLogger = customDebugLogger;
