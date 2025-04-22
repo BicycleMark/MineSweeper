@@ -123,7 +123,7 @@
                 <controls:LedControl Grid.Column="2"
                                      BorderThickness="2"
                                      Margin="2"
-                                     Value="{Binding Time}"
+                                     Value="{Binding GameTime}"
                                      ShowBorder="True"
                                      SizeScale="1.0"
                                      DisplayBackgroundColor="#222222"

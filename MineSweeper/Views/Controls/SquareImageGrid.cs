@@ -78,9 +78,6 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
     private readonly Grid _grid;
     private View[,]? _images;
 
-    // Field to track the selected cell (the "from" position)
-    private Point? _selectedCell;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="SquareImageGrid" /> class.
     /// </summary>
@@ -502,7 +499,6 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
     /// </summary>
     public void ClearSelection()
     {
-        _selectedCell = null;
         // Clear any visual selection indicators
     }
 

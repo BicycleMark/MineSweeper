@@ -63,7 +63,7 @@ public class ChiseledBorder : ContentView
 
     private readonly GraphicsView _borderGraphics;
     private readonly Grid _container;
-    private View _userContent;
+    private View? _userContent;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ChiseledBorder" /> class.
@@ -174,7 +174,7 @@ public class ChiseledBorder : ContentView
     /// <summary>
     ///     Gets or sets the content of the border. Overrides the base ContentView.Content property.
     /// </summary>
-    public new View Content
+    public new View? Content
     {
         get => _userContent;
         set
@@ -202,7 +202,7 @@ public class ChiseledBorder : ContentView
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The event arguments.</param>
-    private void OnSizeChanged(object sender, EventArgs e)
+    private void OnSizeChanged(object? sender, EventArgs e)
     {
         // Force a redraw of the border when the size changes
         _borderGraphics.Invalidate();
@@ -243,6 +243,5 @@ public class ChiseledBorder : ContentView
 
         // Force a layout update
         InvalidateMeasure();
-        InvalidateLayout();
     }
 }

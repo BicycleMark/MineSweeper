@@ -7,7 +7,7 @@ namespace MineSweeper.Views.ImageLoaders;
 /// </summary>
 public class PngLoader : ImageLoader
 {
-    private readonly Dictionary<string, string> _imagePathCache = new();
+    private readonly Dictionary<string, string?> _imagePathCache = new();
     private readonly Dictionary<GamePieceEnum.ThemedGamPieces, Image> _themeDictionary = new();
 
     public override object GetImageResource(GamePieceEnum.ThemedGamPieces piece)

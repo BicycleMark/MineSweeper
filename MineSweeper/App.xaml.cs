@@ -25,7 +25,10 @@ public partial class App : Application
                 new NSString("orientation"));
 #elif ANDROID
             var activity = Platform.CurrentActivity;
-            activity.RequestedOrientation = Android.Content.PM.ScreenOrientation.Portrait;
+            if (activity != null)
+            {
+                activity.RequestedOrientation = Android.Content.PM.ScreenOrientation.Portrait;
+            }
 #endif
         });
     }

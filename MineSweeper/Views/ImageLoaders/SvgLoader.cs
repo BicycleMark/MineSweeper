@@ -7,7 +7,7 @@ namespace MineSweeper.Views.ImageLoaders;
 /// </summary>
 public class SvgLoader : ImageLoader
 {
-    private readonly Dictionary<string, string> _svgContentCache = new();
+    private readonly Dictionary<string, string?> _svgContentCache = new();
     private readonly Dictionary<GamePieceEnum.ThemedGamPieces, string> _themeDictionary = new();
 
 

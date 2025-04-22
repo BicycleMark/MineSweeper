@@ -297,7 +297,6 @@ public class GameStateControl : ContentView
 
             // Force a layout update
             control.InvalidateMeasure();
-            control.InvalidateLayout();
         }
     }
 
@@ -334,7 +333,6 @@ public class GameStateControl : ContentView
 
         // Force a layout update
         InvalidateMeasure();
-        InvalidateLayout();
     }
 
     /// <summary>

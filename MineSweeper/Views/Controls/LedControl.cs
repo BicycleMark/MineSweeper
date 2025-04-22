@@ -297,7 +297,6 @@ public class LedControl : ContentView
 
             // Force a layout update
             control.InvalidateMeasure();
-            control.InvalidateLayout();
         }
     }
 
@@ -349,9 +348,6 @@ public class LedControl : ContentView
 
         // Force a layout update
         InvalidateMeasure();
-
-        // Request a new layout pass
-        InvalidateLayout();
     }
 
     /// <summary>
