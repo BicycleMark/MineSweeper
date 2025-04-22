@@ -1,7 +1,8 @@
+using System.Collections.ObjectModel;
 using System.Windows.Input;
-using MineSweeper.Models;
+using MineSweeper.Features.Game.Models;
 
-namespace MineSweeper.ViewModels;
+namespace MineSweeper.Features.Game.ViewModels;
 
 /// <summary>
 ///     Interface for the game view model, providing access to game state, operations, and UI-related functionality.

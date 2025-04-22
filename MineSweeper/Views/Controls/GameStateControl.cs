@@ -1,5 +1,5 @@
 using System.Windows.Input;
-using MineSweeper.Models;
+using MineSweeper.Features.Game.Models;
 
 namespace MineSweeper.Views.Controls;
 

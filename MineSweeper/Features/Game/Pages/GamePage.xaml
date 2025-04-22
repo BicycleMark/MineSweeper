@@ -5,7 +5,7 @@
              xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
              xmlns:viewmodels="clr-namespace:MineSweeper.Features.Game.ViewModels"
              xmlns:converters="clr-namespace:MineSweeper.Views.Converters"
-             x:Class="MineSweeper.MainPage"
+             x:Class="MineSweeper.Features.Game.Pages.GamePage"
              x:DataType="viewmodels:GameViewModel">
 
     <ContentPage.Resources>
@@ -162,8 +162,6 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-
-
         </Grid>
     </Grid>
 </ContentPage>

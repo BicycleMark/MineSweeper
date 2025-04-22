@@ -1,8 +1,11 @@
-﻿﻿using CommunityToolkit.Maui;
+﻿﻿﻿﻿﻿﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using MineSweeper.Models;
-using MineSweeper.ViewModels;
-using ILogger = MineSweeper.Models.ILogger;
+using MineSweeper.Features.Game.Models;
+using MineSweeper.Features.Game.ViewModels;
+using MineSweeper.Services.Configuration;
+using MineSweeper.Services.Logging;
+using MineSweeper.Services.Platform;
+using ILogger = MineSweeper.Services.Logging.ILogger;
 
 namespace MineSweeper;
 
@@ -15,9 +18,9 @@ public static class MauiProgram
         // Configure app with performance optimizations
         ConfigureApp(builder);
         
-        // Register dependencies with performance considerations
-        RegisterServices(builder.Services);
-        RegisterViewModels(builder.Services);
+        // Register dependencies with clear organization and performance considerations
+        RegisterCore(builder.Services);
+        RegisterFeatures(builder.Services);
         RegisterPages(builder.Services);
         
         #if DEBUG
@@ -45,22 +48,30 @@ public static class MauiProgram
             });
     }
     
-    private static void RegisterServices(IServiceCollection services)
+    private static void RegisterCore(IServiceCollection services)
     {
-        // Core Services - Use appropriate lifetimes for performance
-        services.AddSingleton<ILogger, CustomDebugLogger>(); // Singleton for shared logging
-        
-        // Performance: Factory pattern for more control over instance creation and lifetime
-        services.AddSingleton<IGameModelFactory>(serviceProvider => 
-        {
-            var logger = serviceProvider.GetRequiredService<ILogger>();
-            return new GameModelFactory(logger);
-        });
+        // Core Services
+        services.AddSingleton<ILogger, CustomDebugLogger>();
+        services.AddSingleton<IConfigurationService, AppPreferencesConfigService>();
+        services.AddSingleton<IPlatformService, DefaultPlatformService>();
     }
     
-    private static void RegisterViewModels(IServiceCollection services)
+    private static void RegisterFeatures(IServiceCollection services)
     {
-        // Performance: Lazy initialization through factory
+        // Game feature components
+        RegisterGameFeature(services);
+        
+        // Future features can be added here as separate methods
+        // RegisterSettingsFeature(services);
+        // RegisterHighScoreFeature(services);
+    }
+    
+    private static void RegisterGameFeature(IServiceCollection services)
+    {
+        // Register game models
+        services.AddSingleton<IGameModelFactory, GameModelFactory>();
+        
+        // Register game view models with lazy initialization for performance
         services.AddSingleton<GameViewModel>(serviceProvider => 
         {
             var dispatcher = serviceProvider.GetRequiredService<IDispatcher>();
@@ -76,5 +87,8 @@ public static class MauiProgram
         // Register Pages as transient for lower memory usage
         // Each instance is created when requested and disposed when finished
         services.AddTransient<MainPage>();
+        
+        // Register feature-specific pages
+        services.AddTransient<Features.Game.Pages.GamePage>();
     }
 }

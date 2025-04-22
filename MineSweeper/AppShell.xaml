@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:MineSweeper"
     xmlns:controls="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
     xmlns:viewControls="clr-namespace:MineSweeper.Views.Controls"
+    xmlns:gamePages="clr-namespace:MineSweeper.Features.Game.Pages"
     x:DataType="local:AppShell"
     Shell.FlyoutBehavior="Flyout"
     FlyoutBackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
@@ -58,14 +59,17 @@
     <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent
             Title="Easy Game"
+            ContentTemplate="{DataTemplate gamePages:GamePage}"
             Route="EasyGame" />
 
         <ShellContent
             Title="Medium Game"
+            ContentTemplate="{DataTemplate gamePages:GamePage}"
             Route="MediumGame" />
 
         <ShellContent
             Title="Hard Game"
+            ContentTemplate="{DataTemplate gamePages:GamePage}"
             Route="HardGame" />
     </FlyoutItem>
 

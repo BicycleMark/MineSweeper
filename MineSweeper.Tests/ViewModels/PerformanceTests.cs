@@ -1,7 +1,11 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using MineSweeper.Models;
-using MineSweeper.ViewModels;
+using Microsoft.Maui.Dispatching;
+using Microsoft.Maui.Graphics;
+using Moq;
+using MineSweeper.Features.Game.Models;
+using MineSweeper.Features.Game.ViewModels;
+using MineSweeper.Services.Logging;
 
 namespace MineSweeper.Tests.ViewModels;
 

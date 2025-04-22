@@ -1,8 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.Input;
-using MineSweeper.Models;
-using MineSweeper.ViewModels;
+using Microsoft.Maui.Dispatching;
+using Microsoft.Maui.Graphics;
+using Moq;
+using MineSweeper.Features.Game.Models;
+using MineSweeper.Features.Game.ViewModels;
+using MineSweeper.Services.Logging;
 
 namespace MineSweeper.Tests.ViewModels;
 

@@ -1,8 +1,18 @@
-refactor(MauiProgram): Improve performance and maintainability
+feat: Refactor to feature-based architecture
 
-- Restructure MauiProgram.cs into logical, focused methods
-- Implement factory patterns for lazy initialization of services
-- Add explicit dependency resolution to improve performance
-- Optimize service lifetimes (singletons for shared services, transient for UI)
-- Configure handler placeholders for future rendering optimizations
-- Add detailed comments explaining performance considerations
+- Removed duplicate files in Models/ and ViewModels/ folders
+- Standardized on using Features/Game/Models and Features/Game/ViewModels
+- Kept Services/ folder for cross-cutting concerns
+- Fixed namespace references in XAML and code files
+- Added JSON converters to the Features/Game/Models namespace
+- Updated navigation to use new feature-organized pages
+- Fixed platform-specific orientation code to use fully qualified names
+
+This commit completes the transition to a clean feature-based architecture 
+with proper separation of concerns:
+
+1. Features/ - Contains domain-specific code organized by feature
+2. Services/ - Contains cross-cutting technical concerns
+
+The app now has a more maintainable structure with clearer dependencies
+and better organization.

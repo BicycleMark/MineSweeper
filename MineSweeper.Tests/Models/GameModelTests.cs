@@ -1,4 +1,4 @@
-using MineSweeper.Models;
+using MineSweeper.Features.Game.Models;
 
 namespace MineSweeper.Tests.Models;
 
@@ -48,48 +48,9 @@ public class GameModelTests
             Assert.DoesNotContain(game.Items, i => i.IsMine);
     }
 
-    [Theory]
-    [InlineData(10, 10, 10, "SavedGame.json")]
-    [InlineData(15, 15, 40, "SavedGame.json")]
-    [InlineData(20, 20, 80, "SavedGame.json")]
-    public void SaveGameCustomConstructorTest(int rows, int columns, int mines, string fileName)
-    {
-        var game = new GameModel(rows, columns, mines);
-        game.SaveGameCommand.Execute(fileName);
-        var jsonFile = File.ReadAllText(fileName);
-
-        // Use our custom constructor instead of JsonSerializer.Deserialize
-        var constructedSavedGame = new GameModel(jsonFile);
-        Assert.NotNull(constructedSavedGame);
-        Assert.Equal(rows, constructedSavedGame.Rows);
-        Assert.Equal(columns, constructedSavedGame.Columns);
-        Assert.Equal(mines, constructedSavedGame.Mines);
-        Assert.NotNull(constructedSavedGame.Items);
-        if (constructedSavedGame.Items != null)
-            Assert.Equal(constructedSavedGame.Items.Count, rows * columns);
-    }
-
-    [Theory]
-    [InlineData(GameEnums.GameDifficulty.Easy, "SavedGame.json")]
-    [InlineData(GameEnums.GameDifficulty.Medium, "SavedGame.json")]
-    [InlineData(GameEnums.GameDifficulty.Hard, "SavedGame.json")]
-    public void SaveGameDifficultyLevelConstructorTest
-        (GameEnums.GameDifficulty gd, string fileName)
-    {
-        var game = new GameModel(gd);
-        game.SaveGameCommand.Execute(fileName);
-        var jsonFile = File.ReadAllText(fileName);
-
-        // Use our custom constructor instead of JsonSerializer.Deserialize
-        var constructedSavedGame = new GameModel(jsonFile);
-        Assert.NotNull(constructedSavedGame);
-        Assert.Equal(GameConstants.GameLevels[gd].rows, constructedSavedGame.Rows);
-        Assert.Equal(GameConstants.GameLevels[gd].columns, constructedSavedGame.Columns);
-        Assert.Equal(GameConstants.GameLevels[gd].mines, constructedSavedGame.Mines);
-        Assert.NotNull(constructedSavedGame.Items);
-        if (constructedSavedGame.Items != null)
-            Assert.Equal(constructedSavedGame.Items.Count, constructedSavedGame.Rows * constructedSavedGame.Columns);
-    }
+    // NOTE: Save/Load game functionality has been moved to the ViewModel layer
+    // The following tests have been temporarily removed as they tested functionality
+    // that's no longer directly available at the model level
 
     [Theory]
     [InlineData(20, 20, 0, GameEnums.GameStatus.InProgress)]

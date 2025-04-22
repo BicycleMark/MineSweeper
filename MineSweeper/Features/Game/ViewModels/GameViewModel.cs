@@ -1,8 +1,15 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Input;
-using MineSweeper.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Dispatching;
+using Microsoft.Maui.Graphics;
+using MineSweeper.Features.Game.Models;
+using MineSweeper.Services.Logging;
+using ILogger = MineSweeper.Services.Logging.ILogger;
 
-namespace MineSweeper.ViewModels;
+namespace MineSweeper.Features.Game.ViewModels;
 
 /// <summary>
 ///     ViewModel for the Minesweeper game, implementing the MVVM pattern.
@@ -31,7 +38,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         ILogger logger,
         IGameModelFactory modelFactory)
     {
-        _logger = logger ?? new CustomDebugLogger();
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
         _gameModel = _modelFactory.CreateModel(GameEnums.GameDifficulty.Easy);
@@ -39,7 +46,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         // Initialize timer
         InitializeTimer();
 
-        _logger?.Log("GameViewModel initialized");
+        _logger.Log("GameViewModel initialized");
     }
 
     // ICommand properties for IGameViewModel interface

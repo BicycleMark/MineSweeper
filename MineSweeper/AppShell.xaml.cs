@@ -1,6 +1,7 @@
-﻿using System.Diagnostics;
-using MineSweeper.Models;
-using MineSweeper.ViewModels;
+﻿﻿﻿﻿﻿﻿using System.Diagnostics;
+using MineSweeper.Features.Game.Models;
+using MineSweeper.Features.Game.Pages;
+using MineSweeper.Features.Game.ViewModels;
 using MineSweeper.Views.Controls;
 
 namespace MineSweeper;
@@ -13,9 +14,10 @@ public partial class AppShell : Shell
 
         // Register routes for navigation
         Routing.RegisterRoute("MainPage", typeof(MainPage));
-        Routing.RegisterRoute("EasyGame", typeof(MainPage));
-        Routing.RegisterRoute("MediumGame", typeof(MainPage));
-        Routing.RegisterRoute("HardGame", typeof(MainPage));
+        Routing.RegisterRoute("GamePage", typeof(GamePage));
+        Routing.RegisterRoute("EasyGame", typeof(GamePage));
+        Routing.RegisterRoute("MediumGame", typeof(GamePage));
+        Routing.RegisterRoute("HardGame", typeof(GamePage));
 
 
         Routing.RegisterRoute("SquareImageGridExample", typeof(SquareImageGridExample));
@@ -81,6 +83,19 @@ public partial class AppShell : Shell
                     Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
                     viewModel.NewGameCommand.Execute(difficulty);
                     mainPage.SelectRandomGameAnimationStyle();
+                }
+            }
+            else if (Current.CurrentPage is GamePage gamePage)
+            {
+                // Get the view model from the GamePage
+                var viewModel = gamePage.BindingContext as GameViewModel;
+
+                // Execute the command with the difficulty parameter
+                if (viewModel != null)
+                {
+                    Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
+                    viewModel.NewGameCommand.Execute(difficulty);
+                    gamePage.SelectRandomGameAnimationStyle();
                 }
             }
         }

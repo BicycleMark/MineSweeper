@@ -1,6 +1,13 @@
+using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Graphics;
+using MineSweeper.Services.Logging;
+using ILogger = MineSweeper.Services.Logging.ILogger;
 
-namespace MineSweeper.Models;
+namespace MineSweeper.Features.Game.Models;
 
 /// <summary>
 ///     Model class for the Minesweeper game, containing all game logic and state
@@ -65,7 +72,7 @@ public partial class GameModel : ObservableObject, IGameModel
     /// <param name="rows">Number of rows in the game</param>
     /// <param name="columns">Number of columns in the game</param>
     /// <param name="mines">Number of Mines to be generated in random spots</param>
-    /// <param name="logger">Optional customDebugLogger for debugging</param>
+    /// <param name="logger">Optional logger for debugging</param>
     public GameModel(int rows = 10, int columns = 10, int mines = 10, ILogger? logger = null)
     {
         _logger = logger;
@@ -106,7 +113,7 @@ public partial class GameModel : ObservableObject, IGameModel
     ///     <see cref="GameConstants.GameLevels" />
     /// </summary>
     /// <param name="gameDifficulty">The difficulty level</param>
-    /// <param name="logger">Optional customDebugLogger for debugging</param>
+    /// <param name="logger">Optional logger for debugging</param>
     public GameModel(GameEnums.GameDifficulty gameDifficulty, ILogger? logger = null)
     {
         _logger = logger;
@@ -142,108 +149,6 @@ public partial class GameModel : ObservableObject, IGameModel
     }
 
     /// <summary>
-    ///     Constructor that takes a JSON file and deserializes it into a GameModel
-    /// </summary>
-    /// <param name="jsonFile"></param>
-    public GameModel(string jsonFile)
-    {
-        try
-        {
-            // Parse the JSON manually
-            var jsonDocument = JsonDocument.Parse(jsonFile);
-            var root = jsonDocument.RootElement;
-
-            // Extract basic properties
-            if (root.TryGetProperty("Rows", out var rowsElement))
-                _rows = rowsElement.GetInt32();
-
-            if (root.TryGetProperty("Columns", out var columnsElement))
-                _columns = columnsElement.GetInt32();
-
-            if (root.TryGetProperty("Mines", out var minesElement))
-                _mines = minesElement.GetInt32();
-
-            if (root.TryGetProperty("GameTime", out var gameTimeElement))
-                _gameTime = gameTimeElement.GetInt32();
-
-            if (root.TryGetProperty("GameStatus", out var gameStatusElement))
-            {
-                if (gameStatusElement.ValueKind == JsonValueKind.String)
-                {
-                    var statusString = gameStatusElement.GetString();
-                    if (Enum.TryParse<GameEnums.GameStatus>(statusString, out var status))
-                        _gameStatus = status;
-                }
-                else if (gameStatusElement.ValueKind == JsonValueKind.Number)
-                {
-                    var statusInt = gameStatusElement.GetInt32();
-                    if (Enum.IsDefined(typeof(GameEnums.GameStatus), statusInt))
-                        _gameStatus = (GameEnums.GameStatus) statusInt;
-                }
-            }
-
-            // Initialize items collection
-            _items = new ObservableCollection<SweeperItem>();
-
-            // Parse items if present
-            if (root.TryGetProperty("Items", out var itemsElement) && itemsElement.ValueKind == JsonValueKind.Array)
-                foreach (var itemElement in itemsElement.EnumerateArray())
-                {
-                    var item = new SweeperItem();
-
-                    if (itemElement.TryGetProperty("IsRevealed", out var isRevealedElement))
-                        item.IsRevealed = isRevealedElement.GetBoolean();
-
-                    if (itemElement.TryGetProperty("IsMine", out var isMineElement))
-                        item.IsMine = isMineElement.GetBoolean();
-
-                    if (itemElement.TryGetProperty("IsFlagged", out var isFlaggedElement))
-                        item.IsFlagged = isFlaggedElement.GetBoolean();
-
-                    if (itemElement.TryGetProperty("MineCount", out var mineCountElement))
-                        item.MineCount = mineCountElement.GetInt32();
-
-                    if (itemElement.TryGetProperty("Point", out var pointElement))
-                    {
-                        double x = 0, y = 0;
-
-                        if (pointElement.TryGetProperty("X", out var xElement))
-                            x = xElement.GetDouble();
-
-                        if (pointElement.TryGetProperty("Y", out var yElement))
-                            y = yElement.GetDouble();
-
-                        item.Point = new Point(x, y);
-                    }
-
-                    _items.Add(item);
-                }
-            else
-                // If no items in JSON, create default grid
-                for (var i = 0; i < _rows; i++)
-                for (var j = 0; j < _columns; j++)
-                    _items.Add(new SweeperItem());
-
-            _logger?.Log($"Game loaded from JSON with {Rows}x{Columns} grid and {Mines} mines");
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError($"Error loading game from JSON: {ex.Message}");
-            // Initialize with default values
-            _rows = 10;
-            _columns = 10;
-            _mines = 10;
-            _gameTime = 0;
-            _gameStatus = GameEnums.GameStatus.NotStarted;
-            _items = new ObservableCollection<SweeperItem>();
-
-            for (var i = 0; i < _rows; i++)
-            for (var j = 0; j < _columns; j++)
-                _items.Add(new SweeperItem());
-        }
-    }
-
-    /// <summary>
     ///     The Indexer allows for accessing the SweeperItem at a specific row and column
     /// </summary>
     /// <param name="row"></param>
@@ -272,63 +177,6 @@ public partial class GameModel : ObservableObject, IGameModel
             item.IsFlagged = false; // Ensure mines are not flagged
         }
     }
-
-    /// <summary>
-    ///     Saving the Game to a JSON file
-    /// </summary>
-    /// <param name="fileName">The file does not need to exist</param>
-    [RelayCommand]
-    private void SaveGame(string fileName)
-    {
-        try
-        {
-            using var stream = new MemoryStream();
-            using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions {Indented = true});
-
-            writer.WriteStartObject();
-
-            // Write basic properties
-            writer.WriteNumber("Rows", Rows);
-            writer.WriteNumber("Columns", Columns);
-            writer.WriteNumber("Mines", Mines);
-            writer.WriteNumber("FlaggedItems", FlaggedItems);
-            writer.WriteNumber("RemainingMines", RemainingMines);
-            writer.WriteNumber("GameTime", GameTime);
-            writer.WriteString("GameStatus", GameStatus.ToString());
-
-            // Write items array
-            writer.WriteStartArray("Items");
-
-            foreach (var item in Items)
-            {
-                writer.WriteStartObject();
-                writer.WriteBoolean("IsRevealed", item.IsRevealed);
-                writer.WriteBoolean("IsMine", item.IsMine);
-                writer.WriteBoolean("IsFlagged", item.IsFlagged);
-                writer.WriteNumber("MineCount", item.MineCount);
-
-                writer.WriteStartObject("Point");
-                writer.WriteNumber("X", item.Point.X);
-                writer.WriteNumber("Y", item.Point.Y);
-                writer.WriteEndObject();
-
-                writer.WriteEndObject();
-            }
-
-            writer.WriteEndArray();
-            writer.WriteEndObject();
-
-            writer.Flush();
-
-            File.WriteAllBytes(fileName, stream.ToArray());
-            _logger?.Log($"Game saved to {fileName}");
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError($"Error saving game to {fileName}: {ex.Message}");
-        }
-    }
-
 
     /// <summary>
     ///     Evaluates if the Game is Won

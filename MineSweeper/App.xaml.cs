@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿﻿using System.Diagnostics;
 using Microsoft.Maui.Handlers;
 #if IOS || MACCATALYST
 using Foundation;  // Add this for NSNumber and NSString
@@ -24,7 +24,7 @@ public partial class App : Application
                 NSNumber.FromNInt((int)UIKit.UIInterfaceOrientation.Portrait),
                 new NSString("orientation"));
 #elif ANDROID
-            var activity = Platform.CurrentActivity;
+            var activity = Microsoft.Maui.ApplicationModel.Platform.CurrentActivity;
             if (activity != null)
             {
                 activity.RequestedOrientation = Android.Content.PM.ScreenOrientation.Portrait;

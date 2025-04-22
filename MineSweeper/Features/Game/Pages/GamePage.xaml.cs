@@ -3,23 +3,24 @@ using MineSweeper.Features.Game.Models;
 using MineSweeper.Features.Game.ViewModels;
 using MineSweeper.Services.Logging;
 using MineSweeper.Views.Controls;
+using ILogger = MineSweeper.Services.Logging.ILogger;
 
-namespace MineSweeper;
+namespace MineSweeper.Features.Game.Pages;
 
-public partial class MainPage : ContentPage
+public partial class GamePage : ContentPage
 {
     private readonly GridAnimationManager _animationManager;
     private readonly ILogger _logger;
     private readonly GameViewModel _viewModel;
 
-    public MainPage(GameViewModel viewModel, ILogger logger)
+    public GamePage(GameViewModel viewModel, ILogger logger)
     {
         InitializeComponent();
         _logger = logger;
         _viewModel = viewModel;
         BindingContext = _viewModel;
 
-        // Initialize animation manager
+        // Initialize animation manager after UI components are initialized
         _animationManager = new GridAnimationManager(GameGrid);
 
         // Set up the chiseled border for the top panel
@@ -137,12 +138,12 @@ public partial class MainPage : ContentPage
     /// </summary>
     protected override void OnAppearing()
     {
-        _logger.Log("MainPage: OnAppearing starting");
+        _logger.Log("GamePage: OnAppearing starting");
 
         try
         {
             base.OnAppearing();
-            _logger.Log("MainPage: OnAppearing completed successfully");
+            _logger.Log("GamePage: OnAppearing completed successfully");
         }
         catch (InvalidOperationException ex)
         {
@@ -159,14 +160,14 @@ public partial class MainPage : ContentPage
     /// </summary>
     protected override void OnDisappearing()
     {
-        _logger.Log("MainPage: OnDisappearing starting");
+        _logger.Log("GamePage: OnDisappearing starting");
 
         try
         {
             // Clean up animation manager
             _animationManager.Cleanup();
             base.OnDisappearing();
-            _logger.Log("MainPage: OnDisappearing completed successfully");
+            _logger.Log("GamePage: OnDisappearing completed successfully");
         }
         catch (InvalidOperationException ex)
         {
