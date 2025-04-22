@@ -15,23 +15,23 @@
     <!-- Shell Styles -->
     <Shell.Resources>
         <Style TargetType="FlyoutItem">
-            <Setter Property="Shell.TabBarIsVisible" Value="False"/>
-            <Setter Property="FlyoutDisplayOptions" Value="AsMultipleItems"/>
+            <Setter Property="Shell.TabBarIsVisible" Value="False" />
+            <Setter Property="FlyoutDisplayOptions" Value="AsMultipleItems" />
         </Style>
     </Shell.Resources>
 
     <!-- Flyout Header -->
     <Shell.FlyoutHeader>
-        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" 
+        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
               HeightRequest="100" Padding="20">
-            <Label Text="MineSweeper" 
-                   FontSize="28" 
-                   FontAttributes="Bold" 
-                   TextColor="White" 
-                   VerticalOptions="Center"/>
+            <Label Text="MineSweeper"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   VerticalOptions="Center" />
         </Grid>
     </Shell.FlyoutHeader>
-    
+
     <!-- Custom Flyout Item Template -->
     <Shell.ItemTemplate>
         <DataTemplate x:DataType="controls:BaseShellItem">
@@ -40,13 +40,13 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Label Text="{Binding Title}" 
+                <Label Text="{Binding Title}"
                        Grid.Column="1"
                        FontSize="24" />
             </Grid>
         </DataTemplate>
     </Shell.ItemTemplate>
-    
+
     <!-- Main Page (Default) - This is the initial page shown but not in flyout menu -->
     <ShellContent
         Title="Mine Sweeper"
@@ -59,11 +59,11 @@
         <ShellContent
             Title="Easy Game"
             Route="EasyGame" />
-            
+
         <ShellContent
             Title="Medium Game"
             Route="MediumGame" />
-            
+
         <ShellContent
             Title="Hard Game"
             Route="HardGame" />
@@ -73,12 +73,12 @@
     <MenuItem Text="-" />
 
     <!-- Grid Examples Menu Items -->
-    
+
     <ShellContent
         Title="Square Image Grid Example"
         ContentTemplate="{DataTemplate viewControls:SquareImageGridExample}"
         Route="SquareImageGridExample" />
-        
+
     <ShellContent
         Title="LED Control Example"
         ContentTemplate="{DataTemplate viewControls:LedControlExample}"

@@ -5,7 +5,8 @@
 The current implementation uses a "select source, then select destination" pattern:
 
 1. **IsDragDropEnabled Property**: A bindable property that controls whether drag-and-drop functionality is enabled.
-2. **PlayFromToCommand Property**: A command that executes when a move is completed, receiving a `PlayFromToRecord` with source and destination points.
+2. **PlayFromToCommand Property**: A command that executes when a move is completed, receiving a `PlayFromToRecord` with
+   source and destination points.
 3. **_selectedCell Field**: Tracks the first selected cell (the "from" position).
 4. **OnGridCellTapped Method**: Modified to handle the two-tap selection process when drag-and-drop is enabled.
 5. **ClearSelection Method**: Allows clearing the current selection.
@@ -15,32 +16,32 @@ The current implementation uses a "select source, then select destination" patte
 For a more sophisticated drag-and-drop implementation using MAUI's native capabilities, you would need to:
 
 1. **Add Drag Gesture Recognizers**:
-   - Create `DragGestureRecognizer` objects for each draggable cell
-   - Handle `DragStarting` event to capture the source position
-   - Handle `DropCompleted` event to clean up after a drag operation
+    - Create `DragGestureRecognizer` objects for each draggable cell
+    - Handle `DragStarting` event to capture the source position
+    - Handle `DropCompleted` event to clean up after a drag operation
 
 2. **Add Drop Gesture Recognizers**:
-   - Create a `DropGestureRecognizer` for the grid
-   - Set `AllowDrop = true`
-   - Handle `DragOver` event to determine if a drop is allowed
-   - Handle `Drop` event to process the completed drag operation
+    - Create a `DropGestureRecognizer` for the grid
+    - Set `AllowDrop = true`
+    - Handle `DragOver` event to determine if a drop is allowed
+    - Handle `Drop` event to process the completed drag operation
 
 3. **Visual Feedback**:
-   - Create a visual indicator for the selected cell
-   - Implement a "ghost" image that follows the cursor during drag
-   - Add highlighting for valid drop targets
+    - Create a visual indicator for the selected cell
+    - Implement a "ghost" image that follows the cursor during drag
+    - Add highlighting for valid drop targets
 
 4. **Data Transfer**:
-   - Use the `DataPackage` system to transfer data between drag source and drop target
-   - Include the source position in the drag data
+    - Use the `DataPackage` system to transfer data between drag source and drop target
+    - Include the source position in the drag data
 
 5. **Platform-Specific Considerations**:
-   - Handle platform differences in drag-and-drop behavior
-   - Test on all target platforms (Android, iOS, Windows)
+    - Handle platform differences in drag-and-drop behavior
+    - Test on all target platforms (Android, iOS, Windows)
 
 6. **Performance Optimization**:
-   - Ensure smooth performance during drag operations
-   - Minimize unnecessary visual updates
+    - Ensure smooth performance during drag operations
+    - Minimize unnecessary visual updates
 
 ## Implementation Steps
 
@@ -98,4 +99,5 @@ For a more sophisticated drag-and-drop implementation using MAUI's native capabi
    }
    ```
 
-The current implementation provides a solid foundation that you can build upon if you need more sophisticated drag-and-drop functionality in the future.
+The current implementation provides a solid foundation that you can build upon if you need more sophisticated
+drag-and-drop functionality in the future.

@@ -1,22 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.Maui.Storage;
 using MineSweeper.ViewModels;
 
 namespace MineSweeper.Views.ImageLoaders;
 
 /// <summary>
-/// Base class for image loaders that load game piece images from resources
+///     Base class for image loaders that load game piece images from resources
 /// </summary>
 public abstract class ImageLoader : IImageLoader
 {
-    /// <summary>
-    /// The current theme path being used
-    /// </summary>
-    protected string currentTheme = string.Empty;
-    
     protected readonly string[] imageFiles =
     {
         "digit_0_image.svg",
@@ -45,7 +35,35 @@ public abstract class ImageLoader : IImageLoader
         "unplayed.svg",
         "wrong_guess.svg"
     };
-    
+
+    /// <summary>
+    ///     The current theme path being used
+    /// </summary>
+    protected string currentTheme = string.Empty;
+
+    // Base implementation of IImageLoader interface
+    public virtual async Task InitializeAsync(string themePrefix = "Themes/default")
+    {
+        currentTheme = themePrefix;
+        await ValidateThemeCompleteness(themePrefix);
+        await LoadAllImagesAsync(themePrefix);
+    }
+
+    public virtual async Task ChangeThemeAsync(string themePrefix)
+    {
+        if (currentTheme == themePrefix)
+            // Already using this theme - no need to reload
+            return;
+
+        // Validate new theme before changing
+        await ValidateThemeCompleteness(themePrefix);
+        currentTheme = themePrefix;
+        await LoadAllImagesAsync(themePrefix);
+    }
+
+    // Abstract method that derived classes must implement
+    public abstract object GetImageResource(GamePieceEnum.ThemedGamPieces piece);
+
     // Maps enum values to their corresponding filenames
     protected virtual string MapEnumToFileName(GamePieceEnum.ThemedGamPieces piece)
     {
@@ -79,32 +97,7 @@ public abstract class ImageLoader : IImageLoader
             _ => throw new ArgumentOutOfRangeException(nameof(piece), piece, "Unknown themed game piece")
         };
     }
-    
-    // Base implementation of IImageLoader interface
-    public virtual async Task InitializeAsync(string themePrefix = "Themes/default")
-    {
-        currentTheme = themePrefix;
-        await ValidateThemeCompleteness(themePrefix);
-        await LoadAllImagesAsync(themePrefix);
-    }
-    
-    public virtual async Task ChangeThemeAsync(string themePrefix)
-    {
-        if (currentTheme == themePrefix)
-        {
-            // Already using this theme - no need to reload
-            return;
-        }
-        
-        // Validate new theme before changing
-        await ValidateThemeCompleteness(themePrefix);
-        currentTheme = themePrefix;
-        await LoadAllImagesAsync(themePrefix);
-    }
-    
-    // Abstract method that derived classes must implement
-    public abstract object GetImageResource(GamePieceEnum.ThemedGamPieces piece);
-    
+
     // Protected methods for derived classes to use
     protected virtual async Task<string> LoadMauiAsset(string prefix, string assetName)
     {
@@ -113,13 +106,12 @@ public abstract class ImageLoader : IImageLoader
         using var reader = new StreamReader(stream);
         return await reader.ReadToEndAsync();
     }
-    
+
     protected virtual async Task ValidateThemeCompleteness(string themePrefix)
     {
         List<string> missingFiles = new();
-        
+
         foreach (var fileName in imageFiles)
-        {
             try
             {
                 // Try to open the file to verify it exists
@@ -130,15 +122,12 @@ public abstract class ImageLoader : IImageLoader
                 // File doesn't exist
                 missingFiles.Add(fileName);
             }
-        }
-        
+
         if (missingFiles.Count > 0)
-        {
             throw new FileNotFoundException(
                 $"The following required files are missing from theme '{themePrefix}': {string.Join(", ", missingFiles)}");
-        }
     }
-    
+
     // Abstract method that derived classes must implement to load their specific resources
     protected abstract Task LoadAllImagesAsync(string themePrefix);
 }

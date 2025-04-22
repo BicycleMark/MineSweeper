@@ -1,36 +1,36 @@
 namespace MineSweeper.Models;
 
 /// <summary>
-/// Simple logging interface for debugging
+///     Simple logging interface for debugging
 /// </summary>
 public interface ILogger
 {
     /// <summary>
-    /// Logs an informational message
+    ///     Logs an informational message
     /// </summary>
     /// <param name="message">The message to log</param>
     void Log(string message);
-    
+
     /// <summary>
-    /// Logs an error message
+    ///     Logs an error message
     /// </summary>
     /// <param name="message">The error message to log</param>
     void LogError(string message);
-    
+
     /// <summary>
-    /// Logs a warning message
+    ///     Logs a warning message
     /// </summary>
     /// <param name="message">The warning message to log</param>
     void LogWarning(string message);
 }
 
 /// <summary>
-/// Console implementation of ILogger that writes messages to the console
+///     Console implementation of ILogger that writes messages to the console
 /// </summary>
 public class ConsoleCustomDebugLogger : ILogger
 {
     /// <summary>
-    /// Logs an informational message to the console
+    ///     Logs an informational message to the console
     /// </summary>
     /// <param name="message">The message to log</param>
     public void Log(string message)
@@ -39,7 +39,7 @@ public class ConsoleCustomDebugLogger : ILogger
     }
 
     /// <summary>
-    /// Logs an error message to the console
+    ///     Logs an error message to the console
     /// </summary>
     /// <param name="message">The error message to log</param>
     public void LogError(string message)
@@ -48,7 +48,7 @@ public class ConsoleCustomDebugLogger : ILogger
     }
 
     /// <summary>
-    /// Logs a warning message to the console
+    ///     Logs a warning message to the console
     /// </summary>
     /// <param name="message">The warning message to log</param>
     public void LogWarning(string message)
@@ -58,15 +58,15 @@ public class ConsoleCustomDebugLogger : ILogger
 }
 
 /// <summary>
-/// Custom debug customDebugLogger implementation to demonstrate dependency injection is working
+///     Custom debug customDebugLogger implementation to demonstrate dependency injection is working
 /// </summary>
 /// <remarks>
-/// This customDebugLogger prefixes messages with "CUSTOM" to distinguish them from the standard customDebugLogger
+///     This customDebugLogger prefixes messages with "CUSTOM" to distinguish them from the standard customDebugLogger
 /// </remarks>
 public class CustomDebugLogger : ILogger
 {
     /// <summary>
-    /// Logs an informational message with a custom prefix
+    ///     Logs an informational message with a custom prefix
     /// </summary>
     /// <param name="message">The message to log</param>
     public void Log(string message)
@@ -75,7 +75,7 @@ public class CustomDebugLogger : ILogger
     }
 
     /// <summary>
-    /// Logs an error message with a custom prefix
+    ///     Logs an error message with a custom prefix
     /// </summary>
     /// <param name="message">The error message to log</param>
     public void LogError(string message)
@@ -84,7 +84,7 @@ public class CustomDebugLogger : ILogger
     }
 
     /// <summary>
-    /// Logs a warning message with a custom prefix
+    ///     Logs a warning message with a custom prefix
     /// </summary>
     /// <param name="message">The warning message to log</param>
     public void LogWarning(string message)

@@ -4,66 +4,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MineSweeper.Views.Controls"
              xmlns:viewmodels="clr-namespace:MineSweeper.ViewModels"
-             xmlns:models="clr-namespace:MineSweeper.Models"
              xmlns:converters="clr-namespace:MineSweeper.Views.Converters"
-             xmlns:local="clr-namespace:MineSweeper.Views.Controls"
              x:Class="MineSweeper.MainPage"
              x:DataType="viewmodels:GameViewModel">
 
     <ContentPage.Resources>
         <ResourceDictionary>
             <!-- Converters -->
-            <converters:SimpleRevealedConverter x:Key="SimpleRevealedConverter" />
-            <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter" />
-            <converters:InverseBoolToOpacityConverter x:Key="InverseBoolToOpacityConverter" />
-            <converters:MineCountToColorConverter x:Key="MineCountToColorConverter" />
-            <converters:NonZeroConverter x:Key="NonZeroConverter" />
             <converters:BoolConverter x:Key="BoolConverter" />
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:ProgressConverter x:Key="ProgressConverter" />
 
             <!-- Game Button Style -->
-            <Style x:Key="GameButtonStyle" TargetType="Button">
-                <Setter Property="FontSize" Value="14" />
-                <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Padding" Value="10,8" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="BackgroundColor"
-                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
-                <Setter Property="TextColor" Value="{AppThemeBinding Light=White, Dark=White}" />
-                <Setter Property="Shadow">
-                    <Shadow Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
-                            Offset="0,2"
-                            Radius="4"
-                            Opacity="0.2" />
-                </Setter>
-            </Style>
 
             <!-- Game Label Style -->
-            <Style x:Key="GameLabelStyle" TargetType="Label">
-                <Setter Property="VerticalOptions" Value="Center" />
-                <Setter Property="HorizontalOptions" Value="Center" />
-                <Setter Property="FontSize" Value="16" />
-                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource MidnightBlue}, Dark=White}" />
-            </Style>
 
             <!-- Game Info Panel Style -->
-            <Style x:Key="GameInfoPanelStyle" TargetType="Border">
-                <Setter Property="Stroke"
-                        Value="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource CellBorderDark}}" />
-                <Setter Property="StrokeThickness" Value="1" />
-                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
-                <Setter Property="BackgroundColor"
-                        Value="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}" />
-                <Setter Property="Padding" Value="10,8" />
-                <Setter Property="Shadow">
-                    <Shadow Brush="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}"
-                            Offset="0,2"
-                            Radius="4"
-                            Opacity="0.2" />
-                </Setter>
-            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -121,16 +77,16 @@
         <Grid Grid.Row="1" Margin="8,4,8,0">
             <!-- Chiseled Border using GraphicsView -->
             <GraphicsView x:Name="TopPanelBorder"
-                         HorizontalOptions="Fill"
-                         VerticalOptions="Fill"
-                         BackgroundColor="Transparent" />
-            
+                          HorizontalOptions="Fill"
+                          VerticalOptions="Fill"
+                          BackgroundColor="Transparent" />
+
             <!-- Background -->
             <BoxView BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource MidnightBlue}}"
-                    Margin="6"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill" />
-            
+                     Margin="6"
+                     HorizontalOptions="Fill"
+                     VerticalOptions="Fill" />
+
             <!-- Content -->
             <Grid Margin="10" Padding="0">
                 <Grid.ColumnDefinitions>
@@ -140,53 +96,53 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Mines Counter -->
-                <controls:LedControl Grid.Column="0" 
+                <controls:LedControl Grid.Column="0"
                                      Margin="2"
-                                    BorderThickness="2" 
-                                    Value="{Binding Mines}"
-                                    ShowBorder="True"
-                                    SizeScale="1.0"
-                                    DisplayBackgroundColor="#222222"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center" />
+                                     BorderThickness="2"
+                                     Value="{Binding Mines}"
+                                     ShowBorder="True"
+                                     SizeScale="1.0"
+                                     DisplayBackgroundColor="#222222"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center" />
 
                 <!-- Game Status -->
-                <controls:GameStateControl 
-                       Grid.Column="1"
-                       Status="{Binding GameStatus}"
-                       Command="{Binding NewGameCommand}"
-                       CommandParameter="{Binding GameDifficulty}"
-                       SizeScale="1.2"
-                       BorderThickness="2"
-                       ShowBorder="True"
-                       DisplayBackgroundColor="#222222"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center" />
-                
+                <controls:GameStateControl
+                    Grid.Column="1"
+                    Status="{Binding GameStatus}"
+                    Command="{Binding NewGameCommand}"
+                    CommandParameter="{Binding GameDifficulty}"
+                    SizeScale="1.2"
+                    BorderThickness="2"
+                    ShowBorder="True"
+                    DisplayBackgroundColor="#222222"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center" />
+
                 <!-- Timer -->
-                <controls:LedControl Grid.Column="2" 
-                                    BorderThickness="2" 
-                                    Margin="2"
-                                    Value="{Binding Time}"
-                                    ShowBorder="True"
-                                    SizeScale="1.0"
-                                    DisplayBackgroundColor="#222222"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center" />
+                <controls:LedControl Grid.Column="2"
+                                     BorderThickness="2"
+                                     Margin="2"
+                                     Value="{Binding Time}"
+                                     ShowBorder="True"
+                                     SizeScale="1.0"
+                                     DisplayBackgroundColor="#222222"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="Center" />
             </Grid>
         </Grid>
-        
+
         <!-- Game Grid with ChiseledBorder -->
         <Grid Grid.Row="2">
             <controls:ChiseledBorder ShadowColor="{AppThemeBinding Light=DimGray, Dark=Black}"
-                                    HighlightColor="{AppThemeBinding Light=LightGray, Dark=#444444}"
-                                    BorderThickness="6"
-                                    ContentBackgroundColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource MidnightBlue}}"
-                                    IsRecessed="True"
-                                    Margin="4,0,4,0"
-                                    Padding="4"
-                                    HorizontalOptions="Fill"
-                                    VerticalOptions="Fill">
+                                     HighlightColor="{AppThemeBinding Light=LightGray, Dark=#444444}"
+                                     BorderThickness="6"
+                                     ContentBackgroundColor="{AppThemeBinding Light={StaticResource CellBorder}, Dark={StaticResource MidnightBlue}}"
+                                     IsRecessed="True"
+                                     Margin="4,0,4,0"
+                                     Padding="4"
+                                     HorizontalOptions="Fill"
+                                     VerticalOptions="Fill">
                 <!-- Keep the original Border inside for compatibility -->
                 <Border BackgroundColor="Transparent"
                         Padding="0"

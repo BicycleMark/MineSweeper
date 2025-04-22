@@ -3,33 +3,33 @@ using System.Text.Json.Serialization;
 namespace MineSweeper.Models;
 
 /// <summary>
-/// SweeperItem has all the properties of a single cell in the game board.
+///     SweeperItem has all the properties of a single cell in the game board.
 /// </summary>
 [JsonConverter(typeof(SweeperItemJsonConverter))]
 public partial class SweeperItem : ObservableObject
 {
     /// <summary>
-    /// Whether the cell has been revealed by the player
+    ///     Whether the cell has been flagged by the player
     /// </summary>
-    [ObservableProperty] private bool _isRevealed = false;
-    
+    [ObservableProperty] private bool _isFlagged;
+
     /// <summary>
-    /// Whether the cell contains a mine
+    ///     Whether the cell contains a mine
     /// </summary>
-    [ObservableProperty] private bool _isMine = false;
-    
+    [ObservableProperty] private bool _isMine;
+
     /// <summary>
-    /// Whether the cell has been flagged by the player
+    ///     Whether the cell has been revealed by the player
     /// </summary>
-    [ObservableProperty] private bool _isFlagged = false;
-    
+    [ObservableProperty] private bool _isRevealed;
+
     /// <summary>
-    /// The number of mines in adjacent cells
+    ///     The number of mines in adjacent cells
     /// </summary>
-    [ObservableProperty] private int _mineCount = 0;
-    
+    [ObservableProperty] private int _mineCount;
+
     /// <summary>
-    /// The position of this cell in the grid
+    ///     The position of this cell in the grid
     /// </summary>
     [ObservableProperty] private Point _point;
 }

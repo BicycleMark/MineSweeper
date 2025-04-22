@@ -9,7 +9,7 @@ namespace MineSweeper;
 public class AppDelegate : MauiUIApplicationDelegate
 {
     protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
-    
+
     public UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
     {
         // Lock to Portrait orientation

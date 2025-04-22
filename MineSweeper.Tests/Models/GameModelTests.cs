@@ -1,4 +1,3 @@
-using System.Text.Json;
 using MineSweeper.Models;
 
 namespace MineSweeper.Tests.Models;
@@ -58,7 +57,7 @@ public class GameModelTests
         var game = new GameModel(rows, columns, mines);
         game.SaveGameCommand.Execute(fileName);
         var jsonFile = File.ReadAllText(fileName);
-        
+
         // Use our custom constructor instead of JsonSerializer.Deserialize
         var constructedSavedGame = new GameModel(jsonFile);
         Assert.NotNull(constructedSavedGame);
@@ -80,7 +79,7 @@ public class GameModelTests
         var game = new GameModel(gd);
         game.SaveGameCommand.Execute(fileName);
         var jsonFile = File.ReadAllText(fileName);
-        
+
         // Use our custom constructor instead of JsonSerializer.Deserialize
         var constructedSavedGame = new GameModel(jsonFile);
         Assert.NotNull(constructedSavedGame);
@@ -147,24 +146,24 @@ public class GameModelTests
         var game = new GameModel(gd);
         Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
         Assert.Equal(0, game.Items.Count(i => i.IsMine));
-        
+
         // Act - Flag a cell as the first move
         var point = new Point(0, 0);
         game.FlagCommand.Execute(point);
-        
+
         // Assert
         // Game status should remain NotStarted
         Assert.Equal(GameEnums.GameStatus.NotStarted, game.GameStatus);
-        
+
         // Cell should not be flagged
         Assert.False(game[0, 0].IsFlagged);
-        
+
         // Verify no mines are placed yet
         Assert.Equal(0, game.Items.Count(i => i.IsMine));
-        
+
         // Verify FlaggedItems count is not updated
         Assert.Equal(0, game.FlaggedItems);
-        
+
         // Verify RemainingMines matches the expected mines for the difficulty
         var expectedMines = GameConstants.GameLevels[gd].mines;
         Assert.Equal(expectedMines, game.RemainingMines);

@@ -1,19 +1,15 @@
 using System.Globalization;
-using Microsoft.Maui.Controls;
 
 namespace MineSweeper.Views.Converters;
 
 /// <summary>
-/// Simple boolean converter that returns the input boolean value
+///     Simple boolean converter that returns the input boolean value
 /// </summary>
 public class BoolConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool boolValue)
-        {
-            return boolValue;
-        }
+        if (value is bool boolValue) return boolValue;
         return false;
     }
 
@@ -24,16 +20,13 @@ public class BoolConverter : IValueConverter
 }
 
 /// <summary>
-/// Inverts a boolean value
+///     Inverts a boolean value
 /// </summary>
 public class InverseBoolConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is bool boolValue)
-        {
-            return !boolValue;
-        }
+        if (value is bool boolValue) return !boolValue;
         return true;
     }
 
@@ -44,7 +37,7 @@ public class InverseBoolConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts an integer percentage (0-100) to a double progress value (0.0-1.0)
+///     Converts an integer percentage (0-100) to a double progress value (0.0-1.0)
 /// </summary>
 public class ProgressConverter : IValueConverter
 {
@@ -54,10 +47,11 @@ public class ProgressConverter : IValueConverter
         {
             // Ensure value is between 0 and 100
             intValue = Math.Max(0, Math.Min(100, intValue));
-            
+
             // Convert to double between 0.0 and 1.0
             return intValue / 100.0;
         }
+
         return 0.0;
     }
 

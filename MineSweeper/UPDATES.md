@@ -1,9 +1,9 @@
 ANDROID ENVIRONMENT STATUS: 3/17/2025, 2:13:01 AM
- 
+
 Here is the status of your Android development environment:
- 
+
 Required components:
- 
+
 	✗ Java SDK - UPDATE REQUIRED (VERSION 11.0.16.1 TO VERSION '17.0.12')
 		- Path: '/Library/Java/JavaVirtualMachines/microsoft-11.jdk/Contents/Home' (VSCode settings)
 
@@ -16,9 +16,9 @@ Required components:
 		✓ build-tools/35.0.0 - INSTALLED (version '35.0.0')
 		✓ platform-tools - INSTALLED (version '35.0.2')
 		✓ cmdline-tools/12.0 - INSTALLED (version '17.0')
- 
+
 Optional components:
- 
+
 	✓ Android Virtual Device (AVD) - COMPLETE
 		- AVD Path: '/Users/markwardell/.android/avd'
 		- AVD devices - DETECTED ('Pixel8API35','PixelXL(Eite)API32','Pixel5API30')
@@ -28,73 +28,85 @@ Optional components:
 		✓ system-images/android-35/google_apis_playstore/arm64-v8a - INSTALLED (version '9')
 		✓ system-images/android-32/google_apis/arm64-v8a - INSTALLED (version '4')
 		✓ system-images/android-30/google_apis/arm64-v8a - INSTALLED (version '16')
- 
+
 IMPORTANT:
-- If you are sharing the Android SDK location with Android Studio, the recommended way to install/update the SDK and accept licenses is by using Android Studio.
- 
+
+- If you are sharing the Android SDK location with Android Studio, the recommended way to install/update the SDK and
+  accept licenses is by using Android Studio.
+
 ACTION REQUIRED:
-✗- Java Development Kit (JDK) - The selected Java SDK version 11.0.16.1 is not recommended. Ensure the required JDK version 17.0.12 is configured by installing the JDK, and then setting the JDK at the preferred level.
-	1. Install the JDK:
-		- From the command palette, choose '.NET MAUI: Configure Android', select 'How to configure Android', and follow the instructions.
-	2. Set the JDK via one of the following routes:
-		- (Recommended) Set the JAVA_HOME environment variable to define the Java SDK path at the machine level.
-		- Configure the path to be used by adding the MSBuild property JavaSdkDirectory in the '.csproj' file to define the Android SDK path at the project level.
-		- From the command palette, select '.NET MAUI: Configure Android', and then 'Java SDK Preferred location' to set the preferred Java SDK path at the user/workspace level.
+✗- Java Development Kit (JDK) - The selected Java SDK version 11.0.16.1 is not recommended. Ensure the required JDK
+version 17.0.12 is configured by installing the JDK, and then setting the JDK at the preferred level.
+1. Install the JDK:
+- From the command palette, choose '.NET MAUI: Configure Android', select 'How to configure Android', and follow the
+instructions.
+2. Set the JDK via one of the following routes:
+- (Recommended) Set the JAVA_HOME environment variable to define the Java SDK path at the machine level.
+- Configure the path to be used by adding the MSBuild property JavaSdkDirectory in the '.csproj' file to define the
+Android SDK path at the project level.
+- From the command palette, select '.NET MAUI: Configure Android', and then 'Java SDK Preferred location' to set the
+preferred Java SDK path at the user/workspace level.
 SUGGESTION:
-- Android SDK - There are optional Android SDK components required for emulator usage that we recommend to installed/upgraded: "system-images/android-35/google_apis/arm64-v8a".
-	1. Install the Android SDK components:
-		- From the command palette, choose '.NET MAUI: Configure Android', select 'How to configure Android', and follow the instructions.
-		- Alternatively, you can try installing the components by opening a Terminal, navigating to directory '/Users/markwardell/Library/Android/sdk/cmdline-tools/latest/bin' and then running: './sdkmanager "system-images;android-35;google_apis;arm64-v8a"'. Then, from the command palette, choose '.NET MAUI: Configure Android', and 'Refresh Android environment'.
- 
+
+- Android SDK - There are optional Android SDK components required for emulator usage that we recommend to
+  installed/upgraded: "system-images/android-35/google_apis/arm64-v8a".
+    1. Install the Android SDK components:
+        - From the command palette, choose '.NET MAUI: Configure Android', select 'How to configure Android', and follow
+          the instructions.
+        - Alternatively, you can try installing the components by opening a Terminal, navigating to directory '
+          /Users/markwardell/Library/Android/sdk/cmdline-tools/latest/bin' and then running: './sdkmanager "
+          system-images;android-35;google_apis;arm64-v8a"'. Then, from the command palette, choose '.NET MAUI: Configure
+          Android', and 'Refresh Android environment'.
+
 Xcode:
-	- Path: /Applications/Xcode.app
-	- Discovered from: xcode-select -p
-	- Installed: true
+- Path: /Applications/Xcode.app
+- Discovered from: xcode-select -p
+- Installed: true
 
 # MineSweeper Updates - 3/17/2025
 
 ## UI Improvements
 
 1. **Modern Color Scheme**:
-   - Implemented a fresh, modern color palette using flat design principles
-   - Added game-specific colors for cells, mines, and flags
-   - Created proper dark mode support with appropriate color variations
-   - Used a blue/green/red color scheme for difficulty levels
+    - Implemented a fresh, modern color palette using flat design principles
+    - Added game-specific colors for cells, mines, and flags
+    - Created proper dark mode support with appropriate color variations
+    - Used a blue/green/red color scheme for difficulty levels
 
 2. **Enhanced Layout and Typography**:
-   - Added a proper game title at the top
-   - Improved spacing and padding throughout the UI
-   - Used consistent font sizes and weights for better readability
-   - Applied proper alignment and centering of elements
+    - Added a proper game title at the top
+    - Improved spacing and padding throughout the UI
+    - Used consistent font sizes and weights for better readability
+    - Applied proper alignment and centering of elements
 
 3. **Professional Visual Effects**:
-   - Added subtle shadows to UI elements for depth
-   - Implemented rounded corners on borders and buttons
-   - Created consistent styling for all interactive elements
-   - Improved the visual hierarchy with proper spacing
+    - Added subtle shadows to UI elements for depth
+    - Implemented rounded corners on borders and buttons
+    - Created consistent styling for all interactive elements
+    - Improved the visual hierarchy with proper spacing
 
 4. **Game Grid Improvements**:
-   - Enhanced cell appearance with rounded corners
-   - Added subtle shadows to cells for a more tactile feel
-   - Improved the visual distinction between revealed and unrevealed cells
-   - Used custom colors for mines and flags
+    - Enhanced cell appearance with rounded corners
+    - Added subtle shadows to cells for a more tactile feel
+    - Improved the visual distinction between revealed and unrevealed cells
+    - Used custom colors for mines and flags
 
 ## UniformGrid Control Improvements
 
 1. **Fixed Initialization Issues**:
-   - Properly initialized the `_gridLayoutImplementation` field
-   - Added default values for width and height
-   - Added better error handling for invalid dimensions
+    - Properly initialized the `_gridLayoutImplementation` field
+    - Added default values for width and height
+    - Added better error handling for invalid dimensions
 
 2. **Enhanced Layout Logic**:
-   - Improved the `MeasureOverride` method to handle infinite constraints
-   - Enhanced the `ArrangeOverride` method for more accurate child positioning
-   - Added better logging for debugging layout issues
+    - Improved the `MeasureOverride` method to handle infinite constraints
+    - Enhanced the `ArrangeOverride` method for more accurate child positioning
+    - Added better logging for debugging layout issues
 
 3. **Improved Item Size Calculation**:
-   - Added validation for rows, columns, and available space
-   - Fixed calculation of item size based on available space
-   - Ensured proper positioning of child elements in the grid
+    - Added validation for rows, columns, and available space
+    - Fixed calculation of item size based on available space
+    - Ensured proper positioning of child elements in the grid
 
 All tests are passing, and the application now displays correctly on MacCatalyst.
 
@@ -103,32 +115,33 @@ All tests are passing, and the application now displays correctly on MacCatalyst
 ## DirectUniformGameGrid Implementation
 
 1. **Created DirectUniformGameGrid Control**:
-   - Implemented a new XAML control that directly uses UniformGrid
-   - Added basic properties (ItemsSource, Rows, Columns, ItemTemplate)
-   - Implemented tap gesture handling for both play and flag actions
-   - Inlined the SweeperItemTemplate for better performance
+    - Implemented a new XAML control that directly uses UniformGrid
+    - Added basic properties (ItemsSource, Rows, Columns, ItemTemplate)
+    - Implemented tap gesture handling for both play and flag actions
+    - Inlined the SweeperItemTemplate for better performance
 
 2. **UniformGrid Performance Improvements**:
-   - Reduced excessive logging to improve performance
-   - Optimized measure and arrange methods for faster layout
-   - Added batching for item updates to reduce layout passes
-   - Implemented view caching to reuse objects and improve memory usage
+    - Reduced excessive logging to improve performance
+    - Optimized measure and arrange methods for faster layout
+    - Added batching for item updates to reduce layout passes
+    - Implemented view caching to reuse objects and improve memory usage
 
 3. **MainPage Optimizations**:
-   - Replaced StandardGameGrid with DirectUniformGameGrid
-   - Defined the ItemTemplate directly in MainPage.xaml
-   - Removed unused controls (StandardGameGrid, GameGrid, SweeperItemTemplate)
+    - Replaced StandardGameGrid with DirectUniformGameGrid
+    - Defined the ItemTemplate directly in MainPage.xaml
+    - Removed unused controls (StandardGameGrid, GameGrid, SweeperItemTemplate)
 
 4. **Progressive Loading Implementation**:
-   - Modified GameViewModel to support loading cells in batches
-   - Added loading progress indicator during grid creation
-   - Implemented transparent loading overlay to allow user interaction
-   - Added batch processing to improve responsiveness
+    - Modified GameViewModel to support loading cells in batches
+    - Added loading progress indicator during grid creation
+    - Implemented transparent loading overlay to allow user interaction
+    - Added batch processing to improve responsiveness
 
 5. **Final Cleanup**:
-   - Removed unused code and controls from the project
-   - Updated project file to exclude unused XAML files
-   - Added new converters for improved UI responsiveness
-   - Updated documentation and comments
+    - Removed unused code and controls from the project
+    - Updated project file to exclude unused XAML files
+    - Added new converters for improved UI responsiveness
+    - Updated documentation and comments
 
-These optimizations significantly improve the application's performance, especially for larger grid sizes. The game now loads progressively, allowing user interaction as soon as the first batch of cells is loaded.
+These optimizations significantly improve the application's performance, especially for larger grid sizes. The game now
+loads progressively, allowing user interaction as soon as the first batch of cells is loaded.

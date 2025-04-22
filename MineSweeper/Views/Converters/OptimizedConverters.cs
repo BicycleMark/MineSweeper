@@ -1,11 +1,9 @@
 using System.Globalization;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
 
 namespace MineSweeper.Views.Converters;
 
 /// <summary>
-/// Converts a boolean to a color for cell background (revealed/unrevealed)
+///     Converts a boolean to a color for cell background (revealed/unrevealed)
 /// </summary>
 public class SimpleRevealedConverter : IValueConverter
 {
@@ -18,16 +16,15 @@ public class SimpleRevealedConverter : IValueConverter
             {
                 var revealedKey = "CellRevealed";
                 var unrevealedKey = "CellUnrevealed";
-                
-                if (Application.Current.Resources.TryGetValue(isRevealed ? revealedKey : unrevealedKey, out var color) && color is Color)
-                {
-                    return color;
-                }
+
+                if (Application.Current.Resources.TryGetValue(isRevealed ? revealedKey : unrevealedKey,
+                        out var color) && color is Color) return color;
             }
-            
+
             // Fallback colors
             return isRevealed ? Colors.LightGray : Colors.DarkGray;
         }
+
         return Colors.Transparent;
     }
 
@@ -38,7 +35,7 @@ public class SimpleRevealedConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts a boolean to opacity (1.0 for true, 0.0 for false)
+///     Converts a boolean to opacity (1.0 for true, 0.0 for false)
 /// </summary>
 public class BoolToOpacityConverter : IValueConverter
 {
@@ -54,7 +51,7 @@ public class BoolToOpacityConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts a boolean to opacity (0.0 for true, 1.0 for false)
+///     Converts a boolean to opacity (0.0 for true, 1.0 for false)
 /// </summary>
 public class InverseBoolToOpacityConverter : IValueConverter
 {
@@ -70,7 +67,7 @@ public class InverseBoolToOpacityConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts a mine count to a color
+///     Converts a mine count to a color
 /// </summary>
 public class MineCountToColorConverter : IValueConverter
 {
@@ -80,13 +77,11 @@ public class MineCountToColorConverter : IValueConverter
         {
             // Get color from application resources if available
             var resourceKey = $"MineCount{mineCount}Color";
-            if (Application.Current?.Resources != null && 
-                Application.Current.Resources.TryGetValue(resourceKey, out var color) && 
+            if (Application.Current?.Resources != null &&
+                Application.Current.Resources.TryGetValue(resourceKey, out var color) &&
                 color is Color)
-            {
                 return color;
-            }
-            
+
             // Fallback colors
             return mineCount switch
             {
@@ -101,6 +96,7 @@ public class MineCountToColorConverter : IValueConverter
                 _ => Colors.Transparent
             };
         }
+
         return Colors.Transparent;
     }
 
@@ -111,7 +107,7 @@ public class MineCountToColorConverter : IValueConverter
 }
 
 /// <summary>
-/// Converts a numeric value to a boolean (true if > 0)
+///     Converts a numeric value to a boolean (true if > 0)
 /// </summary>
 public class NonZeroConverter : IValueConverter
 {

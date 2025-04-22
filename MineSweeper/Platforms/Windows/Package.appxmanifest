@@ -38,7 +38,7 @@
                                  Square310x310Logo="$placeholder$.png"/>
                 <uap:SplashScreen Image="$placeholder$.png"/>
                 <uap:InitialRotationPreference>
-                    <uap:Rotation Preference="portrait" />
+                    <uap:Rotation Preference="portrait"/>
                 </uap:InitialRotationPreference>
             </uap:VisualElements>
         </Application>

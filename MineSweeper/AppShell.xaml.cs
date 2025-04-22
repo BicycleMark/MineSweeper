@@ -1,6 +1,7 @@
-﻿﻿using Microsoft.Maui.Controls;
-   using MineSweeper.Models;
+﻿using System.Diagnostics;
+using MineSweeper.Models;
 using MineSweeper.ViewModels;
+using MineSweeper.Views.Controls;
 
 namespace MineSweeper;
 
@@ -9,25 +10,25 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
-        
+
         // Register routes for navigation
         Routing.RegisterRoute("MainPage", typeof(MainPage));
         Routing.RegisterRoute("EasyGame", typeof(MainPage));
         Routing.RegisterRoute("MediumGame", typeof(MainPage));
         Routing.RegisterRoute("HardGame", typeof(MainPage));
-        
-       
-        Routing.RegisterRoute("SquareImageGridExample", typeof(Views.Controls.SquareImageGridExample));
-        Routing.RegisterRoute("LedControlExample", typeof(Views.Controls.LedControlExample));
-        
+
+
+        Routing.RegisterRoute("SquareImageGridExample", typeof(SquareImageGridExample));
+        Routing.RegisterRoute("LedControlExample", typeof(LedControlExample));
+
         // Subscribe to route selection events
         Navigating += OnShellNavigating;
-        
+
         // Add debug logging
-        System.Diagnostics.Debug.WriteLine("AppShell: Constructor called");
-        System.Diagnostics.Debug.WriteLine("AppShell: Routes registered for navigation");
+        Debug.WriteLine("AppShell: Constructor called");
+        Debug.WriteLine("AppShell: Routes registered for navigation");
     }
-    
+
     private void OnShellNavigating(object? sender, ShellNavigatingEventArgs e)
     {
         try
@@ -37,7 +38,7 @@ public partial class AppShell : Shell
             {
                 // Cancel the navigation to EasyGame and stay on MainPage
                 e.Cancel();
-                
+
                 // Start a new Easy game
                 StartNewGame(GameEnums.GameDifficulty.Easy);
             }
@@ -45,7 +46,7 @@ public partial class AppShell : Shell
             {
                 // Cancel the navigation to MediumGame and stay on MainPage
                 e.Cancel();
-                
+
                 // Start a new Medium game
                 StartNewGame(GameEnums.GameDifficulty.Medium);
             }
@@ -53,31 +54,31 @@ public partial class AppShell : Shell
             {
                 // Cancel the navigation to HardGame and stay on MainPage
                 e.Cancel();
-                
+
                 // Start a new Hard game
                 StartNewGame(GameEnums.GameDifficulty.Hard);
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error in OnShellNavigating: {ex}");
+            Debug.WriteLine($"Error in OnShellNavigating: {ex}");
         }
     }
-    
+
     private void StartNewGame(GameEnums.GameDifficulty difficulty)
     {
         try
         {
             // Get the current page
-            if (Shell.Current.CurrentPage is MainPage mainPage)
+            if (Current.CurrentPage is MainPage mainPage)
             {
                 // Get the view model and start a new game
                 var viewModel = mainPage.BindingContext as GameViewModel;
-                
+
                 // Execute the command with the difficulty parameter
                 if (viewModel != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
+                    Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
                     viewModel.NewGameCommand.Execute(difficulty);
                     mainPage.SelectRandomGameAnimationStyle();
                 }
@@ -85,7 +86,7 @@ public partial class AppShell : Shell
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error starting new game: {ex}");
+            Debug.WriteLine($"Error starting new game: {ex}");
         }
     }
 }

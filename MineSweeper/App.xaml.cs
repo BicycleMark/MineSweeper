@@ -1,13 +1,10 @@
-﻿﻿﻿﻿﻿﻿
-using Microsoft.Maui;
-using Microsoft.Maui.Controls;
-using MineSweeper.Models;
-using MineSweeper.ViewModels;
-using MineSweeper.Views.ImageLoaders;
+﻿using System.Diagnostics;
+using Microsoft.Maui.Handlers;
 #if IOS || MACCATALYST
 using Foundation;  // Add this for NSNumber and NSString
 using UIKit;      // Add this for UIInterfaceOrientation
 #endif
+
 namespace MineSweeper;
 
 public partial class App : Application
@@ -15,11 +12,11 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-        
+
         // Add debug logging
-        System.Diagnostics.Debug.WriteLine("App: Constructor called");
-           // Lock orientation to portrait on all platforms
-        Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping("OrientationLock", (handler, view) =>
+        Debug.WriteLine("App: Constructor called");
+        // Lock orientation to portrait on all platforms
+        WindowHandler.Mapper.AppendToMapping("OrientationLock", (handler, view) =>
         {
 #if IOS || MACCATALYST
             var nativeWindow = handler.PlatformView;
@@ -38,22 +35,22 @@ public partial class App : Application
         try
         {
             // Use AppShell to enable navigation between pages
-            System.Diagnostics.Debug.WriteLine("App: Creating AppShell for navigation");
+            Debug.WriteLine("App: Creating AppShell for navigation");
             var appShell = new AppShell();
-            System.Diagnostics.Debug.WriteLine("App: AppShell created successfully");
-            
+            Debug.WriteLine("App: AppShell created successfully");
+
             // Create and return a window with AppShell
             var window = new Window(appShell);
-            System.Diagnostics.Debug.WriteLine("App: Window created with AppShell");
+            Debug.WriteLine("App: Window created with AppShell");
             return window;
         }
         catch (Exception ex)
         {
             // Log any exceptions
-            System.Diagnostics.Debug.WriteLine($"App: Error creating AppShell: {ex}");
-            
+            Debug.WriteLine($"App: Error creating AppShell: {ex}");
+
             // Create a simple error page instead of trying to instantiate MainPage
-            System.Diagnostics.Debug.WriteLine("App: Creating simple error page");
+            Debug.WriteLine("App: Creating simple error page");
             var errorPage = new ContentPage
             {
                 Content = new VerticalStackLayout
