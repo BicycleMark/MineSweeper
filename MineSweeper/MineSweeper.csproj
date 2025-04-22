@@ -95,6 +95,8 @@
         <Compile Remove="Resources\Images\Themes\default\svg\**" />
         <Compile Remove="Views\Controls\CanvasImageGrid.cs" />
         <Compile Remove="Views\Controls\CanvasImageGridExample.xaml.cs" />
+        <Compile Remove="Views\Controls\PlayPointsSequence.cs" />
+        <Compile Remove="Views\Controls\PlayFromToRecord.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -113,6 +115,10 @@
       <None Remove="Resources\Images\Themes\**" />
       <None Remove="Resources\Images\Themes\tropical\**" />
       <None Remove="Resources\Images\Themes\default\svg\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Views\Controls\Helpers\" />
     </ItemGroup>
 
 </Project>
