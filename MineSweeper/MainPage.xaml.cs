@@ -7,14 +7,9 @@ namespace MineSweeper;
 
 public partial class MainPage : ContentPage
 {
-    private const int DoubleTapThresholdMs = 300; // Double tap threshold in milliseconds
     private readonly GridAnimationManager _animationManager;
     private readonly ILogger _logger;
-
-    // Dictionary to track which cells have been tapped for double-tap detection
-    private readonly Dictionary<int, bool> _tappedCells = new();
     private readonly GameViewModel _viewModel;
-    private DateTime _lastTapTime = DateTime.MinValue;
 
     public MainPage(GameViewModel viewModel)
     {
@@ -59,11 +54,19 @@ public partial class MainPage : ContentPage
             // Force a redraw
             TopPanelBorder.Invalidate();
 
-            Debug.WriteLine("Top panel border set up successfully");
+            _logger.Log("Top panel border set up successfully");
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError($"Invalid argument for border setup: {ex.Message}");
+        }
+        catch (NullReferenceException ex)
+        {
+            _logger.LogError($"Null reference in border setup: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error setting up top panel border: {ex}");
+            _logger.LogError($"Unexpected error setting up top panel border: {ex.Message}");
         }
     }
 
@@ -73,11 +76,26 @@ public partial class MainPage : ContentPage
     /// </summary>
     public void SelectRandomGameAnimationStyle()
     {
-        _animationManager.SelectRandomAnimationStyle();
+        try
+        {
+            _animationManager.SelectRandomAnimationStyle();
+            _logger.Log("Random animation style selected");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error selecting animation style: {ex.Message}");
+        }
     }
 
+    /// <summary>
+    ///     Handles the page loaded event.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event arguments.</param>
     private async void OnPageLoaded(object? sender, EventArgs e)
     {
+        _logger.Log("Page loaded, initializing game");
+        
         try
         {
             // Delay the game initialization to improve navigation performance
@@ -85,55 +103,77 @@ public partial class MainPage : ContentPage
 
             // Select a random animation style for this game
             _animationManager.SelectRandomAnimationStyle();
+            _logger.Log("Animation style selected");
 
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
+            _logger.Log("New game created with Easy difficulty");
 
             // Set up animations
             _animationManager.SetupAnimations();
-
+            
             // Create the grid
             GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
+            _logger.Log($"Grid created with {_viewModel.Rows} rows and {_viewModel.Columns} columns");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError($"UI operation error in OnPageLoaded: {ex.Message}");
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError($"Task canceled in OnPageLoaded: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error in OnPageLoaded: {ex}");
+            _logger.LogError($"Unexpected error in OnPageLoaded: {ex.Message}");
         }
     }
 
 
+    /// <summary>
+    ///     Called when the page appears.
+    /// </summary>
     protected override void OnAppearing()
     {
+        _logger.Log("MainPage: OnAppearing starting");
+
         try
         {
-            Debug.WriteLine("MainPage: OnAppearing starting");
-
             base.OnAppearing();
-
-            Debug.WriteLine("MainPage: OnAppearing completed successfully");
+            _logger.Log("MainPage: OnAppearing completed successfully");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError($"UI operation error in OnAppearing: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"MainPage: Exception in OnAppearing: {ex}");
+            _logger.LogError($"Unexpected error in OnAppearing: {ex.Message}");
         }
     }
 
+    /// <summary>
+    ///     Called when the page disappears.
+    /// </summary>
     protected override void OnDisappearing()
     {
+        _logger.Log("MainPage: OnDisappearing starting");
+
         try
         {
-            Debug.WriteLine("MainPage: OnDisappearing starting");
-
             // Clean up animation manager
             _animationManager.Cleanup();
-
             base.OnDisappearing();
-
-            Debug.WriteLine("MainPage: OnDisappearing completed successfully");
+            _logger.Log("MainPage: OnDisappearing completed successfully");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError($"UI operation error in OnDisappearing: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"MainPage: Exception in OnDisappearing: {ex}");
+            _logger.LogError($"Unexpected error in OnDisappearing: {ex.Message}");
         }
     }
 }

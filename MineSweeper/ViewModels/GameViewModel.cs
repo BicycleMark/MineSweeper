@@ -13,10 +13,9 @@ namespace MineSweeper.ViewModels;
 /// </summary>
 public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposable
 {
-    private readonly ILogger _customDebugLogger;
+    private readonly ILogger? _logger;
     private readonly IDispatcher _dispatcher;
     private readonly IGameModelFactory _modelFactory;
-    private readonly ILogger? _logger;
     private bool _disposed;
     private IGameModel _gameModel;
     private IDispatcherTimer? _timer;
@@ -25,16 +24,15 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     ///     Initializes a new instance of the GameViewModel class
     /// </summary>
     /// <param name="dispatcher">The dispatcher for UI thread operations</param>
-    /// <param name="customDebugLogger">Logger for debugging</param>
+    /// <param name="logger">Logger for debugging and error reporting</param>
     /// <param name="modelFactory">The factory for creating game models</param>
     public GameViewModel(
         IDispatcher dispatcher,
-        ILogger customDebugLogger,
+        ILogger logger,
         IGameModelFactory modelFactory)
     {
-        _logger = customDebugLogger ?? new CustomDebugLogger();
+        _logger = logger ?? new CustomDebugLogger();
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-        _customDebugLogger = customDebugLogger ?? throw new ArgumentNullException(nameof(customDebugLogger));
         _modelFactory = modelFactory ?? throw new ArgumentNullException(nameof(modelFactory));
         _gameModel = _modelFactory.CreateModel(GameEnums.GameDifficulty.Easy);
 
@@ -118,7 +116,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Cannot set game status: model is null or disposed");
+            _logger?.LogWarning("Cannot set game status: model is null or disposed");
             return;
         }
 
@@ -136,7 +134,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     {
         if (_disposed)
         {
-            _customDebugLogger?.LogWarning("Cannot invoke check game status: disposed");
+            _logger?.LogWarning("Cannot invoke check game status: disposed");
             return;
         }
 
@@ -147,11 +145,6 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     #endregion
 
     #region Commands
-
-    /// <summary>
-    ///     Gets or sets the batch size for progressive loading
-    /// </summary>
-    private const int BatchSize = 50;
 
     /// <summary>
     ///     Gets or sets whether the grid is fully loaded
@@ -279,7 +272,9 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     ///     Simulates progressive loading for UI feedback
     /// </summary>
     /// <param name="totalItems">The total number of items</param>
-    private async Task SimulateProgressiveLoading(int totalItems)
+    /// <param name="progressIncrement">The increment to use for progress updates (default: 10)</param>
+    /// <param name="delayMs">Delay in milliseconds between progress updates (default: 1)</param>
+    private async Task SimulateProgressiveLoading(int totalItems, int progressIncrement = 10, int delayMs = 1)
     {
         if (totalItems == 0)
         {
@@ -287,15 +282,26 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
             return;
         }
 
-        _logger?.Log($"Starting simulated progressive loading of {totalItems} items");
+        // Validate parameters
+        progressIncrement = Math.Clamp(progressIncrement, 1, 50); // Ensure reasonable range
+        delayMs = Math.Clamp(delayMs, 1, 100); // Prevent excessive delays
+
+        _logger?.Log($"Starting simulated progressive loading of {totalItems} items " +
+                     $"with increment {progressIncrement} and delay {delayMs}ms");
 
         // Simulate loading progress in steps
-        for (var progress = 0; progress <= 100; progress += 10)
+        for (var progress = 0; progress <= 100; progress += progressIncrement)
         {
             LoadingProgress = progress;
 
             // Allow UI to update by yielding to the UI thread
-            await Task.Delay(1); // Minimal delay to allow UI updates
+            await Task.Delay(delayMs);
+        }
+
+        // Ensure we end at 100%
+        if (LoadingProgress < 100)
+        {
+            LoadingProgress = 100;
         }
 
         _logger?.Log("Completed simulated progressive loading");
