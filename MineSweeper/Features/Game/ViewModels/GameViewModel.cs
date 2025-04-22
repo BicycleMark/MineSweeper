@@ -478,7 +478,7 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
         Mines = _gameModel.Mines;
 
         // Calculate remaining mines
-        RemainingMines = _gameModel.Mines - _gameModel.FlaggedItems;
+        RemainingMines = _gameModel.RemainingMines;
 
         // Update game status
         GameStatus = _gameModel.GameStatus;
