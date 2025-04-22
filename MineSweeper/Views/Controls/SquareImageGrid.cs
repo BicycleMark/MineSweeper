@@ -70,17 +70,8 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         typeof(SquareImageGrid),
         true,
         propertyChanged: OnBorderPropertyChanged);
-
-    /// <summary>
-    ///     Bindable property for whether drag and drop is enabled.
-    /// </summary>
-    public static readonly BindableProperty IsDragDropEnabledProperty = BindableProperty.Create(
-        nameof(IsDragDropEnabled),
-        typeof(bool),
-        typeof(SquareImageGrid),
-        false,
-        propertyChanged: OnDragDropEnabledChanged);
-
+    
+    
     private readonly ChiseledBorder _border;
     private readonly AbsoluteLayout _container;
 
@@ -207,16 +198,7 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         get => (bool) GetValue(IsRecessedProperty);
         set => SetValue(IsRecessedProperty, value);
     }
-
-    /// <summary>
-    ///     Gets or sets whether drag and drop is enabled.
-    /// </summary>
-    public bool IsDragDropEnabled
-    {
-        get => (bool) GetValue(IsDragDropEnabledProperty);
-        set => SetValue(IsDragDropEnabledProperty, value);
-    }
-
+    
     /// <summary>
     ///     Indexer to get or set the image at a specific row and column.
     /// </summary>
@@ -363,24 +345,6 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         if (bindable is SquareImageGrid grid)
             // Update the border appearance
             grid.UpdateBorderAppearance();
-    }
-
-    /// <summary>
-    ///     Called when the IsDragDropEnabled property changes.
-    /// </summary>
-    /// <param name="bindable">The bindable object whose property changed.</param>
-    /// <param name="oldValue">The old property value.</param>
-    /// <param name="newValue">The new property value.</param>
-    private static void OnDragDropEnabledChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        if (bindable is SquareImageGrid grid)
-        {
-            // Set up or tear down drag and drop based on the new value
-            if ((bool) newValue)
-                grid.SetupDragAndDrop();
-            else
-                grid.TearDownDragAndDrop();
-        }
     }
 
     /// <summary>
@@ -532,26 +496,7 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                rectangle.Fill is SolidColorBrush brush &&
                brush.Color == Colors.Transparent;
     }
-
-    /// <summary>
-    ///     Sets up drag and drop functionality.
-    /// </summary>
-    private void SetupDragAndDrop()
-    {
-        // For the simplified implementation, we'll use the existing tap gesture recognizer
-        // and track the selected cell to implement a "select source, then select destination" pattern
-        _selectedCell = null;
-    }
-
-    /// <summary>
-    ///     Tears down drag and drop functionality.
-    /// </summary>
-    private void TearDownDragAndDrop()
-    {
-        // Clear the selected cell
-        _selectedCell = null;
-    }
-
+    
     /// <summary>
     ///     Clears the current cell selection.
     /// </summary>

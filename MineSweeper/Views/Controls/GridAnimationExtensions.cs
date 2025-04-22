@@ -5,39 +5,90 @@ namespace MineSweeper.Extensions;
 /// </summary>
 public static class GridAnimationExtensions
 {
-    // Animation pattern enum
+    /// <summary>
+    ///     Defines patterns for how cells are animated in sequence.
+    /// </summary>
     public enum AnimationPattern
     {
+        /// <summary>Cell animations follow a sequential order based on row and column indices.</summary>
         Sequential,
+        
+        /// <summary>Animation starts from top-left corner and spreads like a wave.</summary>
         WaveFromTopLeft,
+        
+        /// <summary>Animation spreads outward from the center.</summary>
         WaveFromCenter,
+        
+        /// <summary>Animation follows a spiral pattern.</summary>
         Spiral,
+        
+        /// <summary>Cells animate in random order.</summary>
         Random,
+        
+        /// <summary>Cells animate in a checkerboard pattern.</summary>
         Checkerboard
     }
 
-    // Animation type enum
+    /// <summary>
+    ///     Defines visual animation types that can be applied to grid cells.
+    /// </summary>
     public enum AnimationType
     {
+        /// <summary>Cells flip into view along the Y-axis.</summary>
         FlipIn,
+        
+        /// <summary>Cells fade into view.</summary>
         FadeIn,
+        
+        /// <summary>Cells scale from small to full size.</summary>
         ScaleIn,
+        
+        /// <summary>Cells bounce into view with an elastic effect.</summary>
         BounceIn,
+        
+        /// <summary>Cells spin into view.</summary>
         SpinIn,
+        
+        /// <summary>Cells slide into view.</summary>
         SlideIn,
+        
+        /// <summary>Each cell uses a randomly selected animation.</summary>
         RandomPerCell,
+        
+        /// <summary>Animation sweeps diagonally from top-left to bottom-right.</summary>
         SwipeDiagonalTopLeftBottomRight,
+        
+        /// <summary>Animation sweeps diagonally from top-right to bottom-left.</summary>
         SwipeDiagonalTopRightBottomLeft,
+        
+        /// <summary>Animation sweeps diagonally from bottom-left to top-right.</summary>
         SwipeDiagonalBottomLeftTopRight,
+        
+        /// <summary>Animation sweeps diagonally from bottom-right to top-left.</summary>
         SwipeDiagonalBottomRightTopLeft,
+        
+        /// <summary>Animation spirals from the center outward.</summary>
         SwirlInnerToOuter,
+        
+        /// <summary>Animation spirals from outside toward the center.</summary>
         SwirlOuterToInner,
+        
+        /// <summary>Animation sweeps from left to right.</summary>
         LeftToRight,
+        
+        /// <summary>Animation sweeps from right to left.</summary>
         RightToLeft,
+        
+        /// <summary>Animation sweeps from top to bottom.</summary>
         TopToBottom,
+        
+        /// <summary>Animation sweeps from bottom to top.</summary>
         BottomToTop
     }
 
+    /// <summary>
+    ///     Random number generator for animation effects.
+    /// </summary>
     private static readonly Random _random = new();
 
     /// <summary>
@@ -128,6 +179,10 @@ public static class GridAnimationExtensions
     }
 
     // Animation implementations
+    
+    /// <summary>
+    ///     Performs a flip-in animation on the specified cell.
+    /// </summary>
     private static async Task FlipInAnimation(Image image, int row, int col)
     {
         image.Opacity = 0.3;
@@ -143,6 +198,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a fade-in animation on the specified cell.
+    /// </summary>
     private static async Task FadeInAnimation(Image image, int row, int col)
     {
         image.Opacity = 0;
@@ -153,6 +211,9 @@ public static class GridAnimationExtensions
         await image.FadeTo(1, 300, Easing.CubicOut);
     }
 
+    /// <summary>
+    ///     Performs a scale-in animation on the specified cell.
+    /// </summary>
     private static async Task ScaleInAnimation(Image image, int row, int col)
     {
         image.Opacity = 0;
@@ -167,6 +228,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a bounce-in animation on the specified cell.
+    /// </summary>
     private static async Task BounceInAnimation(Image image, int row, int col)
     {
         image.Opacity = 0.5;
@@ -181,6 +245,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a spin-in animation on the specified cell.
+    /// </summary>
     private static async Task SpinInAnimation(Image image, int row, int col)
     {
         image.Opacity = 0;
@@ -195,6 +262,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a slide-in animation on the specified cell.
+    /// </summary>
     private static async Task SlideInAnimation(Image image, int row, int col)
     {
         image.Opacity = 0.3;
@@ -209,6 +279,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a random animation for each cell.
+    /// </summary>
     private static async Task RandomPerCellAnimation(Image image, int row, int col, int totalRows, int totalColumns)
     {
         // Select a random animation type (excluding RandomPerCell)
@@ -222,6 +295,9 @@ public static class GridAnimationExtensions
         await image.AnimateCellAsync(row, col, randomType, totalRows, totalColumns);
     }
 
+    /// <summary>
+    ///     Performs a diagonal swipe animation from top-left to bottom-right.
+    /// </summary>
     private static async Task SwipeDiagonalTopLeftBottomRightAnimation(Image image, int row, int col)
     {
         image.Opacity = 0;
@@ -238,6 +314,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a diagonal swipe animation from top-right to bottom-left.
+    /// </summary>
     private static async Task SwipeDiagonalTopRightBottomLeftAnimation(Image image, int row, int col, int totalCols)
     {
         image.Opacity = 0;
@@ -254,6 +333,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a diagonal swipe animation from bottom-left to top-right.
+    /// </summary>
     private static async Task SwipeDiagonalBottomLeftTopRightAnimation(Image image, int row, int col, int totalRows)
     {
         image.Opacity = 0;
@@ -270,6 +352,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a diagonal swipe animation from bottom-right to top-left.
+    /// </summary>
     private static async Task SwipeDiagonalBottomRightTopLeftAnimation(Image image, int row, int col, int totalRows,
         int totalCols)
     {
@@ -287,6 +372,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a swirl animation from inner cells to outer cells.
+    /// </summary>
     private static async Task SwirlInnerToOuterAnimation(Image image, int row, int col, int totalRows, int totalCols)
     {
         image.Opacity = 0;
@@ -323,6 +411,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a swirl animation from outer cells to inner cells.
+    /// </summary>
     private static async Task SwirlOuterToInnerAnimation(Image image, int row, int col, int totalRows, int totalCols)
     {
         image.Opacity = 0;
@@ -363,6 +454,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a left-to-right sweep animation.
+    /// </summary>
     private static async Task LeftToRightAnimation(Image image, int row, int col, int totalCols)
     {
         image.Opacity = 0;
@@ -378,6 +472,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a right-to-left sweep animation.
+    /// </summary>
     private static async Task RightToLeftAnimation(Image image, int row, int col, int totalCols)
     {
         image.Opacity = 0;
@@ -393,6 +490,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a top-to-bottom sweep animation.
+    /// </summary>
     private static async Task TopToBottomAnimation(Image image, int row, int col, int totalRows)
     {
         image.Opacity = 0;
@@ -408,6 +508,9 @@ public static class GridAnimationExtensions
         );
     }
 
+    /// <summary>
+    ///     Performs a bottom-to-top sweep animation.
+    /// </summary>
     private static async Task BottomToTopAnimation(Image image, int row, int col, int totalRows)
     {
         image.Opacity = 0;

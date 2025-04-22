@@ -231,6 +231,9 @@ public class LedControl : ContentView
     /// <summary>
     ///     Called when the Value property changes.
     /// </summary>
+    /// <param name="bindable">The LedControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous value.</param>
+    /// <param name="newValue">The new value.</param>
     private static void OnValueChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is LedControl control) control.UpdateDisplay();
@@ -239,6 +242,9 @@ public class LedControl : ContentView
     /// <summary>
     ///     Called when the MaxDigitsToDisplay property changes.
     /// </summary>
+    /// <param name="bindable">The LedControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous maximum digits value.</param>
+    /// <param name="newValue">The new maximum digits value.</param>
     private static void OnMaxDigitsToDisplayChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is LedControl control)
@@ -254,6 +260,9 @@ public class LedControl : ContentView
     /// <summary>
     ///     Called when the PadWithZeros property changes.
     /// </summary>
+    /// <param name="bindable">The LedControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous padding value.</param>
+    /// <param name="newValue">The new padding value.</param>
     private static void OnPadWithZerosChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is LedControl control) control.UpdateDisplay();
@@ -262,6 +271,9 @@ public class LedControl : ContentView
     /// <summary>
     ///     Called when any of the border properties change.
     /// </summary>
+    /// <param name="bindable">The LedControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous property value.</param>
+    /// <param name="newValue">The new property value.</param>
     private static void OnBorderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is LedControl control)
@@ -272,6 +284,9 @@ public class LedControl : ContentView
     /// <summary>
     ///     Called when the BorderThickness property changes.
     /// </summary>
+    /// <param name="bindable">The LedControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous border thickness value.</param>
+    /// <param name="newValue">The new border thickness value.</param>
     private static void OnBorderThicknessChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is LedControl control)
@@ -289,6 +304,9 @@ public class LedControl : ContentView
     /// <summary>
     ///     Called when the size scale property changes.
     /// </summary>
+    /// <param name="bindable">The LedControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous scale factor value.</param>
+    /// <param name="newValue">The new scale factor value.</param>
     private static void OnSizeScaleChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is LedControl control) control.UpdateSize();
@@ -407,6 +425,8 @@ public class LedControl : ContentView
     /// <summary>
     ///     Gets the image name for a digit.
     /// </summary>
+    /// <param name="digit">The digit character to get the image name for.</param>
+    /// <returns>The filename of the image that corresponds to the digit.</returns>
     private string GetImageNameForDigit(char digit)
     {
         if (digit >= '0' && digit <= '9') return $"digit_{digit}_image.png";

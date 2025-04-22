@@ -1,0 +1,26 @@
+Code cleanup: Remove unused files and methods
+
+This commit improves code maintainability by removing unused code:
+
+1. Removed unused files:
+   - MainPageDebug.xaml and MainPageDebug.xaml.cs
+   - GameGrid.xaml and GameGrid.xaml.cs
+
+2. Updated references:
+   - Removed MainPageDebug references from AppShell.xaml
+   - Removed MainPageDebug route registration in AppShell.xaml.cs
+   - Updated error handling in App.xaml.cs to use a simple error page
+   - Removed MainPageDebug registration in MauiProgram.cs
+
+3. Cleaned up unused methods in MainPage.xaml.cs:
+   - Removed SetHelpButtonImage (commented out in constructor)
+   - Removed GetAllEmbeddedImages and GetCategorizedImages
+   - Removed OnSquareImageGridExampleClicked, OnLedControlExampleClicked,
+     and OnHelpButtonClicked (unused event handlers)
+
+These changes reduce code complexity while preserving all functional
+components of the application. Example files demonstrating control usage
+were kept as they provide valuable documentation.
+
+The build now succeeds for .NET and Android targets, with only a clang
+error in the MacCatalyst build that is unrelated to these changes.

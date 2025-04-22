@@ -50,6 +50,8 @@ public class GridAnimationManager
     /// <summary>
     ///     Handles the GetCellImage event.
     /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="args">The event arguments containing cell information and the image to be set.</param>
     private void HandleGetCellImage(object? sender, GetCellImageEventArgs args)
     {
         var image = new Image

@@ -28,6 +28,8 @@ public class ChiseledBorderDrawable : IDrawable
     /// <summary>
     ///     Draws the chiseled border effect.
     /// </summary>
+    /// <param name="canvas">The canvas to draw on.</param>
+    /// <param name="dirtyRect">The rectangle that needs to be redrawn.</param>
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
         var width = dirtyRect.Width;

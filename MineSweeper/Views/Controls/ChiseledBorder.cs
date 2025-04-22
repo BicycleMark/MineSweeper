@@ -1,7 +1,10 @@
+using Microsoft.Maui.Controls.Shapes;
+
 namespace MineSweeper.Views.Controls;
 
 /// <summary>
-///     A reusable control that provides a 3D chiseled border effect around its content.
+///     A custom control that provides a 3D chiseled border effect around its content.
+///     The border can appear recessed (sunken) or raised based on the IsRecessed property.
 /// </summary>
 public class ChiseledBorder : ContentView
 {
@@ -169,7 +172,7 @@ public class ChiseledBorder : ContentView
     }
 
     /// <summary>
-    ///     Gets or sets the content of the border.
+    ///     Gets or sets the content of the border. Overrides the base ContentView.Content property.
     /// </summary>
     public new View Content
     {
@@ -195,8 +198,10 @@ public class ChiseledBorder : ContentView
     }
 
     /// <summary>
-    ///     Handles the SizeChanged event.
+    ///     Handles the SizeChanged event to ensure the border is redrawn when the control is resized.
     /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments.</param>
     private void OnSizeChanged(object sender, EventArgs e)
     {
         // Force a redraw of the border when the size changes
@@ -204,8 +209,11 @@ public class ChiseledBorder : ContentView
     }
 
     /// <summary>
-    ///     Called when any of the border properties change.
+    ///     Called when any of the border properties change to update the visual appearance.
     /// </summary>
+    /// <param name="bindable">The bindable object whose property changed.</param>
+    /// <param name="oldValue">The old property value.</param>
+    /// <param name="newValue">The new property value.</param>
     private static void OnBorderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is ChiseledBorder border) border.UpdateBorderAppearance();

@@ -249,6 +249,9 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Called when the Status property changes.
     /// </summary>
+    /// <param name="bindable">The GameStateControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous status value.</param>
+    /// <param name="newValue">The new status value.</param>
     private static void OnStatusChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is GameStateControl control) control.UpdateDisplay();
@@ -257,6 +260,9 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Called when the size scale property changes.
     /// </summary>
+    /// <param name="bindable">The GameStateControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous scale factor value.</param>
+    /// <param name="newValue">The new scale factor value.</param>
     private static void OnSizeScaleChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is GameStateControl control) control.UpdateSize();
@@ -265,6 +271,9 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Called when any of the border properties change.
     /// </summary>
+    /// <param name="bindable">The GameStateControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous property value.</param>
+    /// <param name="newValue">The new property value.</param>
     private static void OnBorderPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is GameStateControl control)
@@ -275,6 +284,9 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Called when the BorderThickness property changes.
     /// </summary>
+    /// <param name="bindable">The GameStateControl instance whose property changed.</param>
+    /// <param name="oldValue">The previous border thickness value.</param>
+    /// <param name="newValue">The new border thickness value.</param>
     private static void OnBorderThicknessChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is GameStateControl control)
@@ -357,6 +369,8 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Handles the tap event.
     /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments containing tap information.</param>
     private void OnTapped(object? sender, TappedEventArgs e)
     {
         // For tap events, we'll just reset to the previous status
@@ -374,6 +388,8 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Handles the pressed event.
     /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments.</param>
     private void OnPressed(object? sender, EventArgs e)
     {
         // Only change to pressed state if the game is not over
@@ -388,6 +404,8 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Handles the released event.
     /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments.</param>
     private void OnReleased(object? sender, EventArgs e)
     {
         // Only reset if we're in the pressed state
@@ -401,6 +419,8 @@ public class GameStateControl : ContentView
     /// <summary>
     ///     Gets the image name for a specific game status.
     /// </summary>
+    /// <param name="status">The game status to get the image name for.</param>
+    /// <returns>The filename of the image that corresponds to the given status.</returns>
     private string GetImageNameForStatus(GameEnums.GameStatus status)
     {
         return status switch
