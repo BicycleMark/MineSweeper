@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
-using MineSweeper.Views.ImageLoaders;
 using ILogger = MineSweeper.Models.ILogger;
 
 namespace MineSweeper;
@@ -26,8 +25,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IGameModelFactory, GameModelFactory>();
 
         // Register Image Loaders
-        builder.Services.AddSingleton<IImageLoader>(provider => new SvgLoader());
-        builder.Services.AddSingleton<SvgLoader>();
+        // Removed SvgLoader and PngLoader
 
         // Register ViewModels
         builder.Services.AddSingleton<GameViewModel>();

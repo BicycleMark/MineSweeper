@@ -2,7 +2,6 @@ using System.Diagnostics;
 using MineSweeper.Models;
 using MineSweeper.ViewModels;
 using MineSweeper.Views.Controls;
-using MineSweeper.Views.ImageLoaders;
 
 namespace MineSweeper;
 
@@ -11,19 +10,17 @@ public partial class MainPage : ContentPage
     private const int DoubleTapThresholdMs = 300; // Double tap threshold in milliseconds
     private readonly GridAnimationManager _animationManager;
     private readonly ILogger _logger;
-    private readonly SvgLoader _svgLoader;
 
     // Dictionary to track which cells have been tapped for double-tap detection
     private readonly Dictionary<int, bool> _tappedCells = new();
     private readonly GameViewModel _viewModel;
     private DateTime _lastTapTime = DateTime.MinValue;
 
-    public MainPage(GameViewModel viewModel, SvgLoader svgLoader)
+    public MainPage(GameViewModel viewModel)
     {
         InitializeComponent();
         _logger = new CustomDebugLogger();
         _viewModel = viewModel;
-        _svgLoader = svgLoader;
         BindingContext = _viewModel;
 
         // Initialize animation manager
