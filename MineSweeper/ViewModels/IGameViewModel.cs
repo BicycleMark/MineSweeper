@@ -5,12 +5,13 @@ namespace MineSweeper.ViewModels;
 
 /// <summary>
 ///     Interface for the game view model, providing access to game state, operations, and UI-related functionality.
-///     Implements IDisposable to ensure proper cleanup of resources.
+///     Implements IDisposable to ensure proper cleanup of resources like the game timer.
 /// </summary>
 public interface IGameViewModel : IDisposable
 {
     /// <summary>
-    ///     Gets the collection of sweeper items (cells) in the game grid
+    ///     Gets the collection of sweeper items (cells) in the game grid.
+    ///     May be null during initialization or after disposal.
     /// </summary>
     ObservableCollection<SweeperItem>? Items { get; }
 
@@ -30,7 +31,8 @@ public interface IGameViewModel : IDisposable
     int Mines { get; }
 
     /// <summary>
-    ///     Gets the number of mines remaining to be flagged
+    ///     Gets the number of mines remaining to be flagged.
+    ///     This is calculated as total mines minus the number of flagged cells.
     /// </summary>
     int RemainingMines { get; }
 
@@ -45,22 +47,26 @@ public interface IGameViewModel : IDisposable
     GameEnums.GameStatus GameStatus { get; set; }
 
     /// <summary>
-    ///     Gets or sets the current game difficulty level
+    ///     Gets or sets the current game difficulty level.
+    ///     Changing this property does not affect the current game until NewGameAsyncCommand is executed.
     /// </summary>
     GameEnums.GameDifficulty GameDifficulty { get; set; }
 
     /// <summary>
-    ///     Command to start a new game with the specified difficulty
+    ///     Command to start a new game with the specified difficulty.
+    ///     Parameter can be a GameDifficulty enum value, a string representation of a difficulty, or null for default.
     /// </summary>
     IAsyncRelayCommand NewGameAsyncCommand { get; }
 
     /// <summary>
-    ///     Command to play (reveal) a cell at the specified position
+    ///     Command to play (reveal) a cell at the specified position.
+    ///     Parameter should be a Point with Row and Column coordinates.
     /// </summary>
     ICommand PlayCommand { get; }
 
     /// <summary>
-    ///     Command to flag a cell at the specified position
+    ///     Command to flag a cell at the specified position.
+    ///     Parameter should be a Point with Row and Column coordinates.
     /// </summary>
     ICommand FlagCommand { get; }
 
