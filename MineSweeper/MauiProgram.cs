@@ -24,9 +24,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILogger, CustomDebugLogger>();
         builder.Services.AddSingleton<IGameModelFactory, GameModelFactory>();
 
-        // Register Image Loaders
-        // Removed SvgLoader and PngLoader
-
         // Register ViewModels
         builder.Services.AddSingleton<GameViewModel>();
 
