@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using MineSweeper.Extensions;
 using MineSweeper.Features.Game.Models;
 using MineSweeper.Features.Game.ViewModels;
 using MineSweeper.Services.Logging;
@@ -116,6 +117,9 @@ public partial class MainPage : ContentPage
             _logger.Log("New game created with Easy difficulty");
 
             // Set up animations
+            // Randomize Animations
+            _animationManager.SelectRandomAnimationStyle();
+            
             _animationManager.SetupAnimations();
             
             // Create the grid

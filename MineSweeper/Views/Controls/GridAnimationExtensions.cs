@@ -101,7 +101,13 @@ public static class GridAnimationExtensions
         RadarPaternWitRadarLikeOpacity,
         
         /// <summary>Cells are pulled one by one from a pile and placed into position.</summary>
-        ConstructFromPile
+        ConstructFromPile,
+        
+        /// <summary>Cells fall into place from above like a window shade being pulled down.</summary>
+        LikeAShadePulled,
+        
+        /// <summary>Cells are laid like bricks from above, row by row.</summary>
+        ABrickLayerfromAbove
     }
 
     /// <summary>
@@ -150,6 +156,8 @@ public static class GridAnimationExtensions
             AnimationType.SwirlLikeADrainIntoPlace => SwirlLikeADrainIntoPlaceAnimation(image, row, col, totalRows, totalColumns),
             AnimationType.RadarPaternWitRadarLikeOpacity => RadarPaternWitRadarLikeOpacityAnimationExtension.RadarPaternWitRadarLikeOpacityAnimation(image, row, col, totalRows, totalColumns),
             AnimationType.ConstructFromPile => ConstructFromPileAnimationExtension.ConstructFromPileAnimation(image, row, col, totalRows, totalColumns),
+            AnimationType.LikeAShadePulled => LikeAShadePulledAnimationExtension.LikeAShadePulledAnimation(image, row, col, totalRows, totalColumns),
+            AnimationType.ABrickLayerfromAbove => ABrickLayerfromAboveAnimationExtension.ABrickLayerfromAboveAnimation(image, row, col, totalRows, totalColumns),
             _ => FadeInAnimation(image, row, col)
         };
     }
