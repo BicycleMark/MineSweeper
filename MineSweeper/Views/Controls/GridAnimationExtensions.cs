@@ -82,8 +82,11 @@ public static class GridAnimationExtensions
         /// <summary>Animation sweeps from top to bottom.</summary>
         TopToBottom,
         
-        /// <summary>Animation sweeps from bottom to top.</summary>
-        BottomToTop
+    /// <summary>Animation sweeps from bottom to top.</summary>
+    BottomToTop,
+    
+    /// <summary>Cells appear pixelated and gradually sharpen into view.</summary>
+    Pixelated
     }
 
     /// <summary>
@@ -126,6 +129,7 @@ public static class GridAnimationExtensions
             AnimationType.RightToLeft => RightToLeftAnimation(image, row, col, totalColumns),
             AnimationType.TopToBottom => TopToBottomAnimation(image, row, col, totalRows),
             AnimationType.BottomToTop => BottomToTopAnimation(image, row, col, totalRows),
+            AnimationType.Pixelated => PixelatedAnimation(image, row, col),
             _ => FadeInAnimation(image, row, col)
         };
     }
@@ -523,6 +527,48 @@ public static class GridAnimationExtensions
         await Task.WhenAll(
             image.TranslateTo(0, 0, 300, Easing.CubicOut),
             image.FadeTo(1)
+        );
+    }
+    
+    /// <summary>
+    ///     Performs a pixelation animation where the cell starts blurry and gradually sharpens.
+    /// </summary>
+    private static async Task PixelatedAnimation(Image image, int row, int col)
+    {
+        // Initial state: visible but blurry/pixelated
+        image.Opacity = 1;
+        image.Scale = 1.0;
+        
+        // Apply a blur effect or pixelation effect
+        // We can simulate this with a combination of scaling and opacity
+        image.ScaleX = 0.5;
+        image.ScaleY = 0.5;
+        image.Opacity = 0.7;
+        
+        // Calculate delay based on position
+        var delay = row * 6 + col * 6;
+        await Task.Delay(delay);
+        
+        // Animate from pixelated to clear in steps
+        // First step - increase scale slightly and opacity
+        await Task.WhenAll(
+            image.ScaleXTo(0.7, 100),
+            image.ScaleYTo(0.7, 100),
+            image.FadeTo(0.8, 100)
+        );
+        
+        // Second step - increase scale more and opacity
+        await Task.WhenAll(
+            image.ScaleXTo(0.9, 100),
+            image.ScaleYTo(0.9, 100),
+            image.FadeTo(0.9, 100)
+        );
+        
+        // Final step - full scale and opacity
+        await Task.WhenAll(
+            image.ScaleXTo(1.0, 150, Easing.CubicOut),
+            image.ScaleYTo(1.0, 150, Easing.CubicOut),
+            image.FadeTo(1.0, 150)
         );
     }
 }

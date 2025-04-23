@@ -12,6 +12,12 @@ public class GridAnimationManager
     private readonly Random _random = new();
     private GridAnimationExtensions.AnimationType _currentAnimationType;
     private GridAnimationExtensions.AnimationPattern _currentPattern;
+    
+    /// <summary>
+    ///     Gets or sets the forced animation type. If set, this animation type will always be used.
+    ///     If null, a random animation type will be selected.
+    /// </summary>
+    public GridAnimationExtensions.AnimationType? ForcedAnimationType { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="GridAnimationManager" /> class.
@@ -24,13 +30,22 @@ public class GridAnimationManager
     }
 
     /// <summary>
-    ///     Selects a random animation style and pattern.
+    ///     Selects an animation style and pattern. If ForcedAnimationType is set,
+    ///     that animation type will be used; otherwise, a random type will be selected.
     /// </summary>
     public void SelectRandomAnimationStyle()
     {
-        // Choose random animation type for this game
-        var animationTypes = Enum.GetValues<GridAnimationExtensions.AnimationType>();
-        _currentAnimationType = animationTypes[_random.Next(animationTypes.Length)];
+        if (ForcedAnimationType.HasValue)
+        {
+            // Use the forced animation type
+            _currentAnimationType = ForcedAnimationType.Value;
+        }
+        else
+        {
+            // Choose random animation type for this game
+            var animationTypes = Enum.GetValues<GridAnimationExtensions.AnimationType>();
+            _currentAnimationType = animationTypes[_random.Next(animationTypes.Length)];
+        }
 
         // Choose random pattern for this game
         var patterns = Enum.GetValues<GridAnimationExtensions.AnimationPattern>();
