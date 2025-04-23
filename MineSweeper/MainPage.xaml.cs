@@ -22,8 +22,8 @@ public partial class MainPage : ContentPage
         // Initialize animation manager
         _animationManager = new GridAnimationManager(GameGrid);
         
-        // Force the SwirlLikeADrainIntoPlace animation type
-        //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.SwirlLikeADrainIntoPlace;
+        // Force the RadarPaternWitRadarLikeOpacity animation type
+        //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.RadarPaternWitRadarLikeOpacity;
 
         // Set up the chiseled border for the top panel
         SetupTopPanelBorder();
