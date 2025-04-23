@@ -22,6 +22,7 @@ The following animation types are available:
 - **BottomToTop**: Animation sweeps from bottom to top
 - **Pixelated**: Cells appear pixelated and gradually sharpen into view
 - **BreathInBreathOut**: Cells scale in and out like breathing
+- **AttenuatedVibration**: Cells vibrate with decreasing intensity
 
 ## Animation Patterns
 Animation patterns control the sequence in which cells are animated:
@@ -152,4 +153,40 @@ private static async Task BreathInBreathOutAnimation(Image image, int row, int c
     
     // Final breath in - settle to normal size
     await image.ScaleTo(1.0, 500, Easing.SinOut);
+}
+```
+
+### AttenuatedVibration Animation
+
+```csharp
+/// <summary>
+///     Performs a vibration animation with decreasing intensity.
+/// </summary>
+private static async Task AttenuatedVibrationAnimation(Image image, int row, int col)
+{
+    // Initial state: fully visible
+    image.Opacity = 1;
+    image.Scale = 1.0;
+    
+    // Calculate delay based on position
+    var delay = row * 4 + col * 4;
+    await Task.Delay(delay);
+    
+    // First vibration - high intensity
+    await image.TranslateTo(-5, 0, 50, Easing.CubicOut);
+    await image.TranslateTo(5, 0, 100, Easing.CubicInOut);
+    await image.TranslateTo(-5, 0, 100, Easing.CubicInOut);
+    await image.TranslateTo(5, 0, 100, Easing.CubicInOut);
+    
+    // Second vibration - medium intensity
+    await image.TranslateTo(-3, 0, 80, Easing.CubicInOut);
+    await image.TranslateTo(3, 0, 80, Easing.CubicInOut);
+    await image.TranslateTo(-3, 0, 80, Easing.CubicInOut);
+    
+    // Third vibration - low intensity
+    await image.TranslateTo(2, 0, 60, Easing.CubicInOut);
+    await image.TranslateTo(-2, 0, 60, Easing.CubicInOut);
+    
+    // Return to original position
+    await image.TranslateTo(0, 0, 50, Easing.CubicOut);
 }

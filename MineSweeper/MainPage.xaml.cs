@@ -22,8 +22,8 @@ public partial class MainPage : ContentPage
         // Initialize animation manager
         _animationManager = new GridAnimationManager(GameGrid);
         
-        // Force the BreathInBreathOut animation type
-        //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.BreathInBreathOut;
+        // Force the AttenuatedVibration animation type
+        //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.AttenuatedVibration;
 
         // Set up the chiseled border for the top panel
         SetupTopPanelBorder();
