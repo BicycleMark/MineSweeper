@@ -21,6 +21,7 @@ The following animation types are available:
 - **TopToBottom**: Animation sweeps from top to bottom
 - **BottomToTop**: Animation sweeps from bottom to top
 - **Pixelated**: Cells appear pixelated and gradually sharpen into view
+- **BreathInBreathOut**: Cells scale in and out like breathing
 
 ## Animation Patterns
 Animation patterns control the sequence in which cells are animated:
@@ -73,7 +74,9 @@ To add a new animation type:
 2. Implement a new animation method in the same file
 3. Add a case for the new animation type in the `AnimateCellAsync` switch statement
 
-See the `PixelatedAnimation` method in `GridAnimationExtensions.cs` for an example:
+Here are examples of animation implementations:
+
+### Pixelated Animation
 
 ```csharp
 /// <summary>
@@ -116,4 +119,37 @@ private static async Task PixelatedAnimation(Image image, int row, int col)
         image.ScaleYTo(1.0, 150, Easing.CubicOut),
         image.FadeTo(1.0, 150)
     );
+}
+```
+
+### BreathInBreathOut Animation
+
+```csharp
+/// <summary>
+///     Performs a breathing animation where the cell scales in and out like breathing.
+/// </summary>
+private static async Task BreathInBreathOutAnimation(Image image, int row, int col)
+{
+    // Initial state: fully visible but slightly smaller
+    image.Opacity = 1;
+    image.Scale = 0.9;
+    
+    // Calculate delay based on position
+    var delay = row * 5 + col * 5;
+    await Task.Delay(delay);
+    
+    // First breath in - scale up
+    await image.ScaleTo(1.05, 800, Easing.SinInOut);
+    
+    // First breath out - scale down
+    await image.ScaleTo(0.95, 800, Easing.SinInOut);
+    
+    // Second breath in - scale up
+    await image.ScaleTo(1.03, 700, Easing.SinInOut);
+    
+    // Second breath out - scale down
+    await image.ScaleTo(0.97, 700, Easing.SinInOut);
+    
+    // Final breath in - settle to normal size
+    await image.ScaleTo(1.0, 500, Easing.SinOut);
 }

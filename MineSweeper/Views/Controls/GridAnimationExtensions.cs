@@ -86,7 +86,10 @@ public static class GridAnimationExtensions
     BottomToTop,
     
     /// <summary>Cells appear pixelated and gradually sharpen into view.</summary>
-    Pixelated
+    Pixelated,
+    
+    /// <summary>Cells scale in and out like breathing.</summary>
+    BreathInBreathOut
     }
 
     /// <summary>
@@ -130,6 +133,7 @@ public static class GridAnimationExtensions
             AnimationType.TopToBottom => TopToBottomAnimation(image, row, col, totalRows),
             AnimationType.BottomToTop => BottomToTopAnimation(image, row, col, totalRows),
             AnimationType.Pixelated => PixelatedAnimation(image, row, col),
+            AnimationType.BreathInBreathOut => BreathInBreathOutAnimation(image, row, col),
             _ => FadeInAnimation(image, row, col)
         };
     }
@@ -570,5 +574,34 @@ public static class GridAnimationExtensions
             image.ScaleYTo(1.0, 150, Easing.CubicOut),
             image.FadeTo(1.0, 150)
         );
+    }
+    
+    /// <summary>
+    ///     Performs a breathing animation where the cell scales in and out like breathing.
+    /// </summary>
+    private static async Task BreathInBreathOutAnimation(Image image, int row, int col)
+    {
+        // Initial state: fully visible but slightly smaller
+        image.Opacity = 1;
+        image.Scale = 0.9;
+        
+        // Calculate delay based on position
+        var delay = row * 5 + col * 5;
+        await Task.Delay(delay);
+        
+        // First breath in - scale up
+        await image.ScaleTo(1.05, 800, Easing.SinInOut);
+        
+        // First breath out - scale down
+        await image.ScaleTo(0.95, 800, Easing.SinInOut);
+        
+        // Second breath in - scale up
+        await image.ScaleTo(1.03, 700, Easing.SinInOut);
+        
+        // Second breath out - scale down
+        await image.ScaleTo(0.97, 700, Easing.SinInOut);
+        
+        // Final breath in - settle to normal size
+        await image.ScaleTo(1.0, 500, Easing.SinOut);
     }
 }
