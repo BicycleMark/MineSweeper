@@ -23,6 +23,7 @@ The following animation types are available:
 - **Pixelated**: Cells appear pixelated and gradually sharpen into view
 - **BreathInBreathOut**: Cells scale in and out like breathing
 - **AttenuatedVibration**: Cells vibrate with decreasing intensity
+- **SwirlLikeADrainIntoPlace**: Cells swirl into place like water going down a drain
 
 ## Animation Patterns
 Animation patterns control the sequence in which cells are animated:
@@ -189,4 +190,68 @@ private static async Task AttenuatedVibrationAnimation(Image image, int row, int
     
     // Return to original position
     await image.TranslateTo(0, 0, 50, Easing.CubicOut);
+}
+```
+
+### SwirlLikeADrainIntoPlace Animation
+
+```csharp
+/// <summary>
+///     Performs a swirling animation like water going down a drain.
+/// </summary>
+private static async Task SwirlLikeADrainIntoPlaceAnimation(Image image, int row, int col, int totalRows, int totalColumns)
+{
+    // Initial state: invisible and positioned off-center
+    image.Opacity = 0;
+    image.Scale = 0.5;
+    
+    // Calculate center coordinates
+    var centerRow = totalRows / 2.0;
+    var centerCol = totalColumns / 2.0;
+    
+    // Calculate distance from center
+    var rowDistance = row - centerRow;
+    var colDistance = col - centerCol;
+    
+    // Calculate angle from center (in radians)
+    var angle = Math.Atan2(rowDistance, colDistance);
+    
+    // Convert angle to degrees for rotation
+    var angleDegrees = angle * (180 / Math.PI);
+    
+    // Calculate distance from center
+    var distance = Math.Sqrt(rowDistance * rowDistance + colDistance * colDistance);
+    
+    // Calculate initial position (further out from final position)
+    var initialDistance = distance * 2.5;
+    var initialX = Math.Cos(angle) * initialDistance * 20; // Scale for visual effect
+    var initialY = Math.Sin(angle) * initialDistance * 20;
+    
+    // Set initial position and rotation
+    image.TranslationX = initialX;
+    image.TranslationY = initialY;
+    image.Rotation = angleDegrees;
+    
+    // Calculate delay based on distance from center
+    var delay = (int)(distance * 15);
+    await Task.Delay(delay);
+    
+    // Make visible
+    await image.FadeTo(1, 50);
+    
+    // Number of rotations based on distance from center
+    var rotations = 1 + distance;
+    
+    // Duration based on distance from center
+    var duration = 700 + (int)(distance * 100);
+    
+    // First animate with rotation and translation
+    await Task.WhenAll(
+        image.RotateTo(360 * rotations, (uint)(duration * 0.8), Easing.CubicOut),
+        image.TranslateTo(0, 0, (uint)duration, Easing.CubicOut),
+        image.ScaleTo(1.0, (uint)duration, Easing.CubicOut)
+    );
+    
+    // Then ensure final rotation is 0 (square orientation)
+    await image.RotateTo(0, 200, Easing.CubicOut);
 }

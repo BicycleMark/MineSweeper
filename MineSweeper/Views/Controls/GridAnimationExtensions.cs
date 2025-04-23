@@ -92,7 +92,10 @@ public static class GridAnimationExtensions
     BreathInBreathOut,
     
     /// <summary>Cells vibrate with decreasing intensity.</summary>
-    AttenuatedVibration
+    AttenuatedVibration,
+    
+    /// <summary>Cells swirl into place like water going down a drain.</summary>
+    SwirlLikeADrainIntoPlace
     }
 
     /// <summary>
@@ -138,6 +141,7 @@ public static class GridAnimationExtensions
             AnimationType.Pixelated => PixelatedAnimation(image, row, col),
             AnimationType.BreathInBreathOut => BreathInBreathOutAnimation(image, row, col),
             AnimationType.AttenuatedVibration => AttenuatedVibrationAnimation(image, row, col),
+            AnimationType.SwirlLikeADrainIntoPlace => SwirlLikeADrainIntoPlaceAnimation(image, row, col, totalRows, totalColumns),
             _ => FadeInAnimation(image, row, col)
         };
     }
@@ -639,5 +643,65 @@ public static class GridAnimationExtensions
         
         // Return to original position
         await image.TranslateTo(0, 0, 50, Easing.CubicOut);
+    }
+    
+    /// <summary>
+    ///     Performs a swirling animation like water going down a drain.
+    /// </summary>
+    private static async Task SwirlLikeADrainIntoPlaceAnimation(Image image, int row, int col, int totalRows, int totalColumns)
+    {
+        // Initial state: invisible and positioned off-center
+        image.Opacity = 0;
+        image.Scale = 0.5;
+        
+        // Calculate center coordinates
+        var centerRow = totalRows / 2.0;
+        var centerCol = totalColumns / 2.0;
+        
+        // Calculate distance from center
+        var rowDistance = row - centerRow;
+        var colDistance = col - centerCol;
+        
+        // Calculate angle from center (in radians)
+        var angle = Math.Atan2(rowDistance, colDistance);
+        
+        // Convert angle to degrees for rotation
+        var angleDegrees = angle * (180 / Math.PI);
+        
+        // Calculate distance from center
+        var distance = Math.Sqrt(rowDistance * rowDistance + colDistance * colDistance);
+        
+        // Calculate initial position (further out from final position)
+        var initialDistance = distance * 2.5;
+        var initialX = Math.Cos(angle) * initialDistance * 20; // Scale for visual effect
+        var initialY = Math.Sin(angle) * initialDistance * 20;
+        
+        // Set initial position and rotation
+        image.TranslationX = initialX;
+        image.TranslationY = initialY;
+        image.Rotation = angleDegrees;
+        
+        // Calculate delay based on distance from center
+        var delay = (int)(distance * 15);
+        await Task.Delay(delay);
+        
+        // Make visible
+        await image.FadeTo(1, 50);
+        
+        // Number of rotations based on distance from center
+        var rotations = 1 + distance;
+        
+        // Duration based on distance from center
+        var duration = 700 + (int)(distance * 100);
+        
+        // First animate with rotation and translation
+        await Task.WhenAll(
+            image.RotateTo(360 * rotations, (uint)(duration * 0.8), Easing.CubicOut),
+            image.TranslateTo(0, 0, (uint)duration, Easing.CubicOut),
+            image.ScaleTo(1.0, (uint)duration, Easing.CubicOut)
+        );
+        
+        // Then ensure final rotation is 0 (square orientation)
+        await image.RotateTo(0, 200, Easing.CubicOut);
     }
 }
