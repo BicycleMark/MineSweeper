@@ -156,12 +156,14 @@
             </controls:ChiseledBorder>
         </Grid>
 
-        <!-- Instructions and Controls -->
-        <Grid Grid.Row="3" Margin="0,16,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <Grid Grid.Row="3" Margin="8,4,8,0">
+            <!-- Chiseled Border using GraphicsView -->
+            <GraphicsView x:Name="StatusBar"
+                          HorizontalOptions="Fill"
+                          VerticalOptions="Fill"
+                          BackgroundColor="Transparent" />
+            <Label x:Name="StatusLabel" Text="Status" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"></Label>
+            
 
 
         </Grid>

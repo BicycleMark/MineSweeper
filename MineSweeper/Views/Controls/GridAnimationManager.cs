@@ -14,6 +14,16 @@ public class GridAnimationManager
     private GridAnimationExtensions.AnimationPattern _currentPattern;
     
     /// <summary>
+    ///     Gets the current animation type.
+    /// </summary>
+    public GridAnimationExtensions.AnimationType CurrentAnimationType => _currentAnimationType;
+    
+    /// <summary>
+    ///     Gets the current animation pattern.
+    /// </summary>
+    public GridAnimationExtensions.AnimationPattern CurrentAnimationPattern => _currentPattern;
+    
+    /// <summary>
     ///     Gets or sets the forced animation type. If set, this animation type will always be used.
     ///     If null, a random animation type will be selected.
     /// </summary>

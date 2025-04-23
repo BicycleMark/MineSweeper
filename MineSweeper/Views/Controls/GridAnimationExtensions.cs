@@ -107,7 +107,10 @@ public static class GridAnimationExtensions
         LikeAShadePulled,
         
         /// <summary>Cells are laid like bricks from above, row by row.</summary>
-        ABrickLayerfromAbove
+        ABrickLayerfromAbove,
+        
+        /// <summary>Cells move in a sine wave pattern, one row at a time, alternating between left-to-right and right-to-left.</summary>
+        SineWaveBuilder
     }
 
     /// <summary>
@@ -158,6 +161,7 @@ public static class GridAnimationExtensions
             AnimationType.ConstructFromPile => ConstructFromPileAnimationExtension.ConstructFromPileAnimation(image, row, col, totalRows, totalColumns),
             AnimationType.LikeAShadePulled => LikeAShadePulledAnimationExtension.LikeAShadePulledAnimation(image, row, col, totalRows, totalColumns),
             AnimationType.ABrickLayerfromAbove => ABrickLayerfromAboveAnimationExtension.ABrickLayerfromAboveAnimation(image, row, col, totalRows, totalColumns),
+            AnimationType.SineWaveBuilder => SineWaveBuilderAnimationExtension.SineWaveBuilderAnimation(image, row, col, totalRows, totalColumns),
             _ => FadeInAnimation(image, row, col)
         };
     }

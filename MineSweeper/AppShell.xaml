@@ -76,6 +76,12 @@
     <!-- Separator -->
     <MenuItem Text="-" />
 
+    <!-- Animation Options -->
+    <MenuItem x:Name="ContinuousAnimationsMenuItem" Text="★ ENABLE CONTINUOUS ANIMATIONS ★" Command="{Binding ToggleContinuousAnimationsCommand}" />
+
+    <!-- Separator -->
+    <MenuItem Text="-" />
+
     <!-- Grid Examples Menu Items -->
 
     <ShellContent

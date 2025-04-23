@@ -85,10 +85,35 @@ public partial class MainPage : ContentPage
         {
             _animationManager.SelectRandomAnimationStyle();
             _logger.Log("Random animation style selected");
+            
+            // Update the status label with the current animation type
+            UpdateStatusLabel();
         }
         catch (Exception ex)
         {
             _logger.LogError($"Error selecting animation style: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    ///     Updates the status label with the current animation type.
+    /// </summary>
+    private void UpdateStatusLabel()
+    {
+        try
+        {
+            // Get the current animation type and pattern
+            var animationType = _animationManager.CurrentAnimationType;
+            var animationPattern = _animationManager.CurrentAnimationPattern;
+            
+            // Update the status label
+            StatusLabel.Text = $"Animation: {animationType}";
+            
+            _logger.Log($"Status label updated with animation type: {animationType}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error updating status label: {ex.Message}");
         }
     }
 
@@ -119,12 +144,16 @@ public partial class MainPage : ContentPage
             // Set up animations
             // Randomize Animations
             _animationManager.SelectRandomAnimationStyle();
+            //_animationManager.ForcedAnimationType = GridAnimationExtensions.AnimationType.SineWaveBuilder;
             
             _animationManager.SetupAnimations();
             
             // Create the grid
             GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
             _logger.Log($"Grid created with {_viewModel.Rows} rows and {_viewModel.Columns} columns");
+            
+            // Update the status label with the current animation type
+            UpdateStatusLabel();
         }
         catch (InvalidOperationException ex)
         {
