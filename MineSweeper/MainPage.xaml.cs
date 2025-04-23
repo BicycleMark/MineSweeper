@@ -106,7 +106,9 @@ public partial class MainPage : ContentPage
             await Task.Delay(200);
 
             // Select a random animation style for this game
-            _animationManager.SelectRandomAnimationStyle();
+           _animationManager.SelectRandomAnimationStyle();
+           // _animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.ConstructFromPile;
+            
             _logger.Log("Animation style selected");
 
             // Start a new game with Easy difficulty
