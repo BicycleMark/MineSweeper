@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using MineSweeper;
+using MineSweeper.Extensions;
 using MineSweeper.Features.Game.Models;
 using MineSweeper.Features.Game.ViewModels;
 using MineSweeper.Services.Logging;
@@ -74,22 +76,64 @@ public partial class GamePage : ContentPage
 
 
     /// <summary>
-    ///     Selects a random animation style for the game grid.
+    ///     Selects the same animation style as the MainPage.
     /// </summary>
     public void SelectRandomGameAnimationStyle()
     {
         try
         {
-            // Clear any forced animation type to allow random selection
-            _animationManager.ForcedAnimationType = null;
+            // Try to get the animation type from the MainPage
+            var mainPage = Application.Current?.MainPage as MainPage;
+            if (mainPage != null)
+            {
+                // Get the selected animation type from the MainPage
+                var selectedAnimationType = mainPage.GetSelectedAnimationType();
+                if (selectedAnimationType.HasValue)
+                {
+                    // Use the same animation type as the MainPage
+                    _animationManager.ForceAnimationType(selectedAnimationType.Value);
+                    _logger.Log($"Using MainPage's animation style: {selectedAnimationType.Value}");
+                    return;
+                }
+            }
             
-            // Select a random animation style
+            // Fallback to random selection if MainPage is not available
+            _animationManager.ForcedAnimationType = null;
             _animationManager.SelectRandomAnimationStyle();
             _logger.Log($"Random animation style selected: {_animationManager.CurrentAnimationType}");
         }
         catch (Exception ex)
         {
             _logger.LogError($"Error selecting animation style: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    ///     Forces a random animation style for continuous animations mode.
+    /// </summary>
+    public void ForceRandomAnimationStyle()
+    {
+        try
+        {
+            // Clear any forced animation type to allow random selection
+            _animationManager.ForcedAnimationType = null;
+            
+            // Get all animation types
+            var animationTypes = Enum.GetValues<GridAnimationExtensions.AnimationType>();
+            
+            // Select a random animation type directly
+            var random = new Random();
+            var randomIndex = random.Next(animationTypes.Length);
+            var randomAnimationType = animationTypes[randomIndex];
+            
+            // Force this random animation type
+            _animationManager.ForceAnimationType(randomAnimationType);
+            
+            _logger.Log($"Random animation style forced: {randomAnimationType}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error forcing random animation style: {ex.Message}");
         }
     }
 

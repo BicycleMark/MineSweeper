@@ -12,6 +12,7 @@ public partial class MainPage : ContentPage
     private readonly GridAnimationManager _animationManager;
     private readonly ILogger _logger;
     private readonly GameViewModel _viewModel;
+    private GridAnimationExtensions.AnimationType _selectedAnimationType;
 
     public MainPage(GameViewModel viewModel, ILogger logger)
     {
@@ -23,14 +24,51 @@ public partial class MainPage : ContentPage
         // Initialize animation manager
         _animationManager = new GridAnimationManager(GameGrid);
         
-        // Force the RadarPaternWitRadarLikeOpacity animation type
-        //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.RadarPaternWitRadarLikeOpacity;
-
         // Set up the chiseled border for the top panel
         SetupTopPanelBorder();
+        
+        // Set up the status bar border
+        SetupStatusBarBorder();
+        
+        // Initialize the animation picker
+        InitializeAnimationPicker();
 
         // Start a new game when the page is loaded
         Loaded += OnPageLoaded;
+    }
+    
+    /// <summary>
+    ///     Sets up the chiseled border for the status bar.
+    /// </summary>
+    private void SetupStatusBarBorder()
+    {
+        try
+        {
+            // Get the current app theme
+            var isDarkTheme = Application.Current?.RequestedTheme == AppTheme.Dark;
+
+            // Create a new ChiseledBorderDrawable for the status bar
+            var borderDrawable = new ChiseledBorderDrawable
+            {
+                BorderThickness = 6,
+                // Match the colors used in the game grid's ChiseledBorder
+                ShadowColor = isDarkTheme ? Colors.Black : Colors.DimGray,
+                HighlightColor = isDarkTheme ? Color.FromArgb("#444444") : Colors.LightGray,
+                IsRecessed = true
+            };
+
+            // Set the drawable for the status bar
+            StatusBar.Drawable = borderDrawable;
+
+            // Force a redraw
+            StatusBar.Invalidate();
+
+            _logger.Log("Status bar border set up successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error setting up status bar border: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -77,20 +115,29 @@ public partial class MainPage : ContentPage
 
 
     /// <summary>
-    ///     Selects a random animation style for the game grid.
+    ///     Applies the selected animation style for the game grid.
     /// </summary>
     public void SelectRandomGameAnimationStyle()
     {
         try
         {
-            // Clear any forced animation type to allow random selection
-            _animationManager.ForcedAnimationType = null;
+            // Use the selected animation type if available, otherwise use random
+            if (_selectedAnimationType != null)
+            {
+                _animationManager.ForceAnimationType(_selectedAnimationType);
+                _logger.Log($"Selected animation style applied: {_selectedAnimationType}");
+            }
+            else
+            {
+                // Clear any forced animation type to allow random selection
+                _animationManager.ForcedAnimationType = null;
+                
+                // Select a random animation style
+                _animationManager.SelectRandomAnimationStyle();
+                _logger.Log($"Random animation style selected: {_animationManager.CurrentAnimationType}");
+            }
             
-            // Select a random animation style
-            _animationManager.SelectRandomAnimationStyle();
-            _logger.Log($"Random animation style selected: {_animationManager.CurrentAnimationType}");
-            
-            // Update the status label with the current animation type
+            // Update the animation picker with the current animation type
             UpdateStatusLabel();
         }
         catch (Exception ex)
@@ -100,24 +147,210 @@ public partial class MainPage : ContentPage
     }
     
     /// <summary>
-    ///     Updates the status label with the current animation type.
+    ///     Forces a random animation style for continuous animations mode.
+    /// </summary>
+    public void ForceRandomAnimationStyle()
+    {
+        try
+        {
+            // Clear any forced animation type to allow random selection
+            _animationManager.ForcedAnimationType = null;
+            
+            // Get all animation types
+            var animationTypes = Enum.GetValues<GridAnimationExtensions.AnimationType>();
+            
+            // Select a random animation type directly
+            var random = new Random();
+            var randomIndex = random.Next(animationTypes.Length);
+            var randomAnimationType = animationTypes[randomIndex];
+            
+            // Force this random animation type
+            _animationManager.ForceAnimationType(randomAnimationType);
+            
+            _logger.Log($"Random animation style forced: {randomAnimationType}");
+            
+            // Update the animation picker with the current animation type
+            UpdateStatusLabel();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error forcing random animation style: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    ///     Initializes the animation picker with all available animation types.
+    /// </summary>
+    private void InitializeAnimationPicker()
+    {
+        try
+        {
+            // Set the default selected animation type
+            _selectedAnimationType = _animationManager.CurrentAnimationType;
+            
+            // Update the animation label
+            AnimationLabel.Text = _selectedAnimationType.ToString();
+            
+            _logger.Log("Animation picker initialized");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error initializing animation picker: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    ///     Handles the animation label tap event.
+    /// </summary>
+    private async void OnAnimationLabelTapped(object sender, EventArgs e)
+    {
+        try
+        {
+            // Create a modal page for animation selection
+            var modalPage = new ContentPage
+            {
+                Title = "Select Animation"
+            };
+            
+            // Create a scrollable container for the animation options
+            var scrollView = new ScrollView();
+            var stackLayout = new VerticalStackLayout
+            {
+                Spacing = 10,
+                Padding = new Thickness(20)
+            };
+            
+            // Get all animation types
+            var animationTypes = Enum.GetValues<GridAnimationExtensions.AnimationType>();
+            
+            // Create a radio button for each animation type
+            foreach (var animationType in animationTypes)
+            {
+                var animationName = animationType.ToString();
+                
+                // Create a horizontal layout for each option
+                var optionLayout = new HorizontalStackLayout
+                {
+                    Spacing = 10
+                };
+                
+                // Create a checkbox (using a custom renderer for simplicity)
+                var checkBox = new CheckBox
+                {
+                    IsChecked = animationType.Equals(_selectedAnimationType),
+                    Color = Colors.Blue
+                };
+                
+                // Create a label for the animation name
+                var label = new Label
+                {
+                    Text = animationName,
+                    VerticalOptions = LayoutOptions.Center,
+                    FontSize = 16
+                };
+                
+                // Add tap gesture to the entire layout
+                var tapGesture = new TapGestureRecognizer();
+                tapGesture.Tapped += (s, args) =>
+                {
+                    // Uncheck all checkboxes
+                    foreach (var layout in stackLayout.Children)
+                    {
+                        if (layout is HorizontalStackLayout horizontalLayout && 
+                            horizontalLayout.Children.FirstOrDefault() is CheckBox cb)
+                        {
+                            cb.IsChecked = false;
+                        }
+                    }
+                    
+                    // Check this checkbox
+                    checkBox.IsChecked = true;
+                    
+                    // Set the selected animation type
+                    if (Enum.TryParse<GridAnimationExtensions.AnimationType>(animationName, out var selectedType))
+                    {
+                        _selectedAnimationType = selectedType;
+                        _logger.Log($"Animation type selected: {_selectedAnimationType}");
+                        
+                        // Update the animation label
+                        AnimationLabel.Text = _selectedAnimationType.ToString();
+                        
+                        // Apply the selected animation type
+                        _animationManager.ForceAnimationType(_selectedAnimationType);
+                        
+                        // Close the modal
+                        modalPage.Navigation.PopModalAsync();
+                    }
+                };
+                
+                // Add the tap gesture to both the checkbox and label
+                optionLayout.GestureRecognizers.Add(tapGesture);
+                
+                // Add the checkbox and label to the option layout
+                optionLayout.Children.Add(checkBox);
+                optionLayout.Children.Add(label);
+                
+                // Add the option layout to the stack layout
+                stackLayout.Children.Add(optionLayout);
+            }
+            
+            // Add a cancel button
+            var cancelButton = new Button
+            {
+                Text = "Cancel",
+                HorizontalOptions = LayoutOptions.Center,
+                Margin = new Thickness(0, 20, 0, 0)
+            };
+            
+            cancelButton.Clicked += (s, args) =>
+            {
+                modalPage.Navigation.PopModalAsync();
+            };
+            
+            stackLayout.Children.Add(cancelButton);
+            
+            // Set the content of the scroll view
+            scrollView.Content = stackLayout;
+            
+            // Set the content of the modal page
+            modalPage.Content = scrollView;
+            
+            // Show the modal page
+            await Navigation.PushModalAsync(modalPage);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error handling animation label tap: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    ///     Gets the currently selected animation type.
+    /// </summary>
+    /// <returns>The selected animation type, or null if none is selected.</returns>
+    public GridAnimationExtensions.AnimationType? GetSelectedAnimationType()
+    {
+        return _selectedAnimationType;
+    }
+    
+    /// <summary>
+    ///     Updates the animation label with the current animation type.
     /// </summary>
     private void UpdateStatusLabel()
     {
         try
         {
-            // Get the current animation type and pattern
+            // Get the current animation type
             var animationType = _animationManager.CurrentAnimationType;
-            var animationPattern = _animationManager.CurrentAnimationPattern;
             
-            // Update the status label
-            StatusLabel.Text = $"Animation: {animationType}";
+            // Update the animation label
+            AnimationLabel.Text = animationType.ToString();
             
-            _logger.Log($"Status label updated with animation type: {animationType}");
+            _logger.Log($"Animation label updated with animation type: {animationType}");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error updating status label: {ex.Message}");
+            _logger.LogError($"Error updating animation label: {ex.Message}");
         }
     }
 
@@ -135,17 +368,12 @@ public partial class MainPage : ContentPage
             // Delay the game initialization to improve navigation performance
             await Task.Delay(200);
 
-            // Allow random animation selection
-            _animationManager.ForcedAnimationType = null;
-            _logger.Log("Animation selection set to random");
-
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
             _logger.Log("New game created with Easy difficulty");
 
-            // Set up animations with random animation selection
-            _animationManager.ForcedAnimationType = null;
-            _animationManager.SelectRandomAnimationStyle();
+            // Set up animations with the selected animation type
+            SelectRandomGameAnimationStyle();
             _animationManager.SetupAnimations();
             
             // Create the grid

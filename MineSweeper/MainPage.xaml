@@ -162,10 +162,20 @@
                           HorizontalOptions="Fill"
                           VerticalOptions="Fill"
                           BackgroundColor="Transparent" />
-            <Label x:Name="StatusLabel" Text="Status" HorizontalOptions="Center" VerticalOptions="Center" FontSize="16"></Label>
             
-
-
+            <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="10">
+                <Label Text="Animation:" VerticalOptions="Center" FontSize="16" />
+                <Frame Padding="10,5" BorderColor="Gray" CornerRadius="5" HasShadow="True">
+                    <Label x:Name="AnimationLabel" 
+                           Text="Select Animation"
+                           FontSize="16"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnAnimationLabelTapped" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Frame>
+            </HorizontalStackLayout>
         </Grid>
     </Grid>
 </ContentPage>

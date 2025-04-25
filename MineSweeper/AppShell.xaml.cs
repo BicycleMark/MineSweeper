@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Diagnostics;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Diagnostics;
 using System.Windows.Input;
 using Microsoft.Maui.Dispatching;
 using MineSweeper.Features.Game.Models;
@@ -96,11 +96,16 @@ public partial class AppShell : Shell, IDisposable
             // Initialize and start the timer
             InitializeContinuousAnimationsTimer();
             
-            // Start with the current difficulty
-            _currentDifficulty = GameEnums.GameDifficulty.Easy;
+            // Immediately advance to a random difficulty
+            var random = new Random();
+            _currentDifficulty = (GameEnums.GameDifficulty)random.Next(0, 3); // Random difficulty: 0=Easy, 1=Medium, 2=Hard
+            Debug.WriteLine($"Immediately advanced to random difficulty: {_currentDifficulty}");
             
-            // Start the first game
+            // Start a new game with the random difficulty
             StartNewGame(_currentDifficulty);
+            
+            // The StartNewGame method will apply a random animation since _isContinuousAnimationsEnabled is true
+            Debug.WriteLine("Immediately started new game with random difficulty and animation");
         }
         else
         {
@@ -124,11 +129,21 @@ public partial class AppShell : Shell, IDisposable
                     {
                         viewModel.GameTime = 0;
                     }
+                    
+                    // Restore the user's selected animation
+                    mainPage.SelectRandomGameAnimationStyle();
+                    Debug.WriteLine("Restored user's selected animation style");
+                }
+                else if (Current.CurrentPage is GamePage gamePage)
+                {
+                    // Restore the user's selected animation
+                    gamePage.SelectRandomGameAnimationStyle();
+                    Debug.WriteLine("Restored user's selected animation style");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error resetting game timer display: {ex}");
+                Debug.WriteLine($"Error resetting game timer display or restoring animation: {ex}");
             }
         }
         
@@ -186,8 +201,30 @@ public partial class AppShell : Shell, IDisposable
             // Reset the countdown
             _countdownSeconds = 10;
         }
-        // We removed the code that changes animation during countdown
-        // Animation will only change when a new game starts (every 10 seconds)
+        // Force a random animation style every 3 seconds during continuous animations
+        else if (_countdownSeconds % 3 == 0)
+        {
+            try
+            {
+                // Get the current page
+                if (Current.CurrentPage is MainPage mainPage)
+                {
+                    // Force a random animation style
+                    mainPage.ForceRandomAnimationStyle();
+                    Debug.WriteLine($"Forced random animation style at countdown: {_countdownSeconds}");
+                }
+                else if (Current.CurrentPage is GamePage gamePage)
+                {
+                    // Force a random animation style
+                    gamePage.ForceRandomAnimationStyle();
+                    Debug.WriteLine($"Forced random animation style at countdown: {_countdownSeconds}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error forcing random animation style during countdown: {ex}");
+            }
+        }
     }
     
     /// <summary>
@@ -249,8 +286,19 @@ public partial class AppShell : Shell, IDisposable
                 {
                     Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
                     viewModel.NewGameCommand.Execute(difficulty);
-                    mainPage.SelectRandomGameAnimationStyle();
-                    // The status label is already updated in SelectRandomGameAnimationStyle
+                    
+                    // If continuous animations are enabled, force a random animation style
+                    // Otherwise, use the selected animation style
+                    if (_isContinuousAnimationsEnabled)
+                    {
+                        mainPage.ForceRandomAnimationStyle();
+                        Debug.WriteLine("Forced random animation style for continuous animations");
+                    }
+                    else
+                    {
+                        mainPage.SelectRandomGameAnimationStyle();
+                        Debug.WriteLine("Using selected animation style");
+                    }
                 }
             }
             else if (Current.CurrentPage is GamePage gamePage)
@@ -263,7 +311,19 @@ public partial class AppShell : Shell, IDisposable
                 {
                     Debug.WriteLine($"Starting new game with difficulty: {difficulty}");
                     viewModel.NewGameCommand.Execute(difficulty);
-                    gamePage.SelectRandomGameAnimationStyle();
+                    
+                    // If continuous animations are enabled, force a random animation style
+                    // Otherwise, use the selected animation style
+                    if (_isContinuousAnimationsEnabled)
+                    {
+                        gamePage.ForceRandomAnimationStyle();
+                        Debug.WriteLine("Forced random animation style for continuous animations");
+                    }
+                    else
+                    {
+                        gamePage.SelectRandomGameAnimationStyle();
+                        Debug.WriteLine("Using selected animation style");
+                    }
                 }
             }
         }
