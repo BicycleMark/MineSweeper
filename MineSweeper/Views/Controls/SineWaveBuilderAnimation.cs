@@ -52,7 +52,7 @@ public static class SineWaveBuilderAnimationExtension
             var delay = cellIndex * 50; // 50ms between each cell
             
             // Calculate sine wave parameters
-            double amplitude = 50; // Height of the sine wave
+            double amplitude = 100; // Height of the sine wave (increased from 50 to 100)
             double frequency = 0.3; // Frequency of the sine wave
             
             // Set initial position based on sine wave

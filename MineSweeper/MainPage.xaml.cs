@@ -83,10 +83,12 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            // Force the SlideIn animation type for testing
-            _animationManager.ForcedAnimationType = GridAnimationExtensions.AnimationType.SlideIn;
-            _animationManager.SelectRandomAnimationStyle(); // This will use the forced animation type
-            _logger.Log("SlideIn animation style selected");
+            // Clear any forced animation type to allow random selection
+            _animationManager.ForcedAnimationType = null;
+            
+            // Select a random animation style
+            _animationManager.SelectRandomAnimationStyle();
+            _logger.Log($"Random animation style selected: {_animationManager.CurrentAnimationType}");
             
             // Update the status label with the current animation type
             UpdateStatusLabel();
@@ -135,7 +137,7 @@ public partial class MainPage : ContentPage
 
             // Select a random animation style for this game
            _animationManager.SelectRandomAnimationStyle();
-           // _animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.ConstructFromPile;
+           //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.SineWaveBuilder;
             
             _logger.Log("Animation style selected");
 
@@ -146,7 +148,7 @@ public partial class MainPage : ContentPage
             // Set up animations
             // Randomize Animations
             _animationManager.SelectRandomAnimationStyle();
-            _animationManager.ForcedAnimationType = GridAnimationExtensions.AnimationType.SlideIn;
+            
             
             _animationManager.SetupAnimations();
             

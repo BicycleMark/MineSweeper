@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Diagnostics;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System.Diagnostics;
 using System.Windows.Input;
 using Microsoft.Maui.Dispatching;
 using MineSweeper.Features.Game.Models;
@@ -186,6 +186,8 @@ public partial class AppShell : Shell, IDisposable
             // Reset the countdown
             _countdownSeconds = 10;
         }
+        // We removed the code that changes animation during countdown
+        // Animation will only change when a new game starts (every 10 seconds)
     }
     
     /// <summary>
