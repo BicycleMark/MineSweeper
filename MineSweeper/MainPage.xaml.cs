@@ -83,8 +83,10 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            _animationManager.SelectRandomAnimationStyle();
-            _logger.Log("Random animation style selected");
+            // Force the SlideIn animation type for testing
+            _animationManager.ForcedAnimationType = GridAnimationExtensions.AnimationType.SlideIn;
+            _animationManager.SelectRandomAnimationStyle(); // This will use the forced animation type
+            _logger.Log("SlideIn animation style selected");
             
             // Update the status label with the current animation type
             UpdateStatusLabel();
@@ -144,7 +146,7 @@ public partial class MainPage : ContentPage
             // Set up animations
             // Randomize Animations
             _animationManager.SelectRandomAnimationStyle();
-            //_animationManager.ForcedAnimationType = GridAnimationExtensions.AnimationType.SineWaveBuilder;
+            _animationManager.ForcedAnimationType = GridAnimationExtensions.AnimationType.SlideIn;
             
             _animationManager.SetupAnimations();
             

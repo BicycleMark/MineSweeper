@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace MineSweeper.Extensions;
 
 /// <summary>
@@ -298,21 +300,74 @@ public static class GridAnimationExtensions
         );
     }
 
+    // Static dictionary to track the random delay for each cell
+    private static readonly Dictionary<string, int> _cellRandomDelays = new Dictionary<string, int>();
+    
     /// <summary>
-    ///     Performs a slide-in animation on the specified cell.
+    ///     Performs a slide-in animation on the specified cell, with cells animated in random order.
     /// </summary>
     private static async Task SlideInAnimation(Image image, int row, int col)
     {
-        image.Opacity = 0.3;
-        image.TranslationX = col % 2 == 0 ? -40 : 40;
-
-        var delay = row * 10;
-        await Task.Delay(delay);
-
-        await Task.WhenAll(
-            image.TranslateTo(0, 0, 300, Easing.CubicOut),
-            image.FadeTo(1)
-        );
+        // Generate a unique key for this cell
+        string cellKey = $"{row}_{col}_{image.GetHashCode() % 1000}";
+        
+        // Get or create a random delay for this cell
+        int randomDelay;
+        if (!_cellRandomDelays.TryGetValue(cellKey, out randomDelay))
+        {
+            // Generate a random delay between 0 and 2000ms
+            randomDelay = _random.Next(0, 2000);
+            _cellRandomDelays[cellKey] = randomDelay;
+        }
+        
+        // Set initial state - invisible
+        image.Opacity = 0;
+        
+        // Randomize the direction from which the cell slides in
+        int direction = _random.Next(4);
+        switch (direction)
+        {
+            case 0: // From left
+                image.TranslationX = -40;
+                image.TranslationY = 0;
+                break;
+            case 1: // From right
+                image.TranslationX = 40;
+                image.TranslationY = 0;
+                break;
+            case 2: // From top
+                image.TranslationX = 0;
+                image.TranslationY = -40;
+                break;
+            case 3: // From bottom
+                image.TranslationX = 0;
+                image.TranslationY = 40;
+                break;
+        }
+        
+        try
+        {
+            // Wait for the random delay
+            await Task.Delay(randomDelay);
+            
+            // Make the cell visible
+            image.Opacity = 0.3;
+            
+            // Perform the animation
+            await Task.WhenAll(
+                image.TranslateTo(0, 0, 300, Easing.CubicOut),
+                image.FadeTo(1, 300)
+            );
+        }
+        catch (Exception ex)
+        {
+            // In case of error, make the cell visible
+            image.Opacity = 1;
+            image.TranslationX = 0;
+            image.TranslationY = 0;
+            
+            Debug.WriteLine($"Error in SlideInAnimation: {ex.Message}");
+        }
     }
 
     /// <summary>

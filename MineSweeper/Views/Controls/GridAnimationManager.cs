@@ -93,6 +93,9 @@ public class GridAnimationManager
         {
             await Task.Delay(50);
 
+            // No special setup needed for SlideIn animation anymore
+            // The new implementation handles the randomization internally
+
             // Calculate delay based on current pattern
             var delay = GridAnimationExtensions.CalculateAnimationDelay(
                 args.Row,
