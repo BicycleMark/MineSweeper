@@ -135,21 +135,17 @@ public partial class MainPage : ContentPage
             // Delay the game initialization to improve navigation performance
             await Task.Delay(200);
 
-            // Select a random animation style for this game
-           _animationManager.SelectRandomAnimationStyle();
-           //_animationManager.ForcedAnimationType = MineSweeper.Extensions.GridAnimationExtensions.AnimationType.SineWaveBuilder;
-            
-            _logger.Log("Animation style selected");
+            // Allow random animation selection
+            _animationManager.ForcedAnimationType = null;
+            _logger.Log("Animation selection set to random");
 
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);
             _logger.Log("New game created with Easy difficulty");
 
-            // Set up animations
-            // Randomize Animations
+            // Set up animations with random animation selection
+            _animationManager.ForcedAnimationType = null;
             _animationManager.SelectRandomAnimationStyle();
-            
-            
             _animationManager.SetupAnimations();
             
             // Create the grid

@@ -80,8 +80,12 @@ public partial class GamePage : ContentPage
     {
         try
         {
+            // Clear any forced animation type to allow random selection
+            _animationManager.ForcedAnimationType = null;
+            
+            // Select a random animation style
             _animationManager.SelectRandomAnimationStyle();
-            _logger.Log("Random animation style selected");
+            _logger.Log($"Random animation style selected: {_animationManager.CurrentAnimationType}");
         }
         catch (Exception ex)
         {
@@ -103,9 +107,9 @@ public partial class GamePage : ContentPage
             // Delay the game initialization to improve navigation performance
             await Task.Delay(200);
 
-            // Select a random animation style for this game
-            _animationManager.SelectRandomAnimationStyle();
-            _logger.Log("Animation style selected");
+            // Allow random animation selection
+            _animationManager.ForcedAnimationType = null;
+            _logger.Log("Animation selection set to random");
 
             // Start a new game with Easy difficulty
             await _viewModel.NewGameCommand.ExecuteAsync(GameEnums.GameDifficulty.Easy);

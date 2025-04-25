@@ -28,6 +28,21 @@ public class GridAnimationManager
     ///     If null, a random animation type will be selected.
     /// </summary>
     public GridAnimationExtensions.AnimationType? ForcedAnimationType { get; set; }
+    
+    /// <summary>
+    ///     Forces a specific animation type to be used.
+    /// </summary>
+    /// <param name="animationType">The animation type to force.</param>
+    public void ForceAnimationType(GridAnimationExtensions.AnimationType animationType)
+    {
+        // Set the forced animation type
+        ForcedAnimationType = animationType;
+        
+        // Set the current animation type directly
+        _currentAnimationType = animationType;
+        
+        Debug.WriteLine($"Animation type forced to: {animationType}");
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="GridAnimationManager" /> class.

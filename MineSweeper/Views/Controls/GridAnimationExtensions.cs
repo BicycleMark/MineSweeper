@@ -112,7 +112,10 @@ public static class GridAnimationExtensions
         ABrickLayerfromAbove,
         
         /// <summary>Cells move in a sine wave pattern, one row at a time, alternating between left-to-right and right-to-left.</summary>
-        SineWaveBuilder
+        SineWaveBuilder,
+        
+        /// <summary>Cells roll into place from alternating sides, with even rows going left-to-right and odd rows going right-to-left.</summary>
+        RollIntoPlace
     }
 
     /// <summary>
@@ -164,6 +167,7 @@ public static class GridAnimationExtensions
             AnimationType.LikeAShadePulled => LikeAShadePulledAnimationExtension.LikeAShadePulledAnimation(image, row, col, totalRows, totalColumns),
             AnimationType.ABrickLayerfromAbove => ABrickLayerfromAboveAnimationExtension.ABrickLayerfromAboveAnimation(image, row, col, totalRows, totalColumns),
             AnimationType.SineWaveBuilder => SineWaveBuilderAnimationExtension.SineWaveBuilderAnimation(image, row, col, totalRows, totalColumns),
+            AnimationType.RollIntoPlace => RollIntoPlaceAnimationExtension.RollIntoPlaceAnimation(image, row, col, totalRows, totalColumns),
             _ => FadeInAnimation(image, row, col)
         };
     }
