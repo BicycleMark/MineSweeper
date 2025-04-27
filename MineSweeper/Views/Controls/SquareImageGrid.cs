@@ -320,9 +320,10 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
 
         // Clear the grid
         _grid.Children.Clear();
+       
         _grid.RowDefinitions.Clear();
         _grid.ColumnDefinitions.Clear();
-
+        
         // Add row and column definitions
         for (var i = 0; i < rows; i++)
             _grid.RowDefinitions.Add(new RowDefinition {Height = new GridLength(1, GridUnitType.Star)});
@@ -330,6 +331,8 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         for (var j = 0; j < columns; j++)
             _grid.ColumnDefinitions.Add(new ColumnDefinition {Width = new GridLength(1, GridUnitType.Star)});
 
+        //_grid.RowSpacing = 5;
+        //_grid.ColumnSpacing = 5;
             // Add cells to the grid
             for (var i = 0; i < rows; i++)
             for (var j = 0; j < columns; j++)
@@ -355,7 +358,9 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                         Stroke = Colors.Black,
                         StrokeThickness = 1,
                         Fill = Colors.Transparent,
-                        Margin = new Thickness(1)
+                      
+                        
+                        Margin = new Thickness(5)
                     };
                 }
 
@@ -365,70 +370,52 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                 cell.HorizontalOptions = LayoutOptions.Fill;
                 cell.VerticalOptions = LayoutOptions.Fill;
                 
-                // Ensure the cell can receive input
-                cell.InputTransparent = false;
+                // Make the cell input transparent so clicks pass through to the grid
+                cell.InputTransparent = true;
 
                 // Set the cell's position in the grid
                 Grid.SetRow(cell, i);
                 Grid.SetColumn(cell, j);
                 
-                // Only add buttons to actual tiles, not to whitespace
                 // Check if this is a default tile (whitespace)
                 bool isDefaultTile = IsDefaultTile(cell);
                 
                 if (!isDefaultTile)
                 {
-                    // This is an actual tile, add a button to capture taps
-                    var button = new Button
-                    {
-                        Text = "",
-                        BackgroundColor = Colors.Transparent,
-                        BorderColor = Colors.Transparent,
-                        Margin = new Thickness(0),
-                        Padding = new Thickness(0),
-                        CornerRadius = 0,
-                        HorizontalOptions = LayoutOptions.Fill,
-                        VerticalOptions = LayoutOptions.Fill,
-                        ZIndex = 1, // Ensure it's on top of the cell
-                        // For debugging - make the button slightly visible
-                        Opacity = 0.1
-                    };
-                
+                    // This is an actual tile, add a tap gesture recognizer directly to the image
+                    var tapGesture = new TapGestureRecognizer();
+                    
                     // Store the row and column as local variables for the closure
                     int capturedRow = i;
                     int capturedCol = j;
                     
-                    // Add the click handler
-                    button.Clicked += (sender, e) => {
-                        Debug.WriteLine($"Button clicked at row {capturedRow}, column {capturedCol}");
+                    // Add the tap handler
+                    tapGesture.Tapped += (sender, e) => {
+                        Debug.WriteLine($"Image tapped at row {capturedRow}, column {capturedCol}");
                         
                         // Get the tapped view
                         var tileView = _images[capturedRow, capturedCol];
                         
-                        // Determine if it's a default tile
-                        var isDefaultTile = IsDefaultTile(tileView);
-                        
                         // Create a new event args instance for each tap
-                        var eventArgs = new TileTappedEventArgs(capturedRow, capturedCol, tileView, isDefaultTile);
+                        var eventArgs = new TileTappedEventArgs(capturedRow, capturedCol, tileView, false);
                         
-                        // Invoke both events with the new args
-                        // The legacy TileTapped event is kept for backward compatibility
-                        TileTapped?.Invoke(this, eventArgs);
-                        
-                        // The new GameTileTapped event is guaranteed to only fire for actual game tiles
+                        // Invoke the GameTileTapped event
+                        // This event is guaranteed to only fire for actual game tiles
                         GameTileTapped?.Invoke(this, eventArgs);
                         
                         Debug.WriteLine($"GameTileTapped event raised for row {capturedRow}, column {capturedCol}");
                     };
                     
-                    // Set the button's position in the grid
-                    Grid.SetRow(button, i);
-                    Grid.SetColumn(button, j);
+                    // Get the image for this cell from the _images array
+                    var image = _images[i, j];
                     
-                    // Add the button to the grid
-                    _grid.Children.Add(button);
+                    // Make sure the image can receive input
+                    image.InputTransparent = false;
                     
-                    Debug.WriteLine($"Added button to grid at row {i}, column {j}");
+                    // Add the tap gesture recognizer to the image, not the cell
+                    image.GestureRecognizers.Add(tapGesture);
+                    
+                    Debug.WriteLine($"Added tap gesture to image at row {i}, column {j}");
                 }
                 
                 // Add the cell to the grid (always add the cell, regardless of whether it's a tile or whitespace)

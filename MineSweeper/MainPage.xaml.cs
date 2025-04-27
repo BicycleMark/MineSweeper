@@ -480,15 +480,16 @@ public partial class MainPage : ContentPage
             GameGrid.GameTileTapped += OnTileTapped; // Re-subscribe
             _logger.Log("Re-subscribed to GameTileTapped event (guaranteed no whitespace clicks)");
             
-            // Add a direct tap gesture recognizer to the GameGrid as a backup
-            var tapGesture = new TapGestureRecognizer();
-            tapGesture.Tapped += OnGridDirectTapped;
-            GameGrid.GestureRecognizers.Add(tapGesture);
-            _logger.Log("Added direct tap gesture recognizer to GameGrid");
+            // Remove any direct tap gesture recognizers from the GameGrid
+            foreach (var gesture in GameGrid.GestureRecognizers.OfType<TapGestureRecognizer>().ToList())
+            {
+                GameGrid.GestureRecognizers.Remove(gesture);
+            }
+            _logger.Log("Removed direct tap gesture recognizers from GameGrid");
             
-            // Add tap gesture recognizers to each cell in the grid
-            AddTapGesturesToCells();
-            _logger.Log("Added tap gesture recognizers to each cell in the grid");
+            // Remove any overlay grids that might have been added previously
+            RemoveOverlayGrids();
+            _logger.Log("Removed any overlay grids");
             
             // Update the status label with the current animation type
             UpdateStatusLabel();
@@ -555,13 +556,13 @@ public partial class MainPage : ContentPage
     }
     
     /// <summary>
-    ///     Adds tap gesture recognizers to each cell in the grid.
+    ///     Removes any overlay grids that might have been added previously.
     /// </summary>
-    private void AddTapGesturesToCells()
+    private void RemoveOverlayGrids()
     {
         try
         {
-            // First, remove any existing overlay grids
+            // Get the parent of the game grid
             var gameGridParent = GameGrid.Parent as Layout;
             if (gameGridParent != null)
             {
@@ -575,124 +576,12 @@ public partial class MainPage : ContentPage
                 }
             }
             
-            // Create a transparent overlay grid with the same dimensions as the game grid
-            var overlayGrid = new Grid
-            {
-                BackgroundColor = Colors.Transparent,
-                Padding = 0,
-                RowSpacing = 0,
-                ColumnSpacing = 0,
-                HorizontalOptions = LayoutOptions.Fill,
-                VerticalOptions = LayoutOptions.Fill,
-                InputTransparent = false,
-                ZIndex = 1000 // Ensure it's on top of everything
-            };
-            
-            // Mark this grid as an overlay
-            overlayGrid.SetValue(BindableProperty.Create("IsOverlay", typeof(bool), typeof(Grid), false), true);
-            
-            // Add row and column definitions to match the game grid
-            for (int i = 0; i < GameGrid.Rows; i++)
-                overlayGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            
-            for (int j = 0; j < GameGrid.Columns; j++)
-                overlayGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            
-            // Add buttons only to actual tiles, not to whitespace areas
-            for (int row = 0; row < GameGrid.Rows; row++)
-            {
-                for (int col = 0; col < GameGrid.Columns; col++)
-                {
-                    // Check if this is a default tile (whitespace)
-                    var cell = GameGrid[row, col];
-                    bool isDefaultTile = false;
-                    
-                    // Check if the cell is a Rectangle with transparent fill (default tile)
-                    if (cell is Rectangle rectangle && 
-                        rectangle.Fill is SolidColorBrush brush && 
-                        brush.Color == Colors.Transparent)
-                    {
-                        isDefaultTile = true;
-                    }
-                    
-                    // Only add buttons to actual tiles, not to whitespace
-                    if (!isDefaultTile)
-                    {
-                        // Create a Button for each actual tile
-                        var button = new Button
-                        {
-                            Text = "", // No text
-                            BackgroundColor = Colors.Transparent, // Make it completely transparent
-                            BorderColor = Colors.Transparent, // No border
-                            Margin = new Thickness(0), // No margin
-                            Padding = new Thickness(0), // No padding
-                            CornerRadius = 0, // No rounded corners
-                            HorizontalOptions = LayoutOptions.Fill,
-                            VerticalOptions = LayoutOptions.Fill
-                        };
-                        
-                        // Set the row and column of the button
-                        Grid.SetRow(button, row);
-                        Grid.SetColumn(button, col);
-                        
-                        // Store the row and column as local variables for the closure
-                        int capturedRow = row;
-                        int capturedCol = col;
-                        
-                        // Add the click handler
-                        button.Clicked += (sender, e) => {
-                            // Add a timestamp to help identify if this is a new event or a cached one
-                            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-                            Debug.WriteLine($"[{timestamp}] Button clicked - Row {capturedRow}, Col {capturedCol}");
-                            
-                            // Update the tile status label with the row and column information
-                            MainThread.BeginInvokeOnMainThread(() => {
-                                TileStatus.Text = $"Button: Row {capturedRow}, Col {capturedCol} @ {timestamp}";
-                            });
-                            
-                            _logger.Log($"Button clicked at row {capturedRow}, column {capturedCol}");
-                        };
-                        
-                        // Add the button to the overlay grid
-                        overlayGrid.Children.Add(button);
-                        
-                        Debug.WriteLine($"Added button to overlay grid at row {row}, column {col}");
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"Skipped adding button to whitespace at row {row}, column {col}");
-                    }
-                }
-            }
-            
-            // Add the overlay grid to the page
-            if (gameGridParent != null)
-            {
-                // Get the index of the game grid in its parent
-                var index = gameGridParent.Children.IndexOf(GameGrid);
-                
-                // Add the overlay grid at the same position
-                if (index >= 0)
-                {
-                    gameGridParent.Children.Insert(index + 1, overlayGrid);
-                    Debug.WriteLine("Added overlay grid to the page");
-                }
-                else
-                {
-                    Debug.WriteLine("Could not find game grid in its parent");
-                }
-            }
-            else
-            {
-                Debug.WriteLine("Game grid parent is not a Layout");
-            }
-            
-            Debug.WriteLine($"Added box views to overlay grid for {GameGrid.Rows * GameGrid.Columns} cells");
+            _logger.Log("Removed any existing overlay grids");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error adding tap gesture recognizers to cells: {ex.Message}");
-            Debug.WriteLine($"Error in AddTapGesturesToCells: {ex.Message}\n{ex.StackTrace}");
+            _logger.LogError($"Error removing overlay grids: {ex.Message}");
+            Debug.WriteLine($"Error in RemoveOverlayGrids: {ex.Message}\n{ex.StackTrace}");
         }
     }
     
