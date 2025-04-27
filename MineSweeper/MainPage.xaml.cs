@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.Maui.Controls.Shapes;
 using MineSweeper.Extensions;
 using MineSweeper.Features.Game.Models;
 using MineSweeper.Features.Game.ViewModels;
@@ -35,6 +36,13 @@ public partial class MainPage : ContentPage
 
         // Start a new game when the page is loaded
         Loaded += OnPageLoaded;
+        
+        // Subscribe to the GameTileTapped event instead of TileTapped
+        // GameTileTapped is guaranteed to only fire for actual game tiles, never for whitespace
+        GameGrid.GameTileTapped += OnTileTapped;
+        
+        // Log that we've subscribed to the event
+        _logger.Log("Subscribed to GameTileTapped event (guaranteed no whitespace clicks)");
     }
     
     /// <summary>
@@ -191,7 +199,10 @@ public partial class MainPage : ContentPage
             // Update the animation label
             AnimationLabel.Text = _selectedAnimationType.ToString();
             
-            _logger.Log("Animation picker initialized");
+            // Initialize the tile status label
+            TileStatus.Text = "Click a tile";
+            
+            _logger.Log("Animation picker and tile status initialized");
         }
         catch (Exception ex)
         {
@@ -353,6 +364,90 @@ public partial class MainPage : ContentPage
             _logger.LogError($"Error updating animation label: {ex.Message}");
         }
     }
+    
+    /// <summary>
+    ///     Handles the tile tapped event.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event arguments.</param>
+    private void OnTileTapped(object? sender, TileTappedEventArgs e)
+    {
+        try
+        {
+            // We're no longer checking for whitespace taps
+            // All taps will be treated as valid tile taps
+            
+            // Update the tile status label with the row and column information
+            TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column}";
+            
+            // Add a timestamp to help identify if this is a new event or a cached one
+            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+            Debug.WriteLine($"[{timestamp}] OnTileTapped called - Row {e.Row}, Col {e.Column}, IsDefaultTile: {e.IsDefaultTile}");
+            
+            _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}");
+            
+            // Force the UI to update immediately
+            MainThread.BeginInvokeOnMainThread(() => {
+                TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column} @ {timestamp}";
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error handling tile tapped event: {ex.Message}");
+            Debug.WriteLine($"Error in OnTileTapped: {ex.Message}\n{ex.StackTrace}");
+        }
+    }
+    
+    /// <summary>
+    ///     Handles direct taps on the grid.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event arguments.</param>
+    private void OnGridDirectTapped(object? sender, TappedEventArgs e)
+    {
+        try
+        {
+            // Get the tapped position
+            if (e.GetPosition(GameGrid) is Point position)
+            {
+                // Calculate the cell size
+                var cellWidth = GameGrid.Width / GameGrid.Columns;
+                var cellHeight = GameGrid.Height / GameGrid.Rows;
+
+                // Calculate the row and column
+                var row = (int)(position.Y / cellHeight);
+                var col = (int)(position.X / cellWidth);
+
+                // Add a timestamp to help identify if this is a new event or a cached one
+                var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+                Debug.WriteLine($"[{timestamp}] OnGridDirectTapped called - Position: ({position.X}, {position.Y}), calculated Row {row}, Col {col}");
+                
+                // Ensure the row and column are within bounds
+                if (row >= 0 && row < GameGrid.Rows && col >= 0 && col < GameGrid.Columns)
+                {
+                    // Update the tile status label with the row and column information
+                    MainThread.BeginInvokeOnMainThread(() => {
+                        TileStatus.Text = $"Direct Tap: Row {row}, Col {col} @ {timestamp}";
+                    });
+                    
+                    _logger.Log($"Direct tap at row {row}, column {col}");
+                }
+                else
+                {
+                    Debug.WriteLine($"Tap position out of bounds: Row {row}, Col {col}");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Could not get tap position");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error handling direct grid tap: {ex.Message}");
+            Debug.WriteLine($"Error in OnGridDirectTapped: {ex.Message}\n{ex.StackTrace}");
+        }
+    }
 
     /// <summary>
     ///     Handles the page loaded event.
@@ -379,6 +474,21 @@ public partial class MainPage : ContentPage
             // Create the grid
             GameGrid.CreateGrid(_viewModel.Rows, _viewModel.Columns);
             _logger.Log($"Grid created with {_viewModel.Rows} rows and {_viewModel.Columns} columns");
+            
+            // Re-subscribe to the GameTileTapped event
+            GameGrid.GameTileTapped -= OnTileTapped; // Remove any existing subscription
+            GameGrid.GameTileTapped += OnTileTapped; // Re-subscribe
+            _logger.Log("Re-subscribed to GameTileTapped event (guaranteed no whitespace clicks)");
+            
+            // Add a direct tap gesture recognizer to the GameGrid as a backup
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += OnGridDirectTapped;
+            GameGrid.GestureRecognizers.Add(tapGesture);
+            _logger.Log("Added direct tap gesture recognizer to GameGrid");
+            
+            // Add tap gesture recognizers to each cell in the grid
+            AddTapGesturesToCells();
+            _logger.Log("Added tap gesture recognizers to each cell in the grid");
             
             // Update the status label with the current animation type
             UpdateStatusLabel();
@@ -441,6 +551,183 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError($"Unexpected error in OnDisappearing: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    ///     Adds tap gesture recognizers to each cell in the grid.
+    /// </summary>
+    private void AddTapGesturesToCells()
+    {
+        try
+        {
+            // First, remove any existing overlay grids
+            var gameGridParent = GameGrid.Parent as Layout;
+            if (gameGridParent != null)
+            {
+                // Find and remove any existing overlay grids
+                var isOverlayProperty = BindableProperty.Create("IsOverlay", typeof(bool), typeof(Grid), false);
+                var existingOverlays = gameGridParent.Children.Where(c => c is Grid && (c as BindableObject)?.GetValue(isOverlayProperty) as bool? == true).ToList();
+                foreach (var overlay in existingOverlays)
+                {
+                    gameGridParent.Children.Remove(overlay);
+                    Debug.WriteLine("Removed existing overlay grid");
+                }
+            }
+            
+            // Create a transparent overlay grid with the same dimensions as the game grid
+            var overlayGrid = new Grid
+            {
+                BackgroundColor = Colors.Transparent,
+                Padding = 0,
+                RowSpacing = 0,
+                ColumnSpacing = 0,
+                HorizontalOptions = LayoutOptions.Fill,
+                VerticalOptions = LayoutOptions.Fill,
+                InputTransparent = false,
+                ZIndex = 1000 // Ensure it's on top of everything
+            };
+            
+            // Mark this grid as an overlay
+            overlayGrid.SetValue(BindableProperty.Create("IsOverlay", typeof(bool), typeof(Grid), false), true);
+            
+            // Add row and column definitions to match the game grid
+            for (int i = 0; i < GameGrid.Rows; i++)
+                overlayGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            
+            for (int j = 0; j < GameGrid.Columns; j++)
+                overlayGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            
+            // Add buttons only to actual tiles, not to whitespace areas
+            for (int row = 0; row < GameGrid.Rows; row++)
+            {
+                for (int col = 0; col < GameGrid.Columns; col++)
+                {
+                    // Check if this is a default tile (whitespace)
+                    var cell = GameGrid[row, col];
+                    bool isDefaultTile = false;
+                    
+                    // Check if the cell is a Rectangle with transparent fill (default tile)
+                    if (cell is Rectangle rectangle && 
+                        rectangle.Fill is SolidColorBrush brush && 
+                        brush.Color == Colors.Transparent)
+                    {
+                        isDefaultTile = true;
+                    }
+                    
+                    // Only add buttons to actual tiles, not to whitespace
+                    if (!isDefaultTile)
+                    {
+                        // Create a Button for each actual tile
+                        var button = new Button
+                        {
+                            Text = "", // No text
+                            BackgroundColor = Colors.Transparent, // Make it completely transparent
+                            BorderColor = Colors.Transparent, // No border
+                            Margin = new Thickness(0), // No margin
+                            Padding = new Thickness(0), // No padding
+                            CornerRadius = 0, // No rounded corners
+                            HorizontalOptions = LayoutOptions.Fill,
+                            VerticalOptions = LayoutOptions.Fill
+                        };
+                        
+                        // Set the row and column of the button
+                        Grid.SetRow(button, row);
+                        Grid.SetColumn(button, col);
+                        
+                        // Store the row and column as local variables for the closure
+                        int capturedRow = row;
+                        int capturedCol = col;
+                        
+                        // Add the click handler
+                        button.Clicked += (sender, e) => {
+                            // Add a timestamp to help identify if this is a new event or a cached one
+                            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+                            Debug.WriteLine($"[{timestamp}] Button clicked - Row {capturedRow}, Col {capturedCol}");
+                            
+                            // Update the tile status label with the row and column information
+                            MainThread.BeginInvokeOnMainThread(() => {
+                                TileStatus.Text = $"Button: Row {capturedRow}, Col {capturedCol} @ {timestamp}";
+                            });
+                            
+                            _logger.Log($"Button clicked at row {capturedRow}, column {capturedCol}");
+                        };
+                        
+                        // Add the button to the overlay grid
+                        overlayGrid.Children.Add(button);
+                        
+                        Debug.WriteLine($"Added button to overlay grid at row {row}, column {col}");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Skipped adding button to whitespace at row {row}, column {col}");
+                    }
+                }
+            }
+            
+            // Add the overlay grid to the page
+            if (gameGridParent != null)
+            {
+                // Get the index of the game grid in its parent
+                var index = gameGridParent.Children.IndexOf(GameGrid);
+                
+                // Add the overlay grid at the same position
+                if (index >= 0)
+                {
+                    gameGridParent.Children.Insert(index + 1, overlayGrid);
+                    Debug.WriteLine("Added overlay grid to the page");
+                }
+                else
+                {
+                    Debug.WriteLine("Could not find game grid in its parent");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Game grid parent is not a Layout");
+            }
+            
+            Debug.WriteLine($"Added box views to overlay grid for {GameGrid.Rows * GameGrid.Columns} cells");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error adding tap gesture recognizers to cells: {ex.Message}");
+            Debug.WriteLine($"Error in AddTapGesturesToCells: {ex.Message}\n{ex.StackTrace}");
+        }
+    }
+    
+    /// <summary>
+    ///     Handles taps on individual cells.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event arguments.</param>
+    private void OnCellTapped(object? sender, TappedEventArgs e)
+    {
+        try
+        {
+            // Get the tap gesture recognizer that was tapped
+            if (sender is TapGestureRecognizer tapGesture)
+            {
+                // Get the row and column from the attached properties
+                var row = (int)tapGesture.GetValue(BindableProperty.Create("Row", typeof(int), typeof(TapGestureRecognizer), 0));
+                var col = (int)tapGesture.GetValue(BindableProperty.Create("Column", typeof(int), typeof(TapGestureRecognizer), 0));
+                
+                // Add a timestamp to help identify if this is a new event or a cached one
+                var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+                Debug.WriteLine($"[{timestamp}] OnCellTapped called - Row {row}, Col {col}");
+                
+                // Update the tile status label with the row and column information
+                MainThread.BeginInvokeOnMainThread(() => {
+                    TileStatus.Text = $"Cell Tap: Row {row}, Col {col} @ {timestamp}";
+                });
+                
+                _logger.Log($"Cell tapped at row {row}, column {col}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error handling cell tap: {ex.Message}");
+            Debug.WriteLine($"Error in OnCellTapped: {ex.Message}\n{ex.StackTrace}");
         }
     }
 }

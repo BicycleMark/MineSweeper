@@ -71,6 +71,55 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         true,
         propertyChanged: OnBorderPropertyChanged);
     
+    /// <summary>
+    /// Attached property for storing the row index on a gesture recognizer
+    /// </summary>
+    private static readonly BindableProperty RowProperty = BindableProperty.CreateAttached(
+        "Row",
+        typeof(int),
+        typeof(SquareImageGrid),
+        0);
+
+    /// <summary>
+    /// Attached property for storing the column index on a gesture recognizer
+    /// </summary>
+    private static readonly BindableProperty ColumnProperty = BindableProperty.CreateAttached(
+        "Column",
+        typeof(int),
+        typeof(SquareImageGrid),
+        0);
+    
+    /// <summary>
+    /// Gets the row index from a bindable object
+    /// </summary>
+    private static int GetRow(BindableObject obj)
+    {
+        return (int)obj.GetValue(RowProperty);
+    }
+    
+    /// <summary>
+    /// Sets the row index on a bindable object
+    /// </summary>
+    private static void SetRow(BindableObject obj, int value)
+    {
+        obj.SetValue(RowProperty, value);
+    }
+    
+    /// <summary>
+    /// Gets the column index from a bindable object
+    /// </summary>
+    private static int GetColumn(BindableObject obj)
+    {
+        return (int)obj.GetValue(ColumnProperty);
+    }
+    
+    /// <summary>
+    /// Sets the column index on a bindable object
+    /// </summary>
+    private static void SetColumn(BindableObject obj, int value)
+    {
+        obj.SetValue(ColumnProperty, value);
+    }
     
     private readonly ChiseledBorder _border;
     private readonly AbsoluteLayout _container;
@@ -135,11 +184,11 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         // Add event handlers
         SizeChanged += OnSizeChanged;
         Loaded += OnLoaded;
-
-        // Add tap gesture recognizer to handle cell taps
-        var tapGestureRecognizer = new TapGestureRecognizer();
-        tapGestureRecognizer.Tapped += OnGridCellTapped;
-        _grid.GestureRecognizers.Add(tapGestureRecognizer);
+        
+        // We're not adding a grid-wide tap gesture recognizer anymore
+        // Instead, we'll rely on the buttons added to each cell in CreateGrid
+        
+        Debug.WriteLine("Grid-wide tap gesture recognizer disabled to prevent whitespace clicks");
     }
 
     /// <summary>
@@ -240,13 +289,19 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
 
     /// <summary>
     ///     Event triggered when a tile is tapped.
-    ///     Only fires for non-default tiles (tiles that are not blank).
+    ///     Only fires for actual tiles, not for whitespace.
     /// </summary>
     /// <remarks>
     ///     The event provides row, column, the tapped view, and whether it's a default tile
     ///     through the <see cref="TileTappedEventArgs"/> parameter.
     /// </remarks>
     public event EventHandler<TileTappedEventArgs>? TileTapped;
+    
+    /// <summary>
+    ///     Event triggered when a non-whitespace tile is tapped.
+    ///     This event is guaranteed to only fire for actual game tiles, never for whitespace.
+    /// </summary>
+    public event EventHandler<TileTappedEventArgs>? GameTileTapped;
 
     /// <summary>
     ///     Creates the grid with the specified number of rows and columns.
@@ -275,44 +330,110 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         for (var j = 0; j < columns; j++)
             _grid.ColumnDefinitions.Add(new ColumnDefinition {Width = new GridLength(1, GridUnitType.Star)});
 
-        // Add cells to the grid
-        for (var i = 0; i < rows; i++)
-        for (var j = 0; j < columns; j++)
-        {
-            // Create event args for this cell
-            var args = new GetCellImageEventArgs(i, j);
+            // Add cells to the grid
+            for (var i = 0; i < rows; i++)
+            for (var j = 0; j < columns; j++)
+            {
+                // Create event args for this cell
+                var args = new GetCellImageEventArgs(i, j);
 
-            // Raise the event to get the image
-            GetCellImage?.Invoke(this, args);
+                // Raise the event to get the image
+                GetCellImage?.Invoke(this, args);
 
-            // Use the provided image or create a default one
-            var cell = args.Image;
-            if (cell != null)
-                // If an image is provided, use it
-                cell.Margin = new Thickness(1);
-            else
-                // Default cell if no image is provided
-                cell = new Rectangle
+                // Use the provided image or create a default one
+                var cell = args.Image;
+                if (cell != null)
                 {
-                    Stroke = Colors.Black,
-                    StrokeThickness = 1,
-                    Fill = Colors.Transparent,
-                    Margin = new Thickness(1)
-                };
+                    // If an image is provided, use it
+                    cell.Margin = new Thickness(1);
+                }
+                else
+                {
+                    // Default cell if no image is provided
+                    cell = new Rectangle
+                    {
+                        Stroke = Colors.Black,
+                        StrokeThickness = 1,
+                        Fill = Colors.Transparent,
+                        Margin = new Thickness(1)
+                    };
+                }
 
-            // Store the cell in the images array
-            _images[i, j] = cell;
+                // Store the cell in the images array
+                _images[i, j] = cell;
 
-            cell.HorizontalOptions = LayoutOptions.Fill;
-            cell.VerticalOptions = LayoutOptions.Fill;
+                cell.HorizontalOptions = LayoutOptions.Fill;
+                cell.VerticalOptions = LayoutOptions.Fill;
+                
+                // Ensure the cell can receive input
+                cell.InputTransparent = false;
 
-            // Set the cell's position in the grid
-            Grid.SetRow(cell, i);
-            Grid.SetColumn(cell, j);
-
-            // Add the cell to the grid
-            _grid.Children.Add(cell);
-        }
+                // Set the cell's position in the grid
+                Grid.SetRow(cell, i);
+                Grid.SetColumn(cell, j);
+                
+                // Only add buttons to actual tiles, not to whitespace
+                // Check if this is a default tile (whitespace)
+                bool isDefaultTile = IsDefaultTile(cell);
+                
+                if (!isDefaultTile)
+                {
+                    // This is an actual tile, add a button to capture taps
+                    var button = new Button
+                    {
+                        Text = "",
+                        BackgroundColor = Colors.Transparent,
+                        BorderColor = Colors.Transparent,
+                        Margin = new Thickness(0),
+                        Padding = new Thickness(0),
+                        CornerRadius = 0,
+                        HorizontalOptions = LayoutOptions.Fill,
+                        VerticalOptions = LayoutOptions.Fill,
+                        ZIndex = 1, // Ensure it's on top of the cell
+                        // For debugging - make the button slightly visible
+                        Opacity = 0.1
+                    };
+                
+                    // Store the row and column as local variables for the closure
+                    int capturedRow = i;
+                    int capturedCol = j;
+                    
+                    // Add the click handler
+                    button.Clicked += (sender, e) => {
+                        Debug.WriteLine($"Button clicked at row {capturedRow}, column {capturedCol}");
+                        
+                        // Get the tapped view
+                        var tileView = _images[capturedRow, capturedCol];
+                        
+                        // Determine if it's a default tile
+                        var isDefaultTile = IsDefaultTile(tileView);
+                        
+                        // Create a new event args instance for each tap
+                        var eventArgs = new TileTappedEventArgs(capturedRow, capturedCol, tileView, isDefaultTile);
+                        
+                        // Invoke both events with the new args
+                        // The legacy TileTapped event is kept for backward compatibility
+                        TileTapped?.Invoke(this, eventArgs);
+                        
+                        // The new GameTileTapped event is guaranteed to only fire for actual game tiles
+                        GameTileTapped?.Invoke(this, eventArgs);
+                        
+                        Debug.WriteLine($"GameTileTapped event raised for row {capturedRow}, column {capturedCol}");
+                    };
+                    
+                    // Set the button's position in the grid
+                    Grid.SetRow(button, i);
+                    Grid.SetColumn(button, j);
+                    
+                    // Add the button to the grid
+                    _grid.Children.Add(button);
+                    
+                    Debug.WriteLine($"Added button to grid at row {i}, column {j}");
+                }
+                
+                // Add the cell to the grid (always add the cell, regardless of whether it's a tile or whitespace)
+                _grid.Children.Add(cell);
+            }
 
         // Update the layout
         UpdateLayout();
@@ -441,46 +562,9 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         return null;
     }
 
-    /// <summary>
-    ///     Handles the tap event on a grid cell.
-    /// </summary>
-    /// <param name="sender">The sender of the event.</param>
-    /// <param name="e">The event arguments.</param>
-    private void OnGridCellTapped(object? sender, TappedEventArgs e)
-    {
-        // Get the tapped position
-        if (e.GetPosition(_grid) is Point position)
-        {
-            // Calculate the cell size
-            var cellWidth = _grid.Width / Columns;
-            var cellHeight = _grid.Height / Rows;
-
-            // Calculate the row and column
-            var row = (int) (position.Y / cellHeight);
-            var col = (int) (position.X / cellWidth);
-
-            // Ensure the row and column are within bounds
-            if (row >= 0 && row < Rows && col >= 0 && col < Columns && _images != null)
-            {
-                // Get the tapped view
-                var tileView = _images[row, col];
-
-                // Determine if it's a default tile (Rectangle with transparent fill)
-                var isDefaultTile = IsDefaultTile(tileView);
-
-                // Create a Point to represent the row and column
-                var cellPosition = new Point(col, row);
-
-
-                // Raise the TileTapped event if it's not a default tile
-                if (!isDefaultTile && TileTapped != null)
-                    TileTapped.Invoke(this, new TileTappedEventArgs(row, col, tileView, isDefaultTile));
-
-                Debug.WriteLine(
-                    $"Grid cell tapped at row {row}, column {col}, isDefaultTile: {isDefaultTile}");
-            }
-        }
-    }
+    // OnIndividualTileTapped method removed - we're now using buttons for each cell instead of individual tap gesture recognizers
+    
+    // OnGridCellTapped method removed - we're now using buttons for each cell instead of a grid-wide tap gesture
 
     /// <summary>
     ///     Determines if a view is a default/blank tile.
