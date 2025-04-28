@@ -382,7 +382,9 @@ public partial class MainPage : ContentPage
             var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
             Debug.WriteLine($"[{timestamp}] OnTileTapped called - Row {e.Row}, Col {e.Column}, IsDefaultTile: {e.IsLongHold}");
             
-            
+            var game = BindingContext as GameViewModel;
+            if (game is null)
+                throw new Exception("Error Binding Context must be GameViewModel");
             _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}, isLongHold {e.IsLongHold}");
             if (!e.IsLongHold)
             {
