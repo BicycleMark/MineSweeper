@@ -382,13 +382,13 @@ public partial class MainPage : ContentPage
             
             // Add a timestamp to help identify if this is a new event or a cached one
             var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-            Debug.WriteLine($"[{timestamp}] OnTileTapped called - Row {e.Row}, Col {e.Column}, IsDefaultTile: {e.IsDefaultTile}");
+            Debug.WriteLine($"[{timestamp}] OnTileTapped called - Row {e.Row}, Col {e.Column}, IsDefaultTile: {e.IsLongHold}");
             
-            _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}");
+            _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}, isLongHold {e.IsLongHold}");
             
             // Force the UI to update immediately
             MainThread.BeginInvokeOnMainThread(() => {
-                TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column} @ {timestamp}";
+                TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column} {e.IsLongHold}";
             });
         }
         catch (Exception ex)

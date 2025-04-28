@@ -8,12 +8,12 @@ public class TileTappedEventArgs : EventArgs
     /// <summary>
     ///     Initializes a new instance of the <see cref="TileTappedEventArgs" /> class.
     /// </summary>
-    public TileTappedEventArgs(int row, int column, View tileView, bool isDefaultTile)
+    public TileTappedEventArgs(int row, int column, View tileView, bool isLongHold = false)
     {
         Row = row;
         Column = column;
         TileView = tileView;
-        IsDefaultTile = isDefaultTile;
+        IsLongHold = isLongHold;
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class TileTappedEventArgs : EventArgs
     /// <summary>
     ///     Gets a value indicating whether the tapped tile is a default/blank tile.
     /// </summary>
-    public bool IsDefaultTile { get; }
+    public bool IsLongHold{ get; }
 
     /// <summary>
     ///     Gets the position of the tapped tile as a Point.

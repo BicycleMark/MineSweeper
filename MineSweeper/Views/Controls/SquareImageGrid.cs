@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using CommunityToolkit.Maui.Behaviors;
 using Microsoft.Maui.Controls.Shapes;
 using Microsoft.Maui.Layouts;
 
@@ -304,6 +305,12 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
     public event EventHandler<TileTappedEventArgs>? GameTileTapped;
 
     /// <summary>
+    ///     Event triggered when a non-whitespace tile is LongHold Tapped.
+    ///     This event is guaranteed to only fire for actual game tiles, never for whitespace.
+    /// </summary>
+    public event EventHandler<TileTappedEventArgs>? GameTileLongHoldTapped;
+
+    /// <summary>
     ///     Creates the grid with the specified number of rows and columns.
     ///     Clears any existing grid elements and regenerates the entire structure.
     /// </summary>
@@ -360,7 +367,7 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                         Fill = Colors.Transparent,
                       
                         
-                        Margin = new Thickness(5)
+                        Margin = new Thickness(1)
                     };
                 }
 
@@ -411,11 +418,49 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                     
                     // Make sure the image can receive input
                     image.InputTransparent = false;
+                    #if GESTURE_RECOGNIZER
                     
                     // Add the tap gesture recognizer to the image, not the cell
                     image.GestureRecognizers.Add(tapGesture);
-                    
                     Debug.WriteLine($"Added tap gesture to image at row {i}, column {j}");
+                    #else
+                    
+                    image.Behaviors.Add(new TouchBehavior()
+                    {
+                        Command = new Command(() =>
+                        {
+                            Debug.WriteLine($"Image tapped at row {capturedRow}, column {capturedCol}");
+                            
+                            // Create a new event args instance for each tap
+                            var eventArgs = new TileTappedEventArgs(capturedRow, capturedCol, image, false);
+                            
+                            // Invoke the GameTileTapped event
+                            // This event is guaranteed to only fire for actual game tiles
+                            GameTileTapped?.Invoke(this, eventArgs);
+                            
+                            Debug.WriteLine($"GameTileTapped event raised for row {capturedRow}, column {capturedCol}");
+                        }),
+                        LongPressCommand = new Command(() =>
+                        {
+                            Debug.WriteLine($"Image long pressed at row {capturedRow}, column {capturedCol}");
+                            
+                            // Create a new event args instance for each tap
+                            var eventArgs = new TileTappedEventArgs(capturedRow, capturedCol, image, true);
+                            
+                            // Invoke the GameTileTapped event
+                            // This event is guaranteed to only fire for actual game tiles
+                            GameTileTapped?.Invoke(this, eventArgs);
+                            
+                            Debug.WriteLine($"GameTileTapped event raised for row {capturedRow}, column {capturedCol}");
+                        }),
+                        LongPressDuration = 500
+                        
+                    });
+                  
+                    
+                    #endif
+                    
+                    
                 }
                 
                 // Add the cell to the grid (always add the cell, regardless of whether it's a tile or whitespace)
@@ -641,3 +686,5 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
         UpdateLayout();
     }
 }
+
+
