@@ -77,9 +77,6 @@ public partial class MainPage : ContentPage
                 };
                 break;
         }
-        
-          
-
     }
 
     /// <summary>
@@ -158,6 +155,50 @@ public partial class MainPage : ContentPage
         }
     }
 
+
+    /// <summary>
+    ///     Handles the tile tapped event.
+    /// </summary>
+    /// <param name="sender">The sender of the event.</param>
+    /// <param name="e">The event arguments.</param>
+    private void OnTileTapped(object? sender, TileTappedEventArgs e)
+    {
+        try
+        {
+            
+            // Update the tile status label with the row and column information
+            TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column}";
+            
+            // Add a timestamp to help identify if this is a new event or a cached one
+            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+            Debug.WriteLine($"[{timestamp}] OnTileTapped called - Row {e.Row}, Col {e.Column}, IsDefaultTile: {e.IsLongHold}");
+            
+            var game = BindingContext as GameViewModel;
+            if (game is null)
+                throw new Exception("Error Binding Context must be GameViewModel");
+            _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}, isLongHold {e.IsLongHold}");
+            if (!e.IsLongHold)
+            {
+                // If this is not a long hold, we can Play the tile
+                // and remove the tap handler
+                // This ensures it only fires once
+                e.DoRemove = true;
+            }
+            else
+            {
+                // Toggle Flag on the tile
+            }
+            // Force the UI to update immediately
+            MainThread.BeginInvokeOnMainThread(() => {
+                TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column} {e.IsLongHold}";
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error handling tile tapped event: {ex.Message}");
+            Debug.WriteLine($"Error in OnTileTapped: {ex.Message}\n{ex.StackTrace}");
+        }
+    }
 
     /// <summary>
     ///     Applies the selected animation style for the game grid.
@@ -399,50 +440,6 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError($"Error updating animation label: {ex.Message}");
-        }
-    }
-    
-    /// <summary>
-    ///     Handles the tile tapped event.
-    /// </summary>
-    /// <param name="sender">The sender of the event.</param>
-    /// <param name="e">The event arguments.</param>
-    private void OnTileTapped(object? sender, TileTappedEventArgs e)
-    {
-        try
-        {
-            
-            // Update the tile status label with the row and column information
-            TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column}";
-            
-            // Add a timestamp to help identify if this is a new event or a cached one
-            var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-            Debug.WriteLine($"[{timestamp}] OnTileTapped called - Row {e.Row}, Col {e.Column}, IsDefaultTile: {e.IsLongHold}");
-            
-            var game = BindingContext as GameViewModel;
-            if (game is null)
-                throw new Exception("Error Binding Context must be GameViewModel");
-            _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}, isLongHold {e.IsLongHold}");
-            if (!e.IsLongHold)
-            {
-                // If this is not a long hold, we can Play the tile
-                // and remove the tap handler
-                // This ensures it only fires once
-                e.DoRemove = true;
-            }
-            else
-            {
-                // Toggle Flag on the tile
-            }
-            // Force the UI to update immediately
-            MainThread.BeginInvokeOnMainThread(() => {
-                TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column} {e.IsLongHold}";
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error handling tile tapped event: {ex.Message}");
-            Debug.WriteLine($"Error in OnTileTapped: {ex.Message}\n{ex.StackTrace}");
         }
     }
     
