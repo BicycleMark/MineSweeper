@@ -374,8 +374,6 @@ public partial class MainPage : ContentPage
     {
         try
         {
-            // We're no longer checking for whitespace taps
-            // All taps will be treated as valid tile taps
             
             // Update the tile status label with the row and column information
             TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column}";
@@ -388,9 +386,14 @@ public partial class MainPage : ContentPage
             _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}, isLongHold {e.IsLongHold}");
             if (!e.IsLongHold)
             {
-                // If this is not a long hold, we can remove the tap handler
-                // This prevents the tap from being cached and ensures it only fires once
+                // If this is not a long hold, we can Play the tile
+                // and remove the tap handler
+                // This ensures it only fires once
                 e.DoRemove = true;
+            }
+            else
+            {
+                // Toggle Flag on the tile
             }
             // Force the UI to update immediately
             MainThread.BeginInvokeOnMainThread(() => {
