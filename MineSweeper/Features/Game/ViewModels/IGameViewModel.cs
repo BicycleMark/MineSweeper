@@ -15,6 +15,9 @@ public interface IGameViewModel : IDisposable
     ///     May be null during initialization or after disposal.
     /// </summary>
     ObservableCollection<SweeperItem>? Items { get; }
+    
+    // In IGameModel interface
+    SweeperItem? this[int row, int column] { get; }
 
     /// <summary>
     ///     Gets the number of rows in the game grid

@@ -41,10 +41,47 @@ public partial class MainPage : ContentPage
         // GameTileTapped is guaranteed to only fire for actual game tiles, never for whitespace
         GameGrid.GameTileTapped += OnTileTapped;
         
+        GameGrid.GetCellImage += GetCellImage;
+        
         // Log that we've subscribed to the event
         _logger.Log("Subscribed to GameTileTapped event (guaranteed no whitespace clicks)");
     }
-    
+
+    private void GetCellImage(object? sender, GetCellImageEventArgs e)
+    {
+        var game = BindingContext as GameViewModel;
+        if (game is null)
+            throw new Exception("Error Binding Context must be GameViewModel");
+        var piece = game[e.Row, e.Column];
+        switch (piece)
+        {
+            case SweeperItem tile when tile.IsFlagged:
+                e.Image = new Image
+                {
+                    Source = "flag.png",
+                    Aspect = Aspect.AspectFill
+                };
+                break;
+            case SweeperItem tile when tile.IsRevealed:
+                e.Image = new Image
+                {
+                    Source = $"tile_{tile.MineCount}.png",
+                    Aspect = Aspect.AspectFill
+                };
+                break;
+            default:
+                e.Image = new Image
+                {
+                    Source = "unplayed.png",
+                    Aspect = Aspect.AspectFill
+                };
+                break;
+        }
+        
+          
+
+    }
+
     /// <summary>
     ///     Sets up the chiseled border for the status bar.
     /// </summary>
@@ -410,57 +447,6 @@ public partial class MainPage : ContentPage
     }
     
     /// <summary>
-    ///     Handles direct taps on the grid.
-    /// </summary>
-    /// <param name="sender">The sender of the event.</param>
-    /// <param name="e">The event arguments.</param>
-    private void OnGridDirectTapped(object? sender, TappedEventArgs e)
-    {
-        try
-        {
-            // Get the tapped position
-            if (e.GetPosition(GameGrid) is Point position)
-            {
-                // Calculate the cell size
-                var cellWidth = GameGrid.Width / GameGrid.Columns;
-                var cellHeight = GameGrid.Height / GameGrid.Rows;
-
-                // Calculate the row and column
-                var row = (int)(position.Y / cellHeight);
-                var col = (int)(position.X / cellWidth);
-
-                // Add a timestamp to help identify if this is a new event or a cached one
-                var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-                Debug.WriteLine($"[{timestamp}] OnGridDirectTapped called - Position: ({position.X}, {position.Y}), calculated Row {row}, Col {col}");
-                
-                // Ensure the row and column are within bounds
-                if (row >= 0 && row < GameGrid.Rows && col >= 0 && col < GameGrid.Columns)
-                {
-                    // Update the tile status label with the row and column information
-                    MainThread.BeginInvokeOnMainThread(() => {
-                        TileStatus.Text = $"Direct Tap: Row {row}, Col {col} @ {timestamp}";
-                    });
-                    
-                    _logger.Log($"Direct tap at row {row}, column {col}");
-                }
-                else
-                {
-                    Debug.WriteLine($"Tap position out of bounds: Row {row}, Col {col}");
-                }
-            }
-            else
-            {
-                Debug.WriteLine("Could not get tap position");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error handling direct grid tap: {ex.Message}");
-            Debug.WriteLine($"Error in OnGridDirectTapped: {ex.Message}\n{ex.StackTrace}");
-        }
-    }
-
-    /// <summary>
     ///     Handles the page loaded event.
     /// </summary>
     /// <param name="sender">The sender of the event.</param>
@@ -498,8 +484,6 @@ public partial class MainPage : ContentPage
             }
             _logger.Log("Removed direct tap gesture recognizers from GameGrid");
             
-            // Remove any overlay grids that might have been added previously
-            RemoveOverlayGrids();
             _logger.Log("Removed any overlay grids");
             
             // Update the status label with the current animation type
@@ -563,71 +547,6 @@ public partial class MainPage : ContentPage
         catch (Exception ex)
         {
             _logger.LogError($"Unexpected error in OnDisappearing: {ex.Message}");
-        }
-    }
-    
-    /// <summary>
-    ///     Removes any overlay grids that might have been added previously.
-    /// </summary>
-    private void RemoveOverlayGrids()
-    {
-        try
-        {
-            // Get the parent of the game grid
-            var gameGridParent = GameGrid.Parent as Layout;
-            if (gameGridParent != null)
-            {
-                // Find and remove any existing overlay grids
-                var isOverlayProperty = BindableProperty.Create("IsOverlay", typeof(bool), typeof(Grid), false);
-                var existingOverlays = gameGridParent.Children.Where(c => c is Grid && (c as BindableObject)?.GetValue(isOverlayProperty) as bool? == true).ToList();
-                foreach (var overlay in existingOverlays)
-                {
-                    gameGridParent.Children.Remove(overlay);
-                    Debug.WriteLine("Removed existing overlay grid");
-                }
-            }
-            
-            _logger.Log("Removed any existing overlay grids");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error removing overlay grids: {ex.Message}");
-            Debug.WriteLine($"Error in RemoveOverlayGrids: {ex.Message}\n{ex.StackTrace}");
-        }
-    }
-    
-    /// <summary>
-    ///     Handles taps on individual cells.
-    /// </summary>
-    /// <param name="sender">The sender of the event.</param>
-    /// <param name="e">The event arguments.</param>
-    private void OnCellTapped(object? sender, TappedEventArgs e)
-    {
-        try
-        {
-            // Get the tap gesture recognizer that was tapped
-            if (sender is TapGestureRecognizer tapGesture)
-            {
-                // Get the row and column from the attached properties
-                var row = (int)tapGesture.GetValue(BindableProperty.Create("Row", typeof(int), typeof(TapGestureRecognizer), 0));
-                var col = (int)tapGesture.GetValue(BindableProperty.Create("Column", typeof(int), typeof(TapGestureRecognizer), 0));
-                
-                // Add a timestamp to help identify if this is a new event or a cached one
-                var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
-                Debug.WriteLine($"[{timestamp}] OnCellTapped called - Row {row}, Col {col}");
-                
-                // Update the tile status label with the row and column information
-                MainThread.BeginInvokeOnMainThread(() => {
-                    TileStatus.Text = $"Cell Tap: Row {row}, Col {col} @ {timestamp}";
-                });
-                
-                _logger.Log($"Cell tapped at row {row}, column {col}");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error handling cell tap: {ex.Message}");
-            Debug.WriteLine($"Error in OnCellTapped: {ex.Message}\n{ex.StackTrace}");
         }
     }
 }

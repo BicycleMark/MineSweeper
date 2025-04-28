@@ -56,6 +56,31 @@ public partial class GameViewModel : ObservableObject, IGameViewModel, IDisposab
     ICommand IGameViewModel.FlagCommand => FlagCommand;
 
     #region Properties
+    
+    /// <summary>
+    ///     Gets the SweeperItem at the specified row and column position.
+    /// </summary>
+    /// <param name="row">The row index.</param>
+    /// <param name="column">The column index.</param>
+    /// <returns>The SweeperItem at the specified position or null if out of bounds.</returns>
+    public SweeperItem? this[int row, int column]
+    {
+        get
+        {
+            if (Items == null)
+                return null;
+        
+            // Check boundaries
+            if (row < 0 || row >= Rows || column < 0 || column >= Columns)
+                return null;
+        
+            // Calculate linear index from 2D coordinates
+            int index = row * Columns + column;
+        
+            // Return item if index is valid
+            return index < Items.Count ? Items[index] : null;
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the collection of sweeper items (cells) in the game grid
