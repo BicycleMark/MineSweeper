@@ -438,6 +438,12 @@ public class SquareImageGrid : ContentView, IAnimatableGrid
                             // This event is guaranteed to only fire for actual game tiles
                             GameTileTapped?.Invoke(this, eventArgs);
                             
+                            if (eventArgs.DoRemove)
+                            {
+                                // Remove the tap gesture from the image
+                                image.Behaviors.Clear();
+                            }
+                            
                             Debug.WriteLine($"GameTileTapped event raised for row {capturedRow}, column {capturedCol}");
                         }),
                         LongPressCommand = new Command(() =>

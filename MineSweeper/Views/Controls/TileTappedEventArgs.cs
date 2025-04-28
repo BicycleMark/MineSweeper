@@ -8,13 +8,19 @@ public class TileTappedEventArgs : EventArgs
     /// <summary>
     ///     Initializes a new instance of the <see cref="TileTappedEventArgs" /> class.
     /// </summary>
-    public TileTappedEventArgs(int row, int column, View tileView, bool isLongHold = false)
+    public TileTappedEventArgs(int row, int column, View tileView, bool isLongHold = false, bool doRemove = false)
     {
         Row = row;
         Column = column;
         TileView = tileView;
         IsLongHold = isLongHold;
+        DoRemove = doRemove;
     }
+
+    /// <summary>
+    ///   Gets or sets a value indicating whether the tile Handlershould be removed.
+    /// </summary>  
+    public bool DoRemove { get; set; }
 
     /// <summary>
     ///     Gets the row index of the tapped tile.

@@ -386,7 +386,12 @@ public partial class MainPage : ContentPage
             
             
             _logger.Log($"Tile tapped at row {e.Row}, column {e.Column}, isLongHold {e.IsLongHold}");
-            
+            if (!e.IsLongHold)
+            {
+                // If this is not a long hold, we can remove the tap handler
+                // This prevents the tap from being cached and ensures it only fires once
+                e.DoRemove = true;
+            }
             // Force the UI to update immediately
             MainThread.BeginInvokeOnMainThread(() => {
                 TileStatus.Text = $"Tile: Row {e.Row}, Col {e.Column} {e.IsLongHold}";
